@@ -8,9 +8,11 @@ var _Review = require('./Review');
 
 var _Review2 = _interopRequireDefault(_Review);
 
-function _interopRequireDefault(obj) {
-	return obj && obj.__esModule ? obj : { default: obj };
-}
+var _Status = require('./Status');
+
+var _Status2 = _interopRequireDefault(_Status);
+
+function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
 var Hapi = require('hapi');
 
@@ -34,6 +36,11 @@ function handleGithubEvent(req, reply) {
 		return (0, _Review2.default)(req, reply);
 	}
 
+	if (event === 'status') {
+		console.log('got a status change');
+		return (0, _Status2.default)(req, reply);
+	}
+
 	return reply();
 }
 
@@ -52,9 +59,9 @@ server.route({
 
 // Start the server
 server.start(function (err) {
-
 	if (err) {
 		throw err;
 	}
+
 	console.log('Server running at:', server.info.uri);
 });

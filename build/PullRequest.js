@@ -4,9 +4,9 @@ Object.defineProperty(exports, "__esModule", {
 	value: true
 });
 
-var _utils = require('./utils');
-
 var _consts = require('./consts');
+
+var _utils = require('./utils');
 
 var request = require('request');
 
@@ -59,13 +59,13 @@ function handleMerge(payload, reply) {
 					labels.forEach(function (label) {
 						var pr = {
 							title: label.name + ' -- ' + payload.pull_request.title,
-							body: '# Merging from branch "' + head + '" to version ' + label.name + '\n\n' + payload.pull_request.body,
+							body: '# Merging from branch ' + head + ' to version ' + label.name + '\n\n' + payload.pull_request.body,
 							base: label.name,
 							head: head
 						};
 
 						console.log('PR', pr);
-						request((0, _utils.constructPost)(payload.repository.url + '/pulls', pr));
+						request((0, _utils.constructPost)(payload.repository.url + '/pulls'), pr);
 					});
 				})();
 			}
