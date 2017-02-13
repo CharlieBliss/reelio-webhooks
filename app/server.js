@@ -1,5 +1,6 @@
-import { PullRequest } from './PullRequest'
-import { Review } from './Review'
+import PullRequest from './PullRequest'
+import Review from './Review'
+import Status from './Status'
 
 const Hapi = require('hapi')
 
@@ -21,6 +22,11 @@ function handleGithubEvent(req, reply) {
 	if (event === 'pull_request_review') {
 		console.log('got a review')
 		return Review(req, reply)
+	}
+
+	if (event === 'status') {
+		console.log('got a status change')
+		return Status(req, reply)
 	}
 
 	return reply()
