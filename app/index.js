@@ -1,4 +1,2 @@
-'use strict';
-
-require('babel-core/register');
-require('./app/server');
+require('babel-core/register')
+require('./app/server')
