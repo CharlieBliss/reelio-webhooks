@@ -11,6 +11,8 @@ var _utils = require('./utils');
 var request = require('request');
 
 function handleNew(payload, reply) {
+	var user = _consts.FRONTEND_MEMBERS[payload.pull_request.user.id];
+
 	// Get the issue, not the PR
 	request((0, _utils.constructGet)(payload.pull_request.issue_url), function (err, res, body) {
 		if (res.statusCode >= 200 && res.statusCode < 300) {
@@ -31,13 +33,22 @@ function handleNew(payload, reply) {
 					request((0, _utils.constructPost)(payload.pull_request.issue_url + '/comments', { body: feedback }));
 					request((0, _utils.constructPost)(payload.pull_request.issue_url + '/labels', ['incomplete']));
 
+					if (user) {
+						request((0, _utils.constructPost)(_consts.SLACK_URL, {
+							channel: user.slack_id,
+							username: 'Label Bot',
+							icon_url: 'https://octodex.github.com/images/privateinvestocat.jpg',
+							text: 'Hey there, ' + user.name + '.  Your pull request is missing labels!  Please label at <' + payload.pull_request.html_url + '|GitHub>.'
+						}));
+					}
+
 					return reply('New PR -- Incomplete');
 				}
 
 			return reply('New PR -- Complete');
 		}
 
-		return null;
+		return reply('New PR -- Unhandled but requested');
 	});
 }
 
@@ -54,20 +65,18 @@ function handleMerge(payload, reply) {
 
 			// If there were version labels, create new PRs targetting those branches
 			if (labels.length) {
-				(function () {
-					var head = payload.pull_request.head.ref;
-					labels.forEach(function (label) {
-						var pr = {
-							title: label.name + ' -- ' + payload.pull_request.title,
-							body: '# Merging from branch ' + head + ' to version ' + label.name + '\n\n' + payload.pull_request.body,
-							base: label.name,
-							head: head
-						};
+				// 	const head = payload.pull_request.head.ref
+				// 	labels.forEach((label) => {
+				// 		const pr = {
+				// 			title: `${label.name} -- ${payload.pull_request.title}`,
+				// 			body: `# Merging from branch ${head} to version ${label.name}\n\n${payload.pull_request.body}`,
+				// 			base: label.name,
+				// 			head,
+				// 		}
 
-						console.log('PR', pr);
-						request((0, _utils.constructPost)(payload.repository.url + '/pulls'), pr);
-					});
-				})();
+				// 		console.log('PR', pr)
+				// 		request(constructPost(`${payload.repository.url}/pulls`, pr))
+				// 	})
 			}
 
 			return reply('Closed and created');

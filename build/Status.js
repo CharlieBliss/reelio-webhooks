@@ -6,22 +6,24 @@ Object.defineProperty(exports, "__esModule", {
 
 var _utils = require('./utils.js');
 
+var _consts = require('./consts');
+
 var request = require('request');
 
-function handleError(payload, reply) {
-	request((0, _utils.constructPost)(payload.pull_request.issue_url + '/labels'), ['failed ci']);
-	request((0, _utils.constructDelete)(payload.pull_request.issue_url + '/labels/ready%20to%20review'));
+// This component can't easily link to PRs because statuses are for specific commits, not PRs
 
-	// @TODO add slackbot that slacks a link to the PR to the person who opened the PR
+function handleError(payload, reply) {
+	var user = _consts.FRONTEND_MEMBERS[payload.commit.author.id];
+	if (user) {
+		request((0, _utils.constructPost)(_consts.SLACK_URL, {
+			channel: user.slack_id,
+			username: 'Circle Bot',
+			icon_url: 'https://octodex.github.com/images/socialite.jpg',
+			text: 'Hey there, ' + user.name + '.  Your commit did not pass Circle CI\'s test suite.  Please review on <https://github.com/hangarunderground/reelio-front/pulls|GitHub>.'
+		}));
+	}
 
 	return reply('CI Status fail');
-}
-
-function handleSuccess(payload, reply) {
-	request((0, _utils.constructDelete)(payload.pull_request.issue_url + '/labels/failed%20ci'));
-	request((0, _utils.constructPost)(payload.pull_request.issue_url + '/labels'), ['approved']);
-
-	return reply('CI Status succeed');
 }
 
 function Review(req, reply) {
@@ -29,10 +31,6 @@ function Review(req, reply) {
 
 	if (payload.state === 'failure') {
 		return handleError(payload, reply);
-	}
-
-	if (payload.state === 'success') {
-		return handleSuccess(payload, reply);
 	}
 
 	return reply('Review Success');

@@ -1,10 +1,12 @@
 import { token } from './consts'
 
 export function constructGet(url) {
+	console.log('GETTING', url);
 	return {
 		url,
 		method: 'GET',
 		headers: {
+			Authorization: `token ${token}`,
 			'User-Agent': 'Kyle-Mendes',
 		},
 	}

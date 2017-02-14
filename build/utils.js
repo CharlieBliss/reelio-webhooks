@@ -10,10 +10,12 @@ exports.constructDelete = constructDelete;
 var _consts = require('./consts');
 
 function constructGet(url) {
+	console.log('GETTING', url);
 	return {
 		url: url,
 		method: 'GET',
 		headers: {
+			Authorization: 'token ' + _consts.token,
 			'User-Agent': 'Kyle-Mendes'
 		}
 	};
