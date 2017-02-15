@@ -4,48 +4,57 @@ import { constructGet, constructPost } from './utils'
 const request = require('request')
 
 function createPullRequest(head, base, payload, labels = []) {
-	// create Issue.  To add lables to the PR on creation, it needs to start as an issue
-	const issue = {
-		title: `${head} --> ${base} -- ${payload.pull_request.title}`,
-		body: `# Merging from branch ${head} into ${base}.\n\n${payload.pull_request.body}\n\nPrevious PR: ${payload.pull_request.html_url}`,
-		labels: ['$$webhook', ...labels],
-	}
 
-	request(constructPost(`${payload.repository.url}/issues`, issue), (err, res, body) => {
-		let resBody = JSON.parse(body)
-
-		// If making the issue fails, tell Kyle
-		if (body.errors) {
-			request(constructPost(SLACK_URL, {
-				channel: '@kyle',
-				username: 'PR Bot',
-				icon_url: 'https://octodex.github.com/images/yaktocat.png',
-				text: `Something went wrong when trying to make new PRs based off of: <${payload.pull_request.html_url}|GitHub>.\n\n\`\`\`${resBody.errors}\`\`\``,
-			}))
-		} else {
-			const pr = {
-				issue: JSON.parse(body).number,
-				head,
-				base,
-			}
-
-			console.log('PR', pr)
-
-			request(constructPost(`${payload.repository.url}/pulls`, pr), (e, r, b) => {
-				console.log('CREATE PR', JSON.parse(b))
-				resBody = JSON.parse(b)
-
-				if (e) {
-					request(constructPost(SLACK_URL, {
-						channel: '@kyle',
-						username: 'PR Bot',
-						icon_url: 'https://octodex.github.com/images/yaktocat.png',
-						text: `Something went wrong when trying to make new PRs based off of: <${payload.pull_request.html_url}|GitHub>.\n\n\`\`\`${resBody.errors}\`\`\``,
-					}))
-				}
-			})
+	// Check if there is a PR between the head and branch already.  If there is, we don't need to make a new PR
+	request(constructGet(`${payload.repository.url}/pulls?head=${head}&base=${base}`), (response, errors, openPRs) => {
+		if (openPRs.length) {
+			return
 		}
+
+		// create Issue.  To add lables to the PR on creation, it needs to start as an issue
+		const issue = {
+			title: `${head} --> ${base} -- ${payload.pull_request.title}`,
+			body: `# Merging from branch ${head} into ${base}.\n\n${payload.pull_request.body}\n\nPrevious PR: ${payload.pull_request.html_url}`,
+			labels: ['$$webhook', ...labels],
+		}
+
+		request(constructPost(`${payload.repository.url}/issues`, issue), (err, res, body) => {
+			let resBody = JSON.parse(body)
+
+			// If making the issue fails, tell Kyle
+			if (body.errors) {
+				request(constructPost(SLACK_URL, {
+					channel: '@kyle',
+					username: 'PR Bot',
+					icon_url: 'https://octodex.github.com/images/yaktocat.png',
+					text: `Something went wrong when trying to make new PRs based off of: <${payload.pull_request.html_url}|GitHub>.\n\n\`\`\`${resBody.errors}\`\`\``,
+				}))
+			} else {
+				const pr = {
+					issue: JSON.parse(body).number,
+					head,
+					base,
+				}
+
+				console.log('PR', pr)
+
+				request(constructPost(`${payload.repository.url}/pulls`, pr), (e, r, b) => {
+					console.log('CREATE PR', JSON.parse(b))
+					resBody = JSON.parse(b)
+
+					if (e) {
+						request(constructPost(SLACK_URL, {
+							channel: '@kyle',
+							username: 'PR Bot',
+							icon_url: 'https://octodex.github.com/images/yaktocat.png',
+							text: `Something went wrong when trying to make new PRs based off of: <${payload.pull_request.html_url}|GitHub>.\n\n\`\`\`${resBody.errors}\`\`\``,
+						}))
+					}
+				})
+			}
+		})
 	})
+
 }
 
 function handleNew(payload, reply) {
