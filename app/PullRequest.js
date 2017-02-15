@@ -7,7 +7,7 @@ function createPullRequest(head, base, payload, labels = []) {
 
 	// Check if there is a PR between the head and branch already.  If there is, we don't need to make a new PR
 	request(constructGet(`${payload.repository.url}/pulls?head=${head}&base=${base}&state=open`), (response, errors, openPRs) => {
-		if (openPRs.length) {
+		if (JSON.parse(openPRs).length) {
 			return
 		}
 
