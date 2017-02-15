@@ -19,7 +19,7 @@ var Hapi = require('hapi');
 // Create a server with a host and port
 var server = new Hapi.Server();
 server.connection({
-	host: '0.0.0.0',
+	host: 'localhost',
 	port: 1312
 });
 

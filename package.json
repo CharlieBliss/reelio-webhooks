@@ -2,7 +2,7 @@
   "scripts": {
     "start": "node index.js",
     "watch": "nodemon index.js",
-    "build": "babel --out-dir=build app"
+    "build": "rm -rf build/* && babel --out-dir=build app"
   },
   "dependencies": {
     "babel": "^6.5.2",
