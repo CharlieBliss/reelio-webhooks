@@ -50,6 +50,11 @@ var FRONTEND_MEMBERS = exports.FRONTEND_MEMBERS = {
 		name: 'Damon',
 		slack_id: 'U02BWBRP1',
 		github_id: '188812'
+	},
+	6333919: {
+		name: 'Steve',
+		id: 'U02B43L0M',
+		github_id: '6333919'
 	}
 };
 

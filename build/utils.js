@@ -23,6 +23,7 @@ function constructGet(url) {
 }
 
 function constructPost(url, payload) {
+	console.log('POSTING TO ', url);
 	return {
 		url: url,
 		method: 'POST',

@@ -14,6 +14,7 @@ export function constructGet(url) {
 }
 
 export function constructPost(url, payload) {
+	console.log('POSTING TO ', url);
 	return {
 		url,
 		method: 'POST',
