@@ -72,20 +72,23 @@ function handleNew(payload, reply) {
 				return _consts.versionRegex.test(label.name);
 			}),
 			    head = payload.pull_request.head.ref,
+			    base = payload.pull_request.base.ref,
 			    prBody = payload.pull_request.body || '',
 			    tickets = prBody.match(_consts.jiraRegex);
 
 			// If there aren't any JIRA tickets in the body as well, warn them
-			if (!tickets) {
+			if (!tickets && !labels.map(function (l) {
+				return l.name;
+			}).includes('$$webhook')) {
 				var feedback = '@' + payload.pull_request.user.login + ' - It looks like you didn\'t include JIRA ticket references in this ticket.  Are you sure you have none to reference?';
 				request((0, _utils.constructPost)(payload.pull_request.issue_url + '/comments', { body: feedback }));
 			}
 
-			// If there aren't any version labels, and the PR isn't to a version branch,
+			// If there aren't any version labels, and the PR isn't to a version branch or dev,
 			// warn the developer to add labels, and label the PR "Incomplete"
 			if (!filteredLabels.length && !labels.map(function (l) {
 				return l.name;
-			}).includes('$$webhook') && head !== 'dev' && !head.includes('staging') && !head.includes('master')) {
+			}).includes('$$webhook') && base !== 'dev' && !head.includes('staging') && !head.includes('master')) {
 
 				var _feedback = '@' + payload.pull_request.user.login + ' - It looks like you forgot to label this PR with a version tag.  Please update your PR to include targetted version distrubtions.  Thanks!';
 				request((0, _utils.constructPost)(payload.pull_request.issue_url + '/comments', { body: _feedback }));
