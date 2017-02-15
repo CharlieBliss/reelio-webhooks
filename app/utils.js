@@ -8,6 +8,7 @@ export function constructGet(url) {
 		headers: {
 			Authorization: `token ${token}`,
 			'User-Agent': 'Kyle-Mendes',
+			Accept: 'application/vnd.github.black-cat-preview+json',
 		},
 	}
 }

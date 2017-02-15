@@ -16,7 +16,8 @@ function constructGet(url) {
 		method: 'GET',
 		headers: {
 			Authorization: 'token ' + _consts.token,
-			'User-Agent': 'Kyle-Mendes'
+			'User-Agent': 'Kyle-Mendes',
+			Accept: 'application/vnd.github.black-cat-preview+json'
 		}
 	};
 }
