@@ -17,7 +17,7 @@ function createPullRequest(head, base, payload) {
 
 	// create Issue.  To add lables to the PR on creation, it needs to start as an issue
 	var issue = {
-		title: head + ' --> ' + base,
+		title: head + ' --> ' + base + ' -- ' + payload.pull_request.title,
 		body: '# Merging from branch ' + head + ' into ' + base + '.\n\n' + payload.pull_request.body + '\n\nPrevious PR: ' + payload.pull_request.html_url,
 		labels: ['$$webhook'].concat(_toConsumableArray(labels))
 	};
