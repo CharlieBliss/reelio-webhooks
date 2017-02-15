@@ -17,7 +17,7 @@ function createPullRequest(head, base, payload) {
 
 
 	// Check if there is a PR between the head and branch already.  If there is, we don't need to make a new PR
-	request((0, _utils.constructGet)(payload.repository.url + '/pulls?head=' + head + '&base=' + base), function (response, errors, openPRs) {
+	request((0, _utils.constructGet)(payload.repository.url + '/pulls?head=' + head + '&base=' + base + '&state=open'), function (response, errors, openPRs) {
 		if (openPRs.length) {
 			return;
 		}
