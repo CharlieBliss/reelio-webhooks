@@ -7,8 +7,14 @@ function createPullRequest(head, base, payload, labels = []) {
 
 	// Check if there is a PR between the head and branch already.  If there is, we don't need to make a new PR
 	request(constructGet(`${payload.repository.url}/pulls?head=${head}&base=${base}&state=open`), (response, errors, openPRs) => {
-		if (JSON.parse(openPRs).length) {
-			return
+		const open = JSON.parse(openPRs)
+		if (open.length) {
+			// sometimes it returns non-results.
+			const realOpen = open.filter(o => o.head.ref === head || o.base.ref === base)
+			if (realOpen) {
+				console.log('SKIPPING PR', open.map(o => ({ head: o.head.ref, base: o.base.ref })))
+				return
+			}
 		}
 
 		// create Issue.  To add lables to the PR on creation, it needs to start as an issue

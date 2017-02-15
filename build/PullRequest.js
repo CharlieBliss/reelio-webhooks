@@ -18,8 +18,18 @@ function createPullRequest(head, base, payload) {
 
 	// Check if there is a PR between the head and branch already.  If there is, we don't need to make a new PR
 	request((0, _utils.constructGet)(payload.repository.url + '/pulls?head=' + head + '&base=' + base + '&state=open'), function (response, errors, openPRs) {
-		if (JSON.parse(openPRs).length) {
-			return;
+		var open = JSON.parse(openPRs);
+		if (open.length) {
+			// sometimes it returns non-results.
+			var realOpen = open.filter(function (o) {
+				return o.head.ref === head || o.base.ref === base;
+			});
+			if (realOpen) {
+				console.log('SKIPPING PR', open.map(function (o) {
+					return { head: o.head.ref, base: o.base.ref };
+				}));
+				return;
+			}
 		}
 
 		// create Issue.  To add lables to the PR on creation, it needs to start as an issue
