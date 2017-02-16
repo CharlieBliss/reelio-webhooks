@@ -22,10 +22,10 @@ function createPullRequest(head, base, payload) {
 		if (open.length) {
 			// sometimes it returns non-results.
 			var realOpen = open.filter(function (o) {
-				return o.head.ref === head || o.base.ref === base;
+				return o.head.ref === head && o.base.ref === base;
 			});
-			if (realOpen) {
-				console.log('SKIPPING PR', open.map(function (o) {
+			if (realOpen.length) {
+				console.log('SKIPPING PR', head, base, open.map(function (o) {
 					return { head: o.head.ref, base: o.base.ref };
 				}));
 				return;

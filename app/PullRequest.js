@@ -10,9 +10,9 @@ function createPullRequest(head, base, payload, labels = []) {
 		const open = JSON.parse(openPRs)
 		if (open.length) {
 			// sometimes it returns non-results.
-			const realOpen = open.filter(o => o.head.ref === head || o.base.ref === base)
-			if (realOpen) {
-				console.log('SKIPPING PR', open.map(o => ({ head: o.head.ref, base: o.base.ref })))
+			const realOpen = open.filter(o => o.head.ref === head && o.base.ref === base)
+			if (realOpen.length) {
+				console.log('SKIPPING PR', head, base, open.map(o => ({ head: o.head.ref, base: o.base.ref })))
 				return
 			}
 		}
