@@ -13,7 +13,8 @@ function _toConsumableArray(arr) { if (Array.isArray(arr)) { for (var i = 0, arr
 var request = require('request');
 
 function createPullRequest(head, base, payload) {
-	var labels = arguments.length > 3 && arguments[3] !== undefined ? arguments[3] : [];
+	var newBody = arguments.length > 3 && arguments[3] !== undefined ? arguments[3] : '';
+	var labels = arguments.length > 4 && arguments[4] !== undefined ? arguments[4] : [];
 
 
 	// Check if there is a PR between the head and branch already.  If there is, we don't need to make a new PR
@@ -28,14 +29,20 @@ function createPullRequest(head, base, payload) {
 				console.log('SKIPPING PR', head, base, open.map(function (o) {
 					return { head: o.head.ref, base: o.base.ref };
 				}));
+
+				// append the new resolved tickets to the existing PR
+				// Assumes that there will only ever be ONE PR returned here...
+				var editedBody = realOpen[0].body + newBody.substr(newBody.indexOf('\n'), newBody.length); // append the resolved tickets to the ticket list
+
+				request((0, _utils.constructPatch)(realOpen[0].url, { body: editedBody })); // update the body of the old PR
 				return;
 			}
 		}
 
 		// create Issue.  To add lables to the PR on creation, it needs to start as an issue
 		var issue = {
-			title: head + ' --> ' + base + ' -- ' + payload.pull_request.title,
-			body: '# Merging from branch ' + head + ' into ' + base + '.\n\n' + payload.pull_request.body + '\n\nPrevious PR: ' + payload.pull_request.html_url,
+			title: head + ' --> ' + base,
+			body: '# Merging from branch ' + head + ' into ' + base + '.\n\n### Previous PR: ' + payload.pull_request.html_url + '\n\n' + newBody,
 			labels: ['$$webhook'].concat(_toConsumableArray(labels))
 		};
 
@@ -63,12 +70,12 @@ function createPullRequest(head, base, payload) {
 					console.log('CREATE PR', JSON.parse(b));
 					resBody = JSON.parse(b);
 
-					if (e) {
+					if (e || !resBody.number) {
 						request((0, _utils.constructPost)(_consts.SLACK_URL, {
 							channel: '@kyle',
 							username: 'PR Bot',
 							icon_url: 'https://octodex.github.com/images/yaktocat.png',
-							text: 'Something went wrong when trying to make new PRs based off of: <' + payload.pull_request.html_url + '|GitHub>.\n\n```' + resBody.errors + '```'
+							text: 'Something went wrong when trying to make new PRs based off of: <' + payload.pull_request.html_url + '|a github PR>.\n\n```' + resBody.errors.message + '```'
 						}));
 					}
 				});
@@ -100,6 +107,7 @@ function handleNew(payload, reply) {
 			}).includes('$$webhook')) {
 				var feedback = '@' + payload.pull_request.user.login + ' - It looks like you didn\'t include JIRA ticket references in this ticket.  Are you sure you have none to reference?';
 				request((0, _utils.constructPost)(payload.pull_request.issue_url + '/comments', { body: feedback }));
+				request((0, _utils.constructPost)(payload.pull_request.issue_url + '/labels', ['$$ticketless']));
 			}
 
 			// If there aren't any version labels, and the PR isn't to a version branch or dev,
@@ -110,7 +118,7 @@ function handleNew(payload, reply) {
 
 				var _feedback = '@' + payload.pull_request.user.login + ' - It looks like you forgot to label this PR with a version tag.  Please update your PR to include targetted version distrubtions.  Thanks!';
 				request((0, _utils.constructPost)(payload.pull_request.issue_url + '/comments', { body: _feedback }));
-				request((0, _utils.constructPost)(payload.pull_request.issue_url + '/labels', ['incomplete']));
+				request((0, _utils.constructPost)(payload.pull_request.issue_url + '/labels', ['$$incomplete']));
 
 				if (user) {
 					request((0, _utils.constructPost)(_consts.SLACK_URL, {
@@ -136,8 +144,13 @@ function handleMerge(payload, reply) {
 	    filteredLabels = [],
 	    reviews = [];
 
+	var tickets = payload.pull_request.body.match(_consts.jiraRegex) || [],
+	    newBody = '### Resolves:\n' + tickets.filter(_utils.uniqueFilter).map(_utils.wrapJiraTicketsFromArray).join('\n\t');
+
 	var user = _consts.FRONTEND_MEMBERS[payload.pull_request.user.id],
-	    head = payload.pull_request.base.ref;
+	    base = payload.pull_request.base.ref,
+	    // target of the original PR
+	head = payload.pull_request.head.ref; // The original PR's head
 
 	// Get the issue, not the PR
 	request((0, _utils.constructGet)(payload.pull_request.issue_url), function (err, res, body) {
@@ -155,29 +168,29 @@ function handleMerge(payload, reply) {
 		if (filteredLabels.length) {
 			filteredLabels.forEach(function (label) {
 				// only make new PR if the label doesn't match the current branch.
-				if (!head.includes(label.name)) {
+				if (!base.includes(label.name)) {
 
-					createPullRequest(head, label.name + '-dev', payload, ['only']);
+					createPullRequest(head, label.name + '-dev', payload, newBody, ['only']);
 				}
 			});
 		}
 
-		// If it's a dev branch, continue the PR along the path
+		// If the closed PRs target was a dev branch, continue the PR along the path
 		// Example: 3.0-dev is accepted -> new PR into 3.0-staging
 		//          dev is accepted -> new PR into staging
-		if (head.includes('dev')) {
-			var target = head.substr(0, head.indexOf('-')); // get the version number of the current branch
+		if (base.includes('dev')) {
+			var target = base.substr(0, base.indexOf('-')); // get the version number of the current branch
 			target = target ? target + '-staging' : 'staging';
 
-			createPullRequest(head, target, payload);
+			createPullRequest(base, target, payload, newBody);
 		}
 
-		// If it's a dev branch and it's not tagged "only", create a PR into dev
+		// If PR target was dev branch and it's not tagged "only", create a PR into dev
 		// Example: 3.0-dev is accepted -> new PR into dev
-		if (_consts.versionRegex.test(head) && head.includes('dev') && !labels.map(function (l) {
+		if (_consts.versionRegex.test(base) && base.includes('dev') && !labels.map(function (l) {
 			return l.name;
 		}).includes('only')) {
-			createPullRequest(head, 'dev', payload);
+			createPullRequest(head, 'dev', payload, newBody);
 		}
 	});
 
