@@ -192,6 +192,24 @@ function handleMerge(payload, reply) {
 		}).includes('only')) {
 			createPullRequest(head, 'dev', payload, newBody);
 		}
+
+		// If the closed PRs target was a staging branch, alert QA of impending release
+		// Example: 3.0-staging is accepted -> post in slack all tickets about to be released.
+		if (base.includes('staging')) {
+			request((0, _utils.constructPost)(_consts.SLACK_URL, {
+				channel: '#frontend-deploys',
+				username: 'Deploy Bot',
+				icon_url: 'https://octodex.github.com/images/welcometocat.png',
+				text: '*A deploy to <http://' + base + '.reelio.com|' + base + '> is pending.*  The changes will be ready in ~15 minutes.\n\nThe deploy is based off of <' + payload.pull_request.html_url + '|PR ' + payload.pull_request.number + '>.\n\n*`-- Fixes --`*',
+				attachments: [{
+					text: newBody,
+					color: '#36a64f'
+				}, {
+					text: '<' + base + '.reelio.com|' + base + '.reelio.com>',
+					color: '#de2656'
+				}]
+			}));
+		}
 	});
 
 	// Get the reviews
@@ -205,7 +223,7 @@ function handleMerge(payload, reply) {
 		}
 
 		// If the PR was merged without any changes requested, :tada: to the dev!
-		if (!reviews.includes('CHANGES_REQUESTED')) {
+		if (!reviews.includes('CHANGES_REQUESTED') && user.slack_id !== 'U28LB0AAH') {
 			request((0, _utils.constructPost)(_consts.SLACK_URL, {
 				channel: user.slack_id,
 				username: 'Merge Bot',
