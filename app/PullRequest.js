@@ -180,6 +180,8 @@ function handleMerge(payload, reply) {
 		// If the closed PRs target was a staging branch, alert QA of impending release
 		// Example: 3.0-staging is accepted -> post in slack all tickets about to be released.
 		if (base.includes('staging')) {
+			const fixed = tickets.map(t => `<https://reelio.atlassian.net/browse/${t}|${t}>`).join('\n')
+
 			request(constructPost(SLACK_URL, {
 				channel: '#frontend-deploys',
 				username: 'Deploy Bot',
@@ -187,7 +189,7 @@ function handleMerge(payload, reply) {
 				text: `*A deploy to <http://${base}.reelio.com|${base}> is pending.*  The changes will be ready in ~15 minutes.\n\nThe deploy is based off of <${payload.pull_request.html_url}|PR ${payload.pull_request.number}>.\n\n*\`-- Fixes --\`*`,
 				attachments: [
 					{
-						text: newBody,
+						text: fixed,
 						color: '#36a64f',
 					},
 					{
