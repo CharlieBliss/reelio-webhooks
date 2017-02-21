@@ -3,7 +3,7 @@
 Object.defineProperty(exports, "__esModule", {
 	value: true
 });
-exports.uniqueFilter = uniqueFilter;
+exports.uniqueTicketFilter = uniqueTicketFilter;
 exports.wrapJiraTicketsFromArray = wrapJiraTicketsFromArray;
 exports.constructGet = constructGet;
 exports.constructPost = constructPost;
@@ -12,7 +12,7 @@ exports.constructDelete = constructDelete;
 
 var _consts = require('./consts');
 
-function uniqueFilter(value, index, self) {
+function uniqueTicketFilter(value, index, self) {
 	return self.indexOf(value) === index;
 }
 

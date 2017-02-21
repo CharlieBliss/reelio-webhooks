@@ -1,5 +1,5 @@
 import { versionRegex, jiraRegex, SLACK_URL, FRONTEND_MEMBERS } from './consts'
-import { uniqueFilter, wrapJiraTicketsFromArray, constructGet, constructPost, constructPatch } from './utils'
+import { uniqueTicketFilter, wrapJiraTicketsFromArray, constructGet, constructPost, constructPatch } from './utils'
 
 const request = require('request')
 
@@ -130,7 +130,7 @@ function handleMerge(payload, reply) {
 		reviews = []
 
 	const tickets = payload.pull_request.body.match(jiraRegex) || [],
-		newBody = `### Resolves:\n${tickets.filter(uniqueFilter).map(wrapJiraTicketsFromArray).join('\n\t')}`
+		newBody = `### Resolves:\n${tickets.filter(uniqueTicketFilter).map(wrapJiraTicketsFromArray).join('\n\t')}`
 
 	const user = FRONTEND_MEMBERS[payload.pull_request.user.id],
 		base = payload.pull_request.base.ref, // target of the original PR
@@ -151,11 +151,22 @@ function handleMerge(payload, reply) {
 			filteredLabels.forEach((label) => {
 				// only make new PR if the label doesn't match the current branch.
 				if (!base.includes(label.name)) {
-
 					createPullRequest(head, `${label.name}-dev`, payload, newBody, ['only'])
 				}
 			})
 		}
+
+		if (
+			labels.length &&
+			labels.includes('$$production') &&
+			base.includes('staging')
+		) {
+			let target = base.substr(0, base.indexOf('-')) // get the version number of the current branch
+			target = target ? `${target}-production` : 'master'
+
+			createPullRequest(head, target, payload, newBody)
+		}
+
 
 		// If the closed PRs target was a dev branch, continue the PR along the path
 		// Example: 3.0-dev is accepted -> new PR into 3.0-staging
@@ -180,7 +191,7 @@ function handleMerge(payload, reply) {
 		// If the closed PRs target was a staging branch, alert QA of impending release
 		// Example: 3.0-staging is accepted -> post in slack all tickets about to be released.
 		if (base.includes('staging')) {
-			const fixed = tickets.map(t => `<https://reelio.atlassian.net/browse/${t}|${t}>`).join('\n')
+			const fixed = tickets.filter(uniqueTicketFilter).map(t => `<https://reelio.atlassian.net/browse/${t}|${t}>`).join('\n')
 
 			request(constructPost(SLACK_URL, {
 				channel: '#frontend-deploys',

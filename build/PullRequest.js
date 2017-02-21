@@ -145,7 +145,7 @@ function handleMerge(payload, reply) {
 	    reviews = [];
 
 	var tickets = payload.pull_request.body.match(_consts.jiraRegex) || [],
-	    newBody = '### Resolves:\n' + tickets.filter(_utils.uniqueFilter).map(_utils.wrapJiraTicketsFromArray).join('\n\t');
+	    newBody = '### Resolves:\n' + tickets.filter(_utils.uniqueTicketFilter).map(_utils.wrapJiraTicketsFromArray).join('\n\t');
 
 	var user = _consts.FRONTEND_MEMBERS[payload.pull_request.user.id],
 	    base = payload.pull_request.base.ref,
@@ -169,20 +169,26 @@ function handleMerge(payload, reply) {
 			filteredLabels.forEach(function (label) {
 				// only make new PR if the label doesn't match the current branch.
 				if (!base.includes(label.name)) {
-
 					createPullRequest(head, label.name + '-dev', payload, newBody, ['only']);
 				}
 			});
+		}
+
+		if (labels.length && labels.includes('$$production') && base.includes('staging')) {
+			var target = base.substr(0, base.indexOf('-')); // get the version number of the current branch
+			target = target ? target + '-production' : 'master';
+
+			createPullRequest(head, target, payload, newBody);
 		}
 
 		// If the closed PRs target was a dev branch, continue the PR along the path
 		// Example: 3.0-dev is accepted -> new PR into 3.0-staging
 		//          dev is accepted -> new PR into staging
 		if (base.includes('dev')) {
-			var target = base.substr(0, base.indexOf('-')); // get the version number of the current branch
-			target = target ? target + '-staging' : 'staging';
+			var _target = base.substr(0, base.indexOf('-')); // get the version number of the current branch
+			_target = _target ? _target + '-staging' : 'staging';
 
-			createPullRequest(base, target, payload, newBody);
+			createPullRequest(base, _target, payload, newBody);
 		}
 
 		// If PR target was dev branch and it's not tagged "only", create a PR into dev
@@ -196,7 +202,7 @@ function handleMerge(payload, reply) {
 		// If the closed PRs target was a staging branch, alert QA of impending release
 		// Example: 3.0-staging is accepted -> post in slack all tickets about to be released.
 		if (base.includes('staging')) {
-			var fixed = tickets.map(function (t) {
+			var fixed = tickets.filter(_utils.uniqueTicketFilter).map(function (t) {
 				return '<https://reelio.atlassian.net/browse/' + t + '|' + t + '>';
 			}).join('\n');
 

@@ -1,6 +1,6 @@
 import { token } from './consts'
 
-export function uniqueFilter(value, index, self) {
+export function uniqueTicketFilter(value, index, self) {
 	return self.indexOf(value) === index
 }
 
