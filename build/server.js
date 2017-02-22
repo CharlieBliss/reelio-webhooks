@@ -45,6 +45,15 @@ function handleGithubEvent(req, reply) {
 }
 
 server.route({
+	method: 'GET',
+	path: '/admin/{path*}',
+	handler: function handler(request, reply) {
+		console.log('Admin', request.params, request.method);
+		return reply('Admin front');
+	}
+});
+
+server.route({
 	method: '*',
 	path: '/{path*}',
 	handler: function handler(request, reply) {

@@ -1,5 +1,5 @@
 import { versionRegex, jiraRegex, SLACK_URL, FRONTEND_MEMBERS } from './consts'
-import { uniqueTicketFilter, wrapJiraTicketsFromArray, constructGet, constructPost, constructPatch } from './utils'
+import { uniqueTicketFilter, wrapJiraTicketsFromArray, constructGet, constructPost, constructPatch, constructPut } from './utils'
 
 const request = require('request')
 
@@ -36,7 +36,7 @@ function createPullRequest(head, base, payload, newBody = '', labels = []) {
 			// If making the issue fails, tell Kyle
 			if (body.errors) {
 				request(constructPost(SLACK_URL, {
-					channel: '@kyle',
+					channel: 'U28LB0AAH',
 					username: 'PR Bot',
 					icon_url: 'https://octodex.github.com/images/yaktocat.png',
 					text: `Something went wrong when trying to make new PRs based off of: <${payload.pull_request.html_url}|GitHub>.\n\n\`\`\`${resBody.errors}\`\`\``,
@@ -56,7 +56,7 @@ function createPullRequest(head, base, payload, newBody = '', labels = []) {
 
 					if (e || !resBody.number) {
 						request(constructPost(SLACK_URL, {
-							channel: '@kyle',
+							channel: 'U28LB0AAH',
 							username: 'PR Bot',
 							icon_url: 'https://octodex.github.com/images/yaktocat.png',
 							text: `Something went wrong when trying to make new PRs based off of: <${payload.pull_request.html_url}|a github PR>.\n\n\`\`\`${resBody.errors.message}\`\`\``,
@@ -144,6 +144,8 @@ function handleMerge(payload, reply) {
 			filteredLabels = labels.filter(label => versionRegex.test(label.name))
 		}
 
+		const currentDev = '3.1' // @TODO this is a messy hack.  This shouldn't need to be a const
+
 		// If there were version labels, create new PRs targetting those branches
 		// Example: PR into 3.0-dev is tagged 3.0 && 3.1 -> PR to 3.1-dev
 		//          PR into 3.0-dev is tagged 3.0 -> no action
@@ -172,10 +174,71 @@ function handleMerge(payload, reply) {
 		// Example: 3.0-dev is accepted -> new PR into 3.0-staging
 		//          dev is accepted -> new PR into staging
 		if (base.includes('dev')) {
-			let target = base.substr(0, base.indexOf('-')) // get the version number of the current branch
-			target = target ? `${target}-staging` : 'staging'
+			const version = base.substr(0, base.indexOf('-')) // get the version number of the current branch
+			const target = version ? `${version}-staging` : 'staging'
 
 			createPullRequest(base, target, payload, newBody)
+
+			// BEGIN JIRA INTEGRATION
+
+			// Because this PR is going into a dev branch, we build a workflow table for JIRA tickets
+			const fixed = tickets.filter(uniqueTicketFilter)
+			fixed.forEach((ticket) => {
+				const ticketUrl = `https://reelio.atlassian.net/rest/api/2/issue/${ticket}`
+				const header = '|| ||PR Submitted|| Deployed to Staging|| QA Approved ||'
+
+				request(constructGet(ticketUrl, 'jira'), (error, response, bdy) => {
+					if (JSON.parse(bdy).fields.customfield_10900) {
+						return // the ticket already has a table
+					}
+
+					let table = []
+
+					// If there aren't any version labels, this is going right into dev.
+					if (filteredLabels.length) {
+						table.push(`| *${currentDev}* | No | No | |`)
+					} else {
+						table.push(`| *${currentDev}* | No | No | |`)
+					}
+
+					// Loop through all labels on the PR and make sure the ticket references all envs
+					filteredLabels
+						.forEach((l) => {
+							if (l.name === version) {
+								table.push(`| *${l.name}* | [Yes|${payload.pull_request.html_url}] | No | |`)
+							} else {
+								table.push(`| *${l.name}* | No | No | |`)
+							}
+
+						})
+
+					table = table.sort((a, b) => b.match(/\d\.\d/) - a.match(/\d\.\d/)) // sort by version #
+					table.unshift(header) // add the header in
+					table = table.join('\n') // concatenate back into a string
+
+					console.log('FIXED TICKET', ticket, table)
+
+					request(constructPut(`${ticketUrl}`, {
+						fields: {
+							customfield_10900: table,
+						},
+					}, 'jira'), (_, __, resBody) => {
+
+						const resp = JSON.parse(resBody)
+						if (resp.errorMessages) {
+							request(constructPost(SLACK_URL, {
+								channel: 'U28LB0AAH',
+								username: 'PR Bot',
+								icon_url: 'https://octodex.github.com/images/yaktocat.png',
+								text: `Something went wrong when trying to update the table for: <https://reelio.atlassian.net/browse/${ticket}|${ticket}>.\n\n\`\`\`${resp.errorMessages.join('\n')}\`\`\``,
+							}))
+
+							console.log('TICKET TABLE FAILED', resp)
+						}
+					})
+				})
+
+			})
 		}
 
 		// If PR target was dev branch and it's not tagged "only", create a PR into dev
@@ -191,7 +254,11 @@ function handleMerge(payload, reply) {
 		// If the closed PRs target was a staging branch, alert QA of impending release
 		// Example: 3.0-staging is accepted -> post in slack all tickets about to be released.
 		if (base.includes('staging')) {
-			const fixed = tickets.filter(uniqueTicketFilter).map(t => `<https://reelio.atlassian.net/browse/${t}|${t}>`).join('\n')
+			const fixed = tickets.filter(uniqueTicketFilter),
+				formattedFixed = fixed.map(t => `<https://reelio.atlassian.net/browse/${t}|${t}>`).join('\n')
+
+			const version = base.substr(0, base.indexOf('-')) || 'dev' // get the version number of the current branch
+			const deployVersion = version === 'dev' ? currentDev : version
 
 			request(constructPost(SLACK_URL, {
 				channel: '#frontend-deploys',
@@ -200,7 +267,7 @@ function handleMerge(payload, reply) {
 				text: `*A deploy to <http://${base}.reelio.com|${base}> is pending.*  The changes will be ready in ~15 minutes.\n\nThe deploy is based off of <${payload.pull_request.html_url}|PR ${payload.pull_request.number}>.\n\n*\`-- Fixes --\`*`,
 				attachments: [
 					{
-						text: fixed,
+						text: formattedFixed,
 						color: '#36a64f',
 					},
 					{
@@ -209,6 +276,78 @@ function handleMerge(payload, reply) {
 					},
 				],
 			}))
+
+			// BEGING JIRA INTEGRATION
+			fixed.forEach((ticket) => {
+				const ticketUrl = `https://reelio.atlassian.net/rest/api/2/issue/${ticket}`
+
+				// Make sure the ticket is marked as `Ready for QA`
+				request(constructPost(`${ticketUrl}/transitions`, {
+					transition: {
+						id: 121,
+					},
+				}, 'jira'))
+
+				// Update the current workflow table with new progress
+				request(constructGet(ticketUrl, 'jira'), (error, response, bdy) => {
+					if (error) {
+						// getting ticket failed
+					}
+					const ticketInfo = JSON.parse(bdy),
+						workflowField = ticketInfo.fields.customfield_10900,
+						qaAssignee = ticketInfo.fields.customfield_10901
+
+					if (qaAssignee) {
+						request(constructPost(`${ticketUrl}/comment`, {
+							body: `[~${qaAssignee.key}] This ticket was just deployed to [${deployVersion}-staging|http://${deployVersion}-staging.reelio.com] and will be ready to be tested on that environment in about 10 minutes!`,
+						}, 'jira'))
+					}
+
+
+					const tableRows = workflowField.split('\n') // get the table rows
+					let newTable = workflowField // copy the old table
+
+					if (tableRows.length > 2) {
+						// There are more than 2 rows, so we need to figure out which to update
+						newTable = tableRows.map((row) => {
+							// If the current table row doesn't include the current branch version, don't edit
+							if (row.includes(version)) {
+								return `| *${version}* | [Yes|${payload.pull_request.html_url}] | [Yes|http://${version}-staging.reelio.com] | |`
+							} else if (version === 'dev' && row.includes(currentDev)) {
+								return `| *${currentDev}* | [Yes|${payload.pull_request.html_url}] | [Yes|http://${currentDev}-staging.reelio.com] | |`
+							}
+
+							return row
+						})
+					} else {
+						tableRows[1] = `| *${deployVersion}* | [Yes|${payload.pull_request.html_url}] | [Yes|http://${deployVersion}-staging.reelio.com] | |`
+						newTable = tableRows
+					}
+
+					// Update the ticket with our new table
+					request(constructPut(`${ticketUrl}`, {
+						fields: {
+							customfield_10900: newTable.join('\n'),
+						},
+					}, 'jira'), (_, __, resBody) => {
+						if (!resBody) { return }
+
+						const resp = JSON.parse(resBody)
+
+						if (resp.errorMessages) {
+							request(constructPost(SLACK_URL, {
+								channel: 'U28LB0AAH',
+								username: 'PR Bot',
+								icon_url: 'https://octodex.github.com/images/yaktocat.png',
+								text: `Something went wrong when trying to update the table for: <https://reelio.atlassian.net/browse/${ticket}|${ticket}>.\n\n\`\`\`${resp.errorMessages.join('\n')}\`\`\``,
+							}))
+
+							console.log('TICKET TABLE FAILED', resp)
+						}
+					})
+				})
+			})
+
 		}
 
 
