@@ -279,12 +279,12 @@ function handleMerge(payload, reply) {
 					channel: '#frontend-deploys',
 					username: 'Deploy Bot',
 					icon_url: 'https://octodex.github.com/images/welcometocat.png',
-					text: '*A deploy to <http://' + base + '.reelio.com|' + base + '> is pending.*  The changes will be ready in ~15 minutes.\n\nThe deploy is based off of <' + payload.pull_request.html_url + '|PR ' + payload.pull_request.number + '>.\n\n*`-- Fixes --`*',
+					text: '*A deploy to <http://' + deployVersion + '-staging.reelio.com|' + deployVersion + '-staging> is pending.*  The changes will be ready in ~15 minutes.\n\nThe deploy is based off of <' + payload.pull_request.html_url + '|PR ' + payload.pull_request.number + '>.\n\n*`-- Fixes --`*',
 					attachments: [{
 						text: formattedFixed,
 						color: '#36a64f'
 					}, {
-						text: '<' + base + '.reelio.com|' + base + '.reelio.com>',
+						text: '<' + deployVersion + '-staging.reelio.com|' + deployVersion + '-staging.reelio.com>',
 						color: '#de2656'
 					}]
 				}));
