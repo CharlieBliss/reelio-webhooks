@@ -3,7 +3,7 @@
     "start": "node index.js",
     "watch": "nodemon index.js",
     "build": "rm -rf build/* && babel --out-dir=build app",
-    "lint": "npm run lint"
+    "lint": "lint src"
   },
   "dependencies": {
     "babel": "^6.5.2",
