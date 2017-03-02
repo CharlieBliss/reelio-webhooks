@@ -1,4 +1,4 @@
-import { constructDelete, constructPost } from './utils.js'
+import { constructDelete, constructPost } from './utils'
 import { SLACK_URL, FRONTEND_MEMBERS } from './consts'
 
 const request = require('request')
