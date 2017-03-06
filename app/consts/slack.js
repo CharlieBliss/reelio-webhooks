@@ -51,6 +51,11 @@ export const FRONTEND_MEMBERS = {
 		id: 'U02B43L0M',
 		github_id: '6333919',
 	},
+	25992031: {
+		name: 'reelio-devops',
+		id: 'USLACKBOT',
+		github_id: '25992031',
+	},
 }
 
 /* eslint-disable */

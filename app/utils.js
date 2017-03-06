@@ -1,4 +1,4 @@
-import { token } from './consts'
+import { GITHUB_TOKEN, JIRA_TOKEN } from './consts'
 
 export function uniqueTicketFilter(value, index, self) {
 	return self.indexOf(value) === index
@@ -16,7 +16,7 @@ export function constructGet(url, target = 'github') {
 			url,
 			method: 'GET',
 			headers: {
-				Authorization: `token ${token}`,
+				Authorization: `token ${GITHUB_TOKEN}`,
 				'User-Agent': 'Kyle-Mendes',
 				Accept: 'application/vnd.github.black-cat-preview+json',
 			},
@@ -27,7 +27,7 @@ export function constructGet(url, target = 'github') {
 			method: 'GET',
 			headers: {
 				Accept: 'application/json',
-				Authorization: 'Basic a3lsZUByZWVsaW9sYWJzLmNvbTpqaXJhdGlja2V0c2FyZWZ1bg==',
+				Authorization: `Basic ${JIRA_TOKEN}`,
 			},
 		}
 	}
@@ -43,7 +43,7 @@ export function constructPost(url, payload, target = 'github') {
 			url,
 			method: 'POST',
 			headers: {
-				Authorization: `token ${token}`,
+				Authorization: `token ${GITHUB_TOKEN}`,
 				'User-Agent': 'Kyle-Mendes',
 				'content-type': 'application/json',
 			},
@@ -55,7 +55,7 @@ export function constructPost(url, payload, target = 'github') {
 			method: 'POST',
 			headers: {
 				Accept: 'application/json',
-				Authorization: 'Basic a3lsZUByZWVsaW9sYWJzLmNvbTpqaXJhdGlja2V0c2FyZWZ1bg==',
+				Authorization: `Basic ${JIRA_TOKEN}`,
 				'content-type': 'application/json',
 			},
 			body: JSON.stringify(payload),
@@ -72,7 +72,7 @@ export function constructPatch(url, payload, target = 'github') {
 			url,
 			method: 'PATCH',
 			headers: {
-				Authorization: `token ${token}`,
+				Authorization: `token ${GITHUB_TOKEN}`,
 				'User-Agent': 'Kyle-Mendes',
 				'content-type': 'application/json',
 			},
@@ -84,7 +84,7 @@ export function constructPatch(url, payload, target = 'github') {
 			method: 'PATCH',
 			headers: {
 				Accept: 'application/json',
-				Authorization: 'Basic a3lsZUByZWVsaW9sYWJzLmNvbTpqaXJhdGlja2V0c2FyZWZ1bg==',
+				Authorization: `Basic ${JIRA_TOKEN}`,
 				'content-type': 'application/json',
 			},
 			body: JSON.stringify(payload),
@@ -102,7 +102,7 @@ export function constructPut(url, payload, target = 'github') {
 			url,
 			method: 'PUT',
 			headers: {
-				Authorization: `token ${token}`,
+				Authorization: `token ${GITHUB_TOKEN}`,
 				'User-Agent': 'Kyle-Mendes',
 				'content-type': 'application/json',
 			},
@@ -114,7 +114,7 @@ export function constructPut(url, payload, target = 'github') {
 			method: 'PUT',
 			headers: {
 				Accept: 'application/json',
-				Authorization: 'Basic a3lsZUByZWVsaW9sYWJzLmNvbTpqaXJhdGlja2V0c2FyZWZ1bg==',
+				Authorization: `Basic ${JIRA_TOKEN}`,
 				'content-type': 'application/json',
 			},
 			body: JSON.stringify(payload),
@@ -129,7 +129,7 @@ export function constructDelete(url) {
 		url,
 		method: 'DELETE',
 		headers: {
-			Authorization: `token ${token}`,
+			Authorization: `token ${GITHUB_TOKEN}`,
 			'User-Agent': 'Kyle-Mendes',
 		},
 	}
