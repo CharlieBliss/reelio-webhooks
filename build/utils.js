@@ -31,7 +31,7 @@ function constructGet(url) {
 			url: url,
 			method: 'GET',
 			headers: {
-				Authorization: 'token ' + _consts.token,
+				Authorization: 'token ' + _consts.GITHUB_TOKEN,
 				'User-Agent': 'Kyle-Mendes',
 				Accept: 'application/vnd.github.black-cat-preview+json'
 			}
@@ -42,7 +42,7 @@ function constructGet(url) {
 			method: 'GET',
 			headers: {
 				Accept: 'application/json',
-				Authorization: 'Basic a3lsZUByZWVsaW9sYWJzLmNvbTpqaXJhdGlja2V0c2FyZWZ1bg=='
+				Authorization: 'Basic ' + _consts.JIRA_TOKEN
 			}
 		};
 	}
@@ -60,7 +60,7 @@ function constructPost(url, payload) {
 			url: url,
 			method: 'POST',
 			headers: {
-				Authorization: 'token ' + _consts.token,
+				Authorization: 'token ' + _consts.GITHUB_TOKEN,
 				'User-Agent': 'Kyle-Mendes',
 				'content-type': 'application/json'
 			},
@@ -72,7 +72,7 @@ function constructPost(url, payload) {
 			method: 'POST',
 			headers: {
 				Accept: 'application/json',
-				Authorization: 'Basic a3lsZUByZWVsaW9sYWJzLmNvbTpqaXJhdGlja2V0c2FyZWZ1bg==',
+				Authorization: 'Basic ' + _consts.JIRA_TOKEN,
 				'content-type': 'application/json'
 			},
 			body: JSON.stringify(payload)
@@ -91,7 +91,7 @@ function constructPatch(url, payload) {
 			url: url,
 			method: 'PATCH',
 			headers: {
-				Authorization: 'token ' + _consts.token,
+				Authorization: 'token ' + _consts.GITHUB_TOKEN,
 				'User-Agent': 'Kyle-Mendes',
 				'content-type': 'application/json'
 			},
@@ -103,7 +103,7 @@ function constructPatch(url, payload) {
 			method: 'PATCH',
 			headers: {
 				Accept: 'application/json',
-				Authorization: 'Basic a3lsZUByZWVsaW9sYWJzLmNvbTpqaXJhdGlja2V0c2FyZWZ1bg==',
+				Authorization: 'Basic ' + _consts.JIRA_TOKEN,
 				'content-type': 'application/json'
 			},
 			body: JSON.stringify(payload)
@@ -123,7 +123,7 @@ function constructPut(url, payload) {
 			url: url,
 			method: 'PUT',
 			headers: {
-				Authorization: 'token ' + _consts.token,
+				Authorization: 'token ' + _consts.GITHUB_TOKEN,
 				'User-Agent': 'Kyle-Mendes',
 				'content-type': 'application/json'
 			},
@@ -135,7 +135,7 @@ function constructPut(url, payload) {
 			method: 'PUT',
 			headers: {
 				Accept: 'application/json',
-				Authorization: 'Basic a3lsZUByZWVsaW9sYWJzLmNvbTpqaXJhdGlja2V0c2FyZWZ1bg==',
+				Authorization: 'Basic ' + _consts.JIRA_TOKEN,
 				'content-type': 'application/json'
 			},
 			body: JSON.stringify(payload)
@@ -150,7 +150,7 @@ function constructDelete(url) {
 		url: url,
 		method: 'DELETE',
 		headers: {
-			Authorization: 'token ' + _consts.token,
+			Authorization: 'token ' + _consts.GITHUB_TOKEN,
 			'User-Agent': 'Kyle-Mendes'
 		}
 	};

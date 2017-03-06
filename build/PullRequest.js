@@ -101,6 +101,13 @@ function handleNew(payload, reply) {
 			    prBody = payload.pull_request.body || '',
 			    tickets = prBody.match(_consts.jiraRegex);
 
+			// If the PR is needing a review (not a webhook PR or a deploy PR), add the reviewer checkboxes
+			if (!labels.map(function (l) {
+				return l.name;
+			}).includes('$$webhook') && !head.includes('staging') && !head.includes('production') && !head.includes('master')) {
+				request((0, _utils.constructPatch)(payload.pull_request.url, { body: payload.pull_request.body + ' \n\n - [ ] Review 1\n - [ ] Review 2 ( Kyle )' })); // add the reviewer checkboxes
+			}
+
 			// If there aren't any JIRA tickets in the body as well, warn them
 			if (!tickets && !labels.map(function (l) {
 				return l.name;
@@ -275,19 +282,24 @@ function handleMerge(payload, reply) {
 				var version = base.substr(0, base.indexOf('-')) || 'dev'; // get the version number of the current branch
 				var deployVersion = version === 'dev' ? currentDev : version;
 
-				request((0, _utils.constructPost)(_consts.SLACK_URL, {
-					channel: '#frontend-deploys',
-					username: 'Deploy Bot',
-					icon_url: 'https://octodex.github.com/images/welcometocat.png',
-					text: '*A deploy to <http://' + deployVersion + '-staging.reelio.com|' + deployVersion + '-staging> is pending.*  The changes will be ready in ~15 minutes.\n\nThe deploy is based off of <' + payload.pull_request.html_url + '|PR ' + payload.pull_request.number + '>.\n\n*`-- Fixes --`*',
-					attachments: [{
-						text: formattedFixed,
-						color: '#36a64f'
-					}, {
-						text: '<' + deployVersion + '-staging.reelio.com|' + deployVersion + '-staging.reelio.com>',
-						color: '#de2656'
-					}]
-				}));
+				// Skip if there are only test tickets
+				if (fixed.filter(function (t) {
+					return !t.toUpperCase().includes('TEST');
+				}).length) {
+					request((0, _utils.constructPost)(_consts.SLACK_URL, {
+						channel: '#frontend-deploys',
+						username: 'Deploy Bot',
+						icon_url: 'https://octodex.github.com/images/welcometocat.png',
+						text: '*A deploy to <http://' + deployVersion + '-staging.reelio.com|' + deployVersion + '-staging> is pending.*  The changes will be ready in ~15 minutes.\n\nThe deploy is based off of <' + payload.pull_request.html_url + '|PR ' + payload.pull_request.number + '>.\n\n*`-- Fixes --`*',
+						attachments: [{
+							text: formattedFixed,
+							color: '#36a64f'
+						}, {
+							text: '<' + deployVersion + '-staging.reelio.com|' + deployVersion + '-staging.reelio.com>',
+							color: '#de2656'
+						}]
+					}));
+				}
 
 				// BEGING JIRA INTEGRATION
 				fixed.forEach(function (ticket) {
@@ -306,7 +318,7 @@ function handleMerge(payload, reply) {
 							// getting ticket failed
 						}
 						var ticketInfo = JSON.parse(bdy),
-						    workflowField = ticketInfo.fields.customfield_10900,
+						    workflowField = ticketInfo.fields.customfield_10900 || '',
 						    qaAssignee = ticketInfo.fields.customfield_10901;
 
 						if (qaAssignee) {
@@ -375,7 +387,7 @@ function handleMerge(payload, reply) {
 		}
 
 		// If the PR was merged without any changes requested, :tada: to the dev!
-		if (!reviews.includes('CHANGES_REQUESTED') && user.slack_id !== 'U28LB0AAH') {
+		if (!reviews.includes('CHANGES_REQUESTED') && user.slack_id !== 'U28LB0AAH' && payload.pull_request.user.id !== '25992031') {
 			request((0, _utils.constructPost)(_consts.SLACK_URL, {
 				channel: user.slack_id,
 				username: 'Merge Bot',

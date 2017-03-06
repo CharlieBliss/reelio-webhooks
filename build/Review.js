@@ -4,7 +4,7 @@ Object.defineProperty(exports, "__esModule", {
 	value: true
 });
 
-var _utils = require('./utils.js');
+var _utils = require('./utils');
 
 var _consts = require('./consts');
 
