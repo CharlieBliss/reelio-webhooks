@@ -4,9 +4,15 @@ Object.defineProperty(exports, "__esModule", {
 	value: true
 });
 
+var _firebase = require('./firebase');
+
+var _firebase2 = _interopRequireDefault(_firebase);
+
 var _consts = require('./consts');
 
 var _utils = require('./utils');
+
+function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
 function _toConsumableArray(arr) { if (Array.isArray(arr)) { for (var i = 0, arr2 = Array(arr.length); i < arr.length; i++) { arr2[i] = arr[i]; } return arr2; } else { return Array.from(arr); } }
 
@@ -115,6 +121,8 @@ function handleNew(payload, reply) {
 				var feedback = '@' + payload.pull_request.user.login + ' - It looks like you didn\'t include JIRA ticket references in this ticket.  Are you sure you have none to reference?';
 				request((0, _utils.constructPost)(payload.pull_request.issue_url + '/comments', { body: feedback }));
 				request((0, _utils.constructPost)(payload.pull_request.issue_url + '/labels', ['$$ticketless']));
+
+				_firebase2.default.log('github', payload.repository.full_name, 'pull_request', 'ticketless', payload);
 			}
 
 			// If there aren't any version labels, and the PR isn't to a version branch or dev,
@@ -126,6 +134,7 @@ function handleNew(payload, reply) {
 				var _feedback = '@' + payload.pull_request.user.login + ' - It looks like you forgot to label this PR with a version tag.  Please update your PR to include targetted version distrubtions.  Thanks!';
 				request((0, _utils.constructPost)(payload.pull_request.issue_url + '/comments', { body: _feedback }));
 				request((0, _utils.constructPost)(payload.pull_request.issue_url + '/labels', ['$$incomplete']));
+				_firebase2.default.log('github', payload.repository.full_name, 'pull_request', 'labelless', payload);
 
 				if (user) {
 					request((0, _utils.constructPost)(_consts.SLACK_URL, {
@@ -253,6 +262,7 @@ function handleMerge(payload, reply) {
 									icon_url: 'https://octodex.github.com/images/yaktocat.png',
 									text: 'Something went wrong when trying to update the table for: <https://reelio.atlassian.net/browse/' + ticket + '|' + ticket + '>.\n\n```' + resp.errorMessages.join('\n') + '```'
 								}));
+								_firebase2.default.log('JIRA', 'FRONT', 'table', 'failed', resp);
 
 								console.log('TICKET TABLE FAILED', resp);
 							}
@@ -299,6 +309,14 @@ function handleMerge(payload, reply) {
 							color: '#de2656'
 						}]
 					}));
+
+					_firebase2.default.log('github', payload.repository.full_name, 'reelio_deploy', null, {
+						tickets: tickets.filter(_utils.uniqueTicketFilter),
+						fixed_count: tickets.filter(_utils.uniqueTicketFilter).length,
+						version: deployVersion,
+						environment: 'staging',
+						target: deployVersion + '-staging.reelio.com'
+					});
 				}
 
 				// BEGING JIRA INTEGRATION
@@ -311,6 +329,7 @@ function handleMerge(payload, reply) {
 							id: 121
 						}
 					}, 'jira'));
+					_firebase2.default.log('JIRA', 'FRONT', 'transition', 'QA', { ticket: ticket });
 
 					// Update the current workflow table with new progress
 					request((0, _utils.constructGet)(ticketUrl, 'jira'), function (error, response, bdy) {
@@ -325,6 +344,8 @@ function handleMerge(payload, reply) {
 							request((0, _utils.constructPost)(ticketUrl + '/comment', {
 								body: '[~' + qaAssignee.key + '] This ticket was just deployed to [' + deployVersion + '-staging|http://' + deployVersion + '-staging.reelio.com] and will be ready to be tested on that environment in about 10 minutes!'
 							}, 'jira'));
+
+							_firebase2.default.log('JIRA', 'FRONT', 'qaAssignee', 'alerted', { assignee: qaAssignee, ticket: ticket });
 						}
 
 						var tableRows = workflowField.split('\n'); // get the table rows
@@ -354,6 +375,7 @@ function handleMerge(payload, reply) {
 							}
 						}, 'jira'), function (_, __, resBody) {
 							if (!resBody) {
+								_firebase2.default.log('JIRA', 'FRONT', 'table', 'updated', { ticket: ticket });
 								return;
 							}
 
@@ -394,6 +416,7 @@ function handleMerge(payload, reply) {
 				icon_url: 'https://octodex.github.com/images/welcometocat.png',
 				text: ':tada::party_parrot::tada:Nice work, ' + user.name + '!  Your <' + payload.pull_request.html_url + '|pull request> was merged without needing changes! Keep up the good work! :tada::party_parrot::tada:'
 			}));
+			_firebase2.default.log('github', payload.repository.full_name, 'pull_request', 'party_parrot', payload);
 		}
 	});
 

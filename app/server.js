@@ -1,8 +1,9 @@
+import Hapi from 'hapi'
+
 import PullRequest from './PullRequest'
 import Review from './Review'
 import Status from './Status'
-
-const Hapi = require('hapi')
+import firebase from './firebase'
 
 // Create a server with a host and port
 const server = new Hapi.Server()
@@ -12,7 +13,11 @@ server.connection({
 })
 
 function handleGithubEvent(req, reply) {
+	const repo = req.payload.repository.full_name
 	const event = req.headers['x-github-event']
+	const action = req.payload.action
+
+	firebase.log('github', repo, event, action, req.payload)
 
 	if (event === 'pull_request') {
 		console.log('got a PR')

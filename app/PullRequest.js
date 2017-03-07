@@ -1,3 +1,4 @@
+import firebase from './firebase'
 import { versionRegex, jiraRegex, SLACK_URL, FRONTEND_MEMBERS } from './consts'
 import { uniqueTicketFilter, wrapJiraTicketsFromArray, constructGet, constructPost, constructPatch, constructPut } from './utils'
 
@@ -99,6 +100,8 @@ function handleNew(payload, reply) {
 				const feedback = `@${payload.pull_request.user.login} - It looks like you didn't include JIRA ticket references in this ticket.  Are you sure you have none to reference?`
 				request(constructPost(`${payload.pull_request.issue_url}/comments`, { body: feedback }))
 				request(constructPost(`${payload.pull_request.issue_url}/labels`, ['$$ticketless']))
+
+				firebase.log('github', payload.repository.full_name, 'pull_request', 'ticketless', payload)
 			}
 
 			// If there aren't any version labels, and the PR isn't to a version branch or dev,
@@ -114,6 +117,7 @@ function handleNew(payload, reply) {
 				const feedback = `@${payload.pull_request.user.login} - It looks like you forgot to label this PR with a version tag.  Please update your PR to include targetted version distrubtions.  Thanks!`
 				request(constructPost(`${payload.pull_request.issue_url}/comments`, { body: feedback }))
 				request(constructPost(`${payload.pull_request.issue_url}/labels`, ['$$incomplete']))
+				firebase.log('github', payload.repository.full_name, 'pull_request', 'labelless', payload)
 
 				if (user) {
 					request(constructPost(SLACK_URL, {
@@ -242,6 +246,7 @@ function handleMerge(payload, reply) {
 								icon_url: 'https://octodex.github.com/images/yaktocat.png',
 								text: `Something went wrong when trying to update the table for: <https://reelio.atlassian.net/browse/${ticket}|${ticket}>.\n\n\`\`\`${resp.errorMessages.join('\n')}\`\`\``,
 							}))
+							firebase.log('JIRA', 'FRONT', 'table', 'failed', resp)
 
 							console.log('TICKET TABLE FAILED', resp)
 						}
@@ -288,6 +293,14 @@ function handleMerge(payload, reply) {
 						},
 					],
 				}))
+
+				firebase.log('github', payload.repository.full_name, 'reelio_deploy', null, {
+					tickets: tickets.filter(uniqueTicketFilter),
+					fixed_count: tickets.filter(uniqueTicketFilter).length,
+					version: deployVersion,
+					environment: 'staging',
+					target: `${deployVersion}-staging.reelio.com`,
+				})
 			}
 
 
@@ -301,6 +314,7 @@ function handleMerge(payload, reply) {
 						id: 121,
 					},
 				}, 'jira'))
+				firebase.log('JIRA', 'FRONT', 'transition', 'QA', { ticket })
 
 				// Update the current workflow table with new progress
 				request(constructGet(ticketUrl, 'jira'), (error, response, bdy) => {
@@ -315,6 +329,8 @@ function handleMerge(payload, reply) {
 						request(constructPost(`${ticketUrl}/comment`, {
 							body: `[~${qaAssignee.key}] This ticket was just deployed to [${deployVersion}-staging|http://${deployVersion}-staging.reelio.com] and will be ready to be tested on that environment in about 10 minutes!`,
 						}, 'jira'))
+
+						firebase.log('JIRA', 'FRONT', 'qaAssignee', 'alerted', { assignee: qaAssignee, ticket })
 					}
 
 
@@ -344,7 +360,10 @@ function handleMerge(payload, reply) {
 							customfield_10900: newTable.join('\n'),
 						},
 					}, 'jira'), (_, __, resBody) => {
-						if (!resBody) { return }
+						if (!resBody) {
+							firebase.log('JIRA', 'FRONT', 'table', 'updated', { ticket })
+							return
+						}
 
 						const resp = JSON.parse(resBody)
 
@@ -385,6 +404,7 @@ function handleMerge(payload, reply) {
 				icon_url: 'https://octodex.github.com/images/welcometocat.png',
 				text: `:tada::party_parrot::tada:Nice work, ${user.name}!  Your <${payload.pull_request.html_url}|pull request> was merged without needing changes! Keep up the good work! :tada::party_parrot::tada:`,
 			}))
+			firebase.log('github', payload.repository.full_name, 'pull_request', 'party_parrot', payload)
 		}
 	})
 

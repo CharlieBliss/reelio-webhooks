@@ -1,5 +1,9 @@
 'use strict';
 
+var _hapi = require('hapi');
+
+var _hapi2 = _interopRequireDefault(_hapi);
+
 var _PullRequest = require('./PullRequest');
 
 var _PullRequest2 = _interopRequireDefault(_PullRequest);
@@ -12,19 +16,25 @@ var _Status = require('./Status');
 
 var _Status2 = _interopRequireDefault(_Status);
 
+var _firebase = require('./firebase');
+
+var _firebase2 = _interopRequireDefault(_firebase);
+
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
-var Hapi = require('hapi');
-
 // Create a server with a host and port
-var server = new Hapi.Server();
+var server = new _hapi2.default.Server();
 server.connection({
 	host: '0.0.0.0',
 	port: 1312
 });
 
 function handleGithubEvent(req, reply) {
+	var repo = req.payload.repository.full_name;
 	var event = req.headers['x-github-event'];
+	var action = req.payload.action;
+
+	_firebase2.default.log('github', repo, event, action, req.payload);
 
 	if (event === 'pull_request') {
 		console.log('got a PR');
