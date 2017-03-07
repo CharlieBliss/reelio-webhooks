@@ -409,7 +409,7 @@ function handleMerge(payload, reply) {
 		}
 
 		// If the PR was merged without any changes requested, :tada: to the dev!
-		if (!reviews.includes('CHANGES_REQUESTED') && user.slack_id !== 'U28LB0AAH' && payload.pull_request.user.id !== '25992031') {
+		if (!reviews.includes('CHANGES_REQUESTED') && user.slack_id !== 'U28LB0AAH' && payload.pull_request.user.id.toString() !== '25992031') {
 			request((0, _utils.constructPost)(_consts.SLACK_URL, {
 				channel: user.slack_id,
 				username: 'Merge Bot',

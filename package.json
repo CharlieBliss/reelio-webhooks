@@ -2,7 +2,7 @@
   "scripts": {
     "start": "node index.js",
     "watch": "nodemon index.js",
-    "build": "rm -rf build/* && babel --out-dir=build app",
+    "build": "rm -rf build/* && babel --out-dir=build app && cp app/consts/firebase-auth.json build/consts/firebase-auth.json",
     "lint": "eslint app"
   },
   "dependencies": {

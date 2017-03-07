@@ -25,7 +25,7 @@ function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { de
 // Create a server with a host and port
 var server = new _hapi2.default.Server();
 server.connection({
-	host: '0.0.0.0',
+	host: 'localhost',
 	port: 1312
 });
 
