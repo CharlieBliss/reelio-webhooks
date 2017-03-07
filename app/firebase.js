@@ -29,6 +29,12 @@ class Firebase {
 			action = `${action} - ${payload.review.state}`
 		}
 
+
+		// Only log circle failures
+		if (event === 'status' && payload.state !== 'failure') {
+			return
+		}
+
 		if (action) {
 			this.db.ref(`${service}/${project}/${event}/${action}/${Date.now()}`).set(payload)
 		} else {
