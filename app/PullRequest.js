@@ -377,7 +377,7 @@ function handleMerge(payload, reply) {
 		if (
 			!reviews.includes('CHANGES_REQUESTED') &&
 			user.slack_id !== 'U28LB0AAH' &&
-			payload.pull_request.user.id !== '25992031'
+			payload.pull_request.user.id.toString() !== '25992031'
 		) {
 			request(constructPost(SLACK_URL, {
 				channel: user.slack_id,
