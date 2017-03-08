@@ -251,7 +251,9 @@ function handleMerge(payload, reply) {
 			createPullRequest(head, 'dev', payload, newBody)
 		}
 
-		if (base.includes('production')) {
+		// If the closed PRs target was a production/master branch, alert QA of impending release
+		// Example: 3.0-production is accepted -> post in slack all tickets about to be released.
+		if (base.includes('production') || base === 'master') {
 			const fixed = tickets.filter(uniqueTicketFilter),
 				formattedFixed = fixed.map(t => `<https://reelio.atlassian.net/browse/${t}|${t}>`).join('\n')
 
