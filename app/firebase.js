@@ -54,8 +54,8 @@ class Firebase {
 					payload.comment_info = {
 						author: payload.comment.user.login,
 						issue: {
-							url: payload.issue.url,
-							title: payload.issue.title,
+							url: payload.issue ? payload.issue.url : '',
+							title: payload.issue ? payload.issue.title : '',
 						},
 					}
 
@@ -130,7 +130,7 @@ class Firebase {
 			} else {
 				this.db.ref(`${service}/${project}/${event}/${Date.now()}`).set(payload)
 			}
-		}, 10000)
+		}, 5000)
 	}
 }
 
