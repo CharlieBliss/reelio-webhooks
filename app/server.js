@@ -17,24 +17,25 @@ function handleGithubEvent(req, reply) {
 	const event = req.headers['x-github-event']
 	const action = req.payload.action
 
-	firebase.log('github', repo, event, action, req.payload)
+	let response
 
 	if (event === 'pull_request') {
 		console.log('got a PR')
-		return PullRequest(req, reply)
+		response = PullRequest(req, reply)
 	}
 
 	if (event === 'pull_request_review') {
 		console.log('got a review')
-		return Review(req, reply)
+		response = Review(req, reply)
 	}
 
 	if (event === 'status') {
 		console.log('got a status change')
-		return Status(req, reply)
+		response = Status(req, reply)
 	}
 
-	return reply()
+	firebase.log('github', repo, event, action, req.payload)
+	return response || reply()
 }
 
 server.route({
