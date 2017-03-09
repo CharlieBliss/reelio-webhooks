@@ -1,5 +1,4 @@
 import { constructPost } from './utils'
-import firebase from './firebase'
 import { SLACK_URL, FRONTEND_MEMBERS } from './consts'
 
 const request = require('request')
@@ -16,8 +15,6 @@ function handleError(payload, reply) {
 			text: `Hey there, ${user.name}.  Your commit did not pass Circle CI's test suite.  Please review on <https://github.com/hangarunderground/reelio-front/pulls|GitHub>.`,
 		}))
 	}
-
-	firebase.log('custom', 'circle', 'status', 'failure', payload)
 
 	return reply('CI Status fail')
 }
