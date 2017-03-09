@@ -280,8 +280,32 @@ function handleMerge(payload, reply) {
 			createPullRequest(head, 'dev', payload, newBody);
 		}
 
+		// If the closed PRs target was a production/master branch, alert QA of impending release
+		// Example: 3.0-production is accepted -> post in slack all tickets about to be released.
+		if (base.includes('production') || base === 'master') {
+			var fixed = tickets.filter(_utils.uniqueTicketFilter),
+			    formattedFixed = fixed.map(function (t) {
+				return '<https://reelio.atlassian.net/browse/' + t + '|' + t + '>';
+			}).join('\n');
+
+			request((0, _utils.constructPost)(_consts.SLACK_URL, {
+				channel: '#frontend-deploys',
+				username: 'Deploy Bot',
+				icon_url: 'https://octodex.github.com/images/welcometocat.png',
+				text: '*A deploy to <http://pro.reelio.com|production> is pending.*  The changes will be ready in ~15 minutes.\n\nThe deploy is based off of <' + payload.pull_request.html_url + '|PR ' + payload.pull_request.number + '>.\n\n*`-- Fixes --`*',
+				attachments: [{
+					text: formattedFixed,
+					color: '#36a64f'
+				}, {
+					text: '<pro.reelio.com|Production>',
+					color: '#de2656'
+				}]
+			}));
+		}
+
 		// If the closed PRs target was a staging branch, alert QA of impending release
 		// Example: 3.0-staging is accepted -> post in slack all tickets about to be released.
+
 		if (base.includes('staging')) {
 			(function () {
 				var fixed = tickets.filter(_utils.uniqueTicketFilter),

@@ -6,13 +6,7 @@ Object.defineProperty(exports, "__esModule", {
 
 var _utils = require('./utils');
 
-var _firebase = require('./firebase');
-
-var _firebase2 = _interopRequireDefault(_firebase);
-
 var _consts = require('./consts');
-
-function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
 var request = require('request');
 
@@ -28,8 +22,6 @@ function handleError(payload, reply) {
 			text: 'Hey there, ' + user.name + '.  Your commit did not pass Circle CI\'s test suite.  Please review on <https://github.com/hangarunderground/reelio-front/pulls|GitHub>.'
 		}));
 	}
-
-	_firebase2.default.log('custom', 'circle', 'status', 'failure', payload);
 
 	return reply('CI Status fail');
 }

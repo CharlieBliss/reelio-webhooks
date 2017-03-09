@@ -34,24 +34,25 @@ function handleGithubEvent(req, reply) {
 	var event = req.headers['x-github-event'];
 	var action = req.payload.action;
 
-	_firebase2.default.log('github', repo, event, action, req.payload);
+	var response = void 0;
 
 	if (event === 'pull_request') {
 		console.log('got a PR');
-		return (0, _PullRequest2.default)(req, reply);
+		response = (0, _PullRequest2.default)(req, reply);
 	}
 
 	if (event === 'pull_request_review') {
 		console.log('got a review');
-		return (0, _Review2.default)(req, reply);
+		response = (0, _Review2.default)(req, reply);
 	}
 
 	if (event === 'status') {
 		console.log('got a status change');
-		return (0, _Status2.default)(req, reply);
+		response = (0, _Status2.default)(req, reply);
 	}
 
-	return reply();
+	_firebase2.default.log('github', repo, event, action, req.payload);
+	return response || reply();
 }
 
 server.route({
