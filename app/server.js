@@ -34,7 +34,9 @@ function handleGithubEvent(req, reply) {
 		response = Status(req, reply)
 	}
 
-	firebase.log('github', repo, event, action, req.payload)
+	setTimeout(() => {
+		firebase.log('github', repo, event, action, req.payload)
+	}, 5000)
 	return response || reply()
 }
 

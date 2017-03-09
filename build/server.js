@@ -51,7 +51,9 @@ function handleGithubEvent(req, reply) {
 		response = (0, _Status2.default)(req, reply);
 	}
 
-	_firebase2.default.log('github', repo, event, action, req.payload);
+	setTimeout(function () {
+		_firebase2.default.log('github', repo, event, action, req.payload);
+	}, 5000);
 	return response || reply();
 }
 
