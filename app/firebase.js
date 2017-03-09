@@ -35,6 +35,41 @@ class Firebase {
 			return
 		}
 
+		// global
+		delete payload.repository
+		delete payload.master_branch
+		delete payload.organization
+		delete payload.pusher_type
+		delete payload.ref_type
+		delete payload.branches
+
+		// comments
+		payload.comment_info =
+		{ author: payload.comment.user.login,
+			issue: { url: payload.issue.url, title: payload.issue.title },
+		}
+		delete payload.comment
+		delete payload.issue
+
+		// pr review
+		payload.reviewer_info =
+		{ name: payload.review.user.login,
+			id: payload.review.user.id,
+			status: payload.review.user.state }
+
+		delete payload.reviewer
+
+		// push
+		payload.commit_count = payload.commits.size
+		payload.sender_info = { id: payload.sender.id, author: payload.sender.login }
+		delete payload.commits
+		delete payload.head_commit
+
+		// status (CI)
+		payload.commit_info = { url: payload.commit.url, author: { id: payload.commit.author.id, login: payload.commit.author.login } }
+		delete payload.commit
+
+
 		if (action) {
 			this.db.ref(`${service}/${project}/${event}/${action}/${Date.now()}`).set(payload)
 		} else {
