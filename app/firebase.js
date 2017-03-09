@@ -1,5 +1,8 @@
 import * as admin from 'firebase-admin'
+import { SLACK_URL } from './consts'
+import { constructPost } from './utils'
 
+const request = require('request')
 const serviceAccount = require('./consts/firebase-auth.json')
 
 class Firebase {
@@ -42,46 +45,84 @@ class Firebase {
 		delete payload.pusher_type
 		delete payload.ref_type
 		delete payload.branches
-
-		// comments
-		payload.comment_info = {
-			author: payload.comment.user.login,
-			issue: {
-				url: payload.issue.url,
-				title: payload.issue.title,
-			},
-		}
-		delete payload.comment
-		delete payload.issue
-
-		// pr review
-		payload.reviewer_info = {
-			name: payload.review.user.login,
-			id: payload.review.user.id,
-			status: payload.review.user.state,
-		}
-
-		delete payload.reviewer
-
-		// push
-		payload.commit_count = payload.commits.size
-		payload.sender_info = {
-			id: payload.sender.id,
-			author: payload.sender.login,
-		}
-		delete payload.commits
 		delete payload.head_commit
 
-		// status (CI)
-		payload.commit_info = {
-			url: payload.commit.url,
-			author: {
-				id: payload.commit.author.id,
-				login: payload.commit.author.login,
-			},
-		}
-		delete payload.commit
+		try {
+			// comments
+			if (payload.comment) {
+				payload.comment_info = {
+					author: payload.comment.user.login,
+					issue: {
+						url: payload.issue.url,
+						title: payload.issue.title,
+					},
+				}
 
+				delete payload.comment
+			}
+
+			if (payload.pull_request) {
+				if (payload.pull_request.head) {
+					payload.pull_request.head_info = payload.pull_request.head.ref
+					delete payload.pull_request.head
+				}
+
+				if (payload.pull_request.base) {
+					payload.pull_request.base_info = payload.pull_request.base.ref
+					delete payload.pull_request.base
+				}
+
+				delete payload.pull_request._links // eslint-disable-line
+			}
+
+			// pr review
+			if (payload.review) {
+				payload.reviewer = {
+					name: payload.review.user.login,
+					id: payload.review.user.id,
+					status: payload.review.state,
+					body: payload.review.body,
+				}
+
+				delete payload.review
+			}
+
+			// push
+			if (payload.commits) {
+				payload.commit_count = payload.commits.length || 0
+				delete payload.commits
+			}
+
+			if (payload.sender) {
+				payload.sender_info = {
+					id: payload.sender.id,
+					author: payload.sender.login,
+				}
+
+				delete payload.sender
+			}
+
+			// status (CI)
+			if (payload.commit) {
+				payload.commit_info = {
+					url: payload.commit.url,
+					author: {
+						id: payload.commit.author.id,
+						login: payload.commit.author.login,
+					},
+				}
+				delete payload.commit
+			}
+		} catch (err) {
+			request(constructPost(SLACK_URL, {
+				channel: 'U28LB0AAH',
+				username: 'Firebase Bot',
+				icon_url: 'https://octodex.github.com/images/yaktocat.png',
+				text: 'Something went wrong when trying to trim firebase payload size. Check server logs, scrub',
+			}))
+
+			console.warn('FIREBASE NO WORK -- ', err)
+		}
 
 		if (action) {
 			this.db.ref(`${service}/${project}/${event}/${action}/${Date.now()}`).set(payload)
