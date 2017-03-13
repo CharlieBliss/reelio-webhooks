@@ -54,13 +54,17 @@ function CheckReviewers(req, event) {
 		return;
 	}
 
-	// Skip PRs that don't need reviews.
-	if (base.includes('staging') || base.includes('production') || base.includes('master') || author.id.toString() === '25992031') {
-		return;
-	}
-
 	var prUrl = payload.pull_request.url,
 	    sha = payload.pull_request.head.sha;
+
+	// Skip PRs that don't need reviews.
+	if (base.includes('staging') || base.includes('production') || base.includes('master') || author.id.toString() === '25992031') {
+		(0, _request2.default)((0, _utils.constructPost)(payload.repository.url + '/statuses/' + sha, {
+			state: 'success',
+			description: 'No reviews required',
+			context: 'ci/reelio'
+		}));
+	}
 
 	(0, _request2.default)((0, _utils.constructGet)(prUrl + '/reviews'), function (response, errors, body) {
 		var reviews = JSON.parse(body);

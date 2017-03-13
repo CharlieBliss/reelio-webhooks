@@ -39,6 +39,9 @@ function CheckReviewers(req, event) {
 		return
 	}
 
+	const prUrl = payload.pull_request.url,
+		sha = payload.pull_request.head.sha
+
 	// Skip PRs that don't need reviews.
 	if (
 		base.includes('staging') ||
@@ -46,11 +49,12 @@ function CheckReviewers(req, event) {
 		base.includes('master') ||
 		author.id.toString() === '25992031'
 	) {
-		return
+		request(constructPost(`${payload.repository.url}/statuses/${sha}`, {
+			state: 'success',
+			description: 'No reviews required',
+			context: 'ci/reelio',
+		}))
 	}
-
-	const prUrl = payload.pull_request.url,
-		sha = payload.pull_request.head.sha
 
 	request(constructGet(`${prUrl}/reviews`), (response, errors, body) => {
 		let reviews = JSON.parse(body)
