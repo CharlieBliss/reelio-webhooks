@@ -16,11 +16,18 @@ var _Status = require('./Status');
 
 var _Status2 = _interopRequireDefault(_Status);
 
+var _CheckReviewers = require('./CheckReviewers');
+
+var _CheckReviewers2 = _interopRequireDefault(_CheckReviewers);
+
 var _firebase = require('./firebase');
 
 var _firebase2 = _interopRequireDefault(_firebase);
 
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
+
+// import request from 'request'
+// import { constructPost } from './utils'
 
 // Create a server with a host and port
 var server = new _hapi2.default.Server();
@@ -35,6 +42,11 @@ function handleGithubEvent(req, reply) {
 	var action = req.payload.action;
 
 	var response = void 0;
+
+	if (event === 'pull_request' || event === 'pull_request_review') {
+		// Doesn't reply because we don't want to call it twice.
+		(0, _CheckReviewers2.default)(req, event);
+	}
 
 	if (event === 'pull_request') {
 		console.log('got a PR');

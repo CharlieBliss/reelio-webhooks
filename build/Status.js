@@ -26,14 +26,14 @@ function handleError(payload, reply) {
 	return reply('CI Status fail');
 }
 
-function Review(req, reply) {
+function Status(req, reply) {
 	var payload = req.payload;
 
-	if (payload.state === 'failure') {
+	if (payload.state === 'failure' && payload.context === 'ci/circleci') {
 		return handleError(payload, reply);
 	}
 
-	return reply('Review Success');
+	return reply('Status Success');
 }
 
-exports.default = Review;
+exports.default = Status;

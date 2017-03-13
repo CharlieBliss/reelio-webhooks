@@ -107,13 +107,6 @@ function handleNew(payload, reply) {
 			    prBody = payload.pull_request.body || '',
 			    tickets = prBody.match(_consts.jiraRegex);
 
-			// If the PR is needing a review (not a webhook PR or a deploy PR), add the reviewer checkboxes
-			if (!labels.map(function (l) {
-				return l.name;
-			}).includes('$$webhook') && !head.includes('staging') && !head.includes('production') && !head.includes('master')) {
-				request((0, _utils.constructPatch)(payload.pull_request.url, { body: payload.pull_request.body + ' \n\n - [ ] Review 1\n - [ ] Review 2 ( Kyle )' })); // add the reviewer checkboxes
-			}
-
 			// If there aren't any JIRA tickets in the body as well, warn them
 			if (!tickets && !labels.map(function (l) {
 				return l.name;

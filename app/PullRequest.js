@@ -85,16 +85,6 @@ function handleNew(payload, reply) {
 				prBody = payload.pull_request.body || '',
 				tickets = prBody.match(jiraRegex)
 
-			// If the PR is needing a review (not a webhook PR or a deploy PR), add the reviewer checkboxes
-			if (
-				!labels.map(l => l.name).includes('$$webhook') &&
-				!head.includes('staging') &&
-				!head.includes('production') &&
-				!head.includes('master')
-			) {
-				request(constructPatch(payload.pull_request.url, { body: `${payload.pull_request.body} \n\n - [ ] Review 1\n - [ ] Review 2 ( Kyle )` })) // add the reviewer checkboxes
-			}
-
 			// If there aren't any JIRA tickets in the body as well, warn them
 			if (!tickets && !labels.map(l => l.name).includes('$$webhook')) {
 				const feedback = `@${payload.pull_request.user.login} - It looks like you didn't include JIRA ticket references in this ticket.  Are you sure you have none to reference?`
