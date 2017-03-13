@@ -28,7 +28,9 @@ function parseReviews(reviews) {
 
 function CheckReviewers(req, event) {
 	const payload = req.payload,
-		action = payload.action
+		action = payload.action,
+		base = payload.pull_request.base.ref,
+		author = payload.pull_request.user
 
 	// We don't want to run this check on things like PR closed
 	if (
@@ -38,6 +40,16 @@ function CheckReviewers(req, event) {
 			action !== 'reopened' ||
 			action !== 'synchronize'
 		)
+	) {
+		return
+	}
+
+	// Skip PRs that don't need reviews.
+	if (
+		base.includes('staging') ||
+		base.includes('production') ||
+		base.includes('master') ||
+		author.id.toString() === '25992031'
 	) {
 		return
 	}
