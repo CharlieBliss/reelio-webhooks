@@ -47,8 +47,10 @@ function CheckReviewers(req, event) {
 	    base = payload.pull_request.base.ref,
 	    author = payload.pull_request.user;
 
+	var actions = ['opened', 'edited', 'reopened', 'synchronize'];
+
 	// We don't want to run this check on things like PR closed
-	if (event === 'pull_request' && (action !== 'opened' || action !== 'edited' || action !== 'reopened' || action !== 'synchronize')) {
+	if (event === 'pull_request' && !actions.includes(action)) {
 		return;
 	}
 
