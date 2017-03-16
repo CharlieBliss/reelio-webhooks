@@ -278,6 +278,14 @@ function handleMerge(payload, reply) {
 					},
 				],
 			}))
+
+			firebase.log('github', payload.repository.full_name, 'reelio_deploy', null, {
+				tickets: tickets.filter(uniqueTicketFilter),
+				fixed_count: tickets.filter(uniqueTicketFilter).length,
+				version: 'production',
+				environment: currentDev,
+				target: 'pro.reelio.com',
+			})
 		}
 
 		// If the closed PRs target was a staging branch, alert QA of impending release

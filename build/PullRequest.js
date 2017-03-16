@@ -294,6 +294,14 @@ function handleMerge(payload, reply) {
 					color: '#de2656'
 				}]
 			}));
+
+			_firebase2.default.log('github', payload.repository.full_name, 'reelio_deploy', null, {
+				tickets: tickets.filter(_utils.uniqueTicketFilter),
+				fixed_count: tickets.filter(_utils.uniqueTicketFilter).length,
+				version: 'production',
+				environment: currentDev,
+				target: 'pro.reelio.com'
+			});
 		}
 
 		// If the closed PRs target was a staging branch, alert QA of impending release
