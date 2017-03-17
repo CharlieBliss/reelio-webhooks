@@ -1,6 +1,8 @@
 import firebase from './firebase'
+import moment from 'moment'
 import { versionRegex, jiraRegex, SLACK_URL, FRONTEND_MEMBERS } from './consts'
 import { uniqueTicketFilter, wrapJiraTicketsFromArray, constructGet, constructPost, constructPatch, constructPut } from './utils'
+
 
 const request = require('request')
 
@@ -189,7 +191,7 @@ function handleMerge(payload, reply) {
 			const fixed = tickets.filter(uniqueTicketFilter)
 			fixed.forEach((ticket) => {
 				const ticketUrl = `https://reelio.atlassian.net/rest/api/2/issue/${ticket}`
-				const header = '|| ||PR Submitted|| Deployed to Staging|| QA Approved ||'
+				const header = '|| ||PR Submitted|| Deployed to Staging|| QA Approved || Deployed On||'
 
 				request(constructGet(ticketUrl, 'jira'), (error, response, bdy) => {
 					if (JSON.parse(bdy).fields.customfield_10900) {
@@ -365,15 +367,14 @@ function handleMerge(payload, reply) {
 						newTable = tableRows.map((row) => {
 							// If the current table row doesn't include the current branch version, don't edit
 							if (row.includes(version)) {
-								return `| *${version}* | [Yes|${payload.pull_request.html_url}] | [Yes|http://${version}-staging.reelio.com] | |`
+								return `| *${version}* | [Yes|${payload.pull_request.html_url}] | [Yes|http://${version}-staging.reelio.com] | | ${moment().format('MM/DD/YYYY')}`
 							} else if (version === 'dev' && row.includes(currentDev)) {
-								return `| *${currentDev}* | [Yes|${payload.pull_request.html_url}] | [Yes|http://${currentDev}-staging.reelio.com] | |`
+								return `| *${currentDev}* | [Yes|${payload.pull_request.html_url}] | [Yes|http://${currentDev}-staging.reelio.com] | | ${moment().format('MM/DD/YYYY')}`
 							}
-
 							return row
 						})
 					} else {
-						tableRows[1] = `| *${deployVersion}* | [Yes|${payload.pull_request.html_url}] | [Yes|http://${deployVersion}-staging.reelio.com] | |`
+						tableRows[1] = `| *${deployVersion}* | [Yes|${payload.pull_request.html_url}] | [Yes|http://${deployVersion}-staging.reelio.com] | | ${moment().format('MM/DD/YYYY')}`
 						newTable = tableRows
 					}
 
