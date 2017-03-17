@@ -284,8 +284,8 @@ function handleMerge(payload, reply) {
 			firebase.log('github', payload.repository.full_name, 'reelio_deploy', null, {
 				tickets: tickets.filter(uniqueTicketFilter),
 				fixed_count: tickets.filter(uniqueTicketFilter).length,
-				version: 'production',
-				environment: currentDev,
+				version: currentDev,
+				environment: 'production',
 				target: 'pro.reelio.com',
 			})
 		}
