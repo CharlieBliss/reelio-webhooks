@@ -75,6 +75,7 @@ function CheckReviewers(req, event) {
 			}))
 			request(constructPost(`${payload.pull_request.issue_url}/labels`, ['approved']))
 			request(constructDelete(`${payload.pull_request.issue_url}/labels/%24%24review`))
+			request(constructDelete(`${payload.pull_request.issue_url}/labels/ready%20to%20review`))
 		} else {
 			request(constructPost(`${payload.repository.url}/statuses/${sha}`, {
 				state: 'failure',
