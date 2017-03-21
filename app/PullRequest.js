@@ -1,5 +1,6 @@
-import firebase from './firebase'
 import moment from 'moment'
+
+import firebase from './firebase'
 import { versionRegex, jiraRegex, SLACK_URL, FRONTEND_MEMBERS } from './consts'
 import { uniqueTicketFilter, wrapJiraTicketsFromArray, constructGet, constructPost, constructPatch, constructPut } from './utils'
 
