@@ -3,7 +3,7 @@ import { SLACK_URL, FRONTEND_MEMBERS } from './consts'
 
 const request = require('request')
 
-function handleRequestedChanges(payload, reply) {
+function handleRequestedChanges(payload) {
 	const user = FRONTEND_MEMBERS[payload.pull_request.user.id]
 
 	request(constructPost(`${payload.pull_request.issue_url}/labels`, ['changes requested']))
@@ -21,12 +21,14 @@ function handleRequestedChanges(payload, reply) {
 
 	// @TODO add slackbot that slacks a link to the PR to the person who opened the PR
 
-	return reply('Review Changes Request')
+	return 'Review Changes Request'
 }
 
-function handleApproved(payload, reply) {
+function handleApproved(payload) {
+	request(constructDelete(`${payload.pull_request.issue_url}/labels/ready%20to%20review`))
 	request(constructDelete(`${payload.pull_request.issue_url}/labels/changes%20requested`))
-	return reply('Review Changes Success')
+
+	return 'Review Changes Success'
 }
 
 function Review(req, reply) {
@@ -40,7 +42,7 @@ function Review(req, reply) {
 		return handleApproved(payload, reply)
 	}
 
-	return reply('Review Success')
+	return 'Review Success'
 }
 
 export default Review

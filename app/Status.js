@@ -5,7 +5,7 @@ const request = require('request')
 
 // This component can't easily link to PRs because statuses are for specific commits, not PRs
 
-function handleError(payload, reply) {
+function handleError(payload) {
 	const user = FRONTEND_MEMBERS[payload.commit.author.id]
 	if (user) {
 		request(constructPost(SLACK_URL, {
@@ -16,7 +16,7 @@ function handleError(payload, reply) {
 		}))
 	}
 
-	return reply('CI Status fail')
+	return 'CI Status fail'
 }
 
 function Status(req, reply) {
@@ -26,7 +26,7 @@ function Status(req, reply) {
 		return handleError(payload, reply)
 	}
 
-	return reply('Status Success')
+	return 'Status Success'
 }
 
 export default Status

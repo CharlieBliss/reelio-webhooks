@@ -73,7 +73,7 @@ function createPullRequest(head, base, payload, newBody = '', labels = []) {
 
 }
 
-function handleNew(payload, reply) {
+function handleNew(payload) {
 	const user = FRONTEND_MEMBERS[payload.pull_request.user.id]
 
 	// Get the issue, not the PR
@@ -121,17 +121,17 @@ function handleNew(payload, reply) {
 					}))
 				}
 
-				return reply('New PR -- Incomplete')
+				return 'New PR -- Incomplete'
 			}
 
-			return reply('New PR -- Complete')
+			return 'New PR -- Complete'
 		}
 
-		return reply('New PR -- Unhandled but requested')
+		return 'New PR -- Unhandled but requested'
 	})
 }
 
-function handleMerge(payload, reply) {
+function handleMerge(payload) {
 	let labels = [],
 		filteredLabels = [],
 		reviews = []
@@ -434,7 +434,7 @@ function handleMerge(payload, reply) {
 	})
 
 
-	return reply('Merged!')
+	return 'Merged!'
 }
 
 function PullRequest(req, reply) {
@@ -448,7 +448,7 @@ function PullRequest(req, reply) {
 		return handleMerge(payload, reply)
 	}
 
-	return reply('Got a pull request!!!')
+	return 'Got a pull request!!!'
 }
 
 export default PullRequest

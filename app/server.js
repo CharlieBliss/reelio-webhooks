@@ -21,7 +21,7 @@ function handleGithubEvent(req, reply) {
 	const event = req.headers['x-github-event']
 	const action = req.payload.action
 
-	let response
+	let response = 'No handling needed'
 
 	if (
 		event === 'pull_request' ||
@@ -48,7 +48,7 @@ function handleGithubEvent(req, reply) {
 	}
 
 	firebase.log('github', repo, event, action, req.payload)
-	return response || reply()
+	return reply(response)
 }
 
 server.route({
