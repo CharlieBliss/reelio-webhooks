@@ -10,7 +10,7 @@ var _consts = require('./consts');
 
 var request = require('request');
 
-function handleRequestedChanges(payload, reply) {
+function handleRequestedChanges(payload) {
 	var user = _consts.FRONTEND_MEMBERS[payload.pull_request.user.id];
 
 	request((0, _utils.constructPost)(payload.pull_request.issue_url + '/labels', ['changes requested']));
@@ -27,14 +27,14 @@ function handleRequestedChanges(payload, reply) {
 
 	// @TODO add slackbot that slacks a link to the PR to the person who opened the PR
 
-	return reply('Review Changes Request');
+	return 'Review Changes Request';
 }
 
-function handleApproved(payload, reply) {
+function handleApproved(payload) {
 	request((0, _utils.constructDelete)(payload.pull_request.issue_url + '/labels/ready%20to%20review'));
 	request((0, _utils.constructDelete)(payload.pull_request.issue_url + '/labels/changes%20requested'));
 
-	return reply('Review Changes Success');
+	return 'Review Changes Success';
 }
 
 function Review(req, reply) {
@@ -48,7 +48,7 @@ function Review(req, reply) {
 		return handleApproved(payload, reply);
 	}
 
-	return reply('Review Success');
+	return 'Review Success';
 }
 
 exports.default = Review;

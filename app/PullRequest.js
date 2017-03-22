@@ -337,7 +337,7 @@ function handleMerge(payload) {
 				// Make sure the ticket is marked as `Ready for QA`
 				request(constructPost(`${ticketUrl}/transitions`, {
 					transition: {
-						id: 121,
+						id: 221,
 					},
 				}, 'jira'))
 				firebase.log('JIRA', 'FRONT', 'transition', 'QA', { ticket })

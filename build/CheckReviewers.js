@@ -77,13 +77,24 @@ function CheckReviewers(req, event) {
 		console.log('reviews', reviews, approved);
 
 		if (reviews.length > 1 && approved.length > 1) {
-			(0, _request2.default)((0, _utils.constructPost)(payload.repository.url + '/statuses/' + sha, {
-				state: 'success',
-				description: 'At least 2 reviewers.',
-				context: 'ci/reelio'
-			}));
-			(0, _request2.default)((0, _utils.constructPost)(payload.pull_request.issue_url + '/labels', ['approved']));
-			(0, _request2.default)((0, _utils.constructDelete)(payload.pull_request.issue_url + '/labels/%24%24review'));
+			if (reviews.length === approved.length) {
+				(0, _request2.default)((0, _utils.constructPost)(payload.repository.url + '/statuses/' + sha, {
+					state: 'success',
+					description: 'At least 2 reviews, all reviews approved.',
+					context: 'ci/reelio'
+				}));
+				(0, _request2.default)((0, _utils.constructPost)(payload.pull_request.issue_url + '/labels', ['approved']));
+				(0, _request2.default)((0, _utils.constructDelete)(payload.pull_request.issue_url + '/labels/%24%24review'));
+			}
+			if (reviews.length !== approved.length) {
+				(0, _request2.default)((0, _utils.constructPost)(payload.repository.url + '/statuses/' + sha, {
+					state: 'failure',
+					description: 'This PR is blocked from merging due to a pending request for changes.',
+					context: 'ci/reelio'
+				}));
+				(0, _request2.default)((0, _utils.constructPost)(payload.pull_request.issue_url + '/labels', ['$$review']));
+				(0, _request2.default)((0, _utils.constructDelete)(payload.pull_request.issue_url + '/labels/approved'));
+			}
 		} else {
 			(0, _request2.default)((0, _utils.constructPost)(payload.repository.url + '/statuses/' + sha, {
 				state: 'failure',

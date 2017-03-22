@@ -4,6 +4,10 @@ Object.defineProperty(exports, "__esModule", {
 	value: true
 });
 
+var _moment = require('moment');
+
+var _moment2 = _interopRequireDefault(_moment);
+
 var _firebase = require('./firebase');
 
 var _firebase2 = _interopRequireDefault(_firebase);
@@ -90,7 +94,7 @@ function createPullRequest(head, base, payload) {
 	});
 }
 
-function handleNew(payload, reply) {
+function handleNew(payload) {
 	var user = _consts.FRONTEND_MEMBERS[payload.pull_request.user.id];
 
 	// Get the issue, not the PR
@@ -138,17 +142,17 @@ function handleNew(payload, reply) {
 					}));
 				}
 
-				return reply('New PR -- Incomplete');
+				return 'New PR -- Incomplete';
 			}
 
-			return reply('New PR -- Complete');
+			return 'New PR -- Complete';
 		}
 
-		return reply('New PR -- Unhandled but requested');
+		return 'New PR -- Unhandled but requested';
 	});
 }
 
-function handleMerge(payload, reply) {
+function handleMerge(payload) {
 	var labels = [],
 	    filteredLabels = [],
 	    reviews = [];
@@ -208,7 +212,7 @@ function handleMerge(payload, reply) {
 				var fixed = tickets.filter(_utils.uniqueTicketFilter);
 				fixed.forEach(function (ticket) {
 					var ticketUrl = 'https://reelio.atlassian.net/rest/api/2/issue/' + ticket;
-					var header = '|| ||PR Submitted|| Deployed to Staging|| QA Approved ||';
+					var header = '|| ||PR Submitted|| Deployed to Staging|| QA Approved || Deployed On||';
 
 					request((0, _utils.constructGet)(ticketUrl, 'jira'), function (error, response, bdy) {
 						if (JSON.parse(bdy).fields.customfield_10900) {
@@ -298,8 +302,8 @@ function handleMerge(payload, reply) {
 			_firebase2.default.log('github', payload.repository.full_name, 'reelio_deploy', null, {
 				tickets: tickets.filter(_utils.uniqueTicketFilter),
 				fixed_count: tickets.filter(_utils.uniqueTicketFilter).length,
-				version: 'production',
-				environment: currentDev,
+				version: currentDev,
+				environment: 'production',
 				target: 'pro.reelio.com'
 			});
 		}
@@ -351,7 +355,7 @@ function handleMerge(payload, reply) {
 					// Make sure the ticket is marked as `Ready for QA`
 					request((0, _utils.constructPost)(ticketUrl + '/transitions', {
 						transition: {
-							id: 121
+							id: 221
 						}
 					}, 'jira'));
 					_firebase2.default.log('JIRA', 'FRONT', 'transition', 'QA', { ticket: ticket });
@@ -381,15 +385,14 @@ function handleMerge(payload, reply) {
 							newTable = tableRows.map(function (row) {
 								// If the current table row doesn't include the current branch version, don't edit
 								if (row.includes(version)) {
-									return '| *' + version + '* | [Yes|' + payload.pull_request.html_url + '] | [Yes|http://' + version + '-staging.reelio.com] | |';
+									return '| *' + version + '* | [Yes|' + payload.pull_request.html_url + '] | [Yes|http://' + version + '-staging.reelio.com] | | ' + (0, _moment2.default)().format('MM/DD/YYYY');
 								} else if (version === 'dev' && row.includes(currentDev)) {
-									return '| *' + currentDev + '* | [Yes|' + payload.pull_request.html_url + '] | [Yes|http://' + currentDev + '-staging.reelio.com] | |';
+									return '| *' + currentDev + '* | [Yes|' + payload.pull_request.html_url + '] | [Yes|http://' + currentDev + '-staging.reelio.com] | | ' + (0, _moment2.default)().format('MM/DD/YYYY');
 								}
-
 								return row;
 							});
 						} else {
-							tableRows[1] = '| *' + deployVersion + '* | [Yes|' + payload.pull_request.html_url + '] | [Yes|http://' + deployVersion + '-staging.reelio.com] | |';
+							tableRows[1] = '| *' + deployVersion + '* | [Yes|' + payload.pull_request.html_url + '] | [Yes|http://' + deployVersion + '-staging.reelio.com] | | ' + (0, _moment2.default)().format('MM/DD/YYYY');
 							newTable = tableRows;
 						}
 
@@ -445,7 +448,7 @@ function handleMerge(payload, reply) {
 		}
 	});
 
-	return reply('Merged!');
+	return 'Merged!';
 }
 
 function PullRequest(req, reply) {
@@ -459,7 +462,7 @@ function PullRequest(req, reply) {
 		return handleMerge(payload, reply);
 	}
 
-	return reply('Got a pull request!!!');
+	return 'Got a pull request!!!';
 }
 
 exports.default = PullRequest;

@@ -41,7 +41,7 @@ function handleGithubEvent(req, reply) {
 	var event = req.headers['x-github-event'];
 	var action = req.payload.action;
 
-	var response = void 0;
+	var response = 'No handling needed';
 
 	if (event === 'pull_request' || event === 'pull_request_review') {
 		// Doesn't reply because we don't want to call it twice.
@@ -64,7 +64,7 @@ function handleGithubEvent(req, reply) {
 	}
 
 	_firebase2.default.log('github', repo, event, action, req.payload);
-	return response || reply();
+	return reply(response);
 }
 
 server.route({
