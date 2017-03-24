@@ -123,9 +123,17 @@ function handleNew(payload) {
 
 				_firebase2.default.log('github', payload.repository.full_name, 'pull_request', 'featureless', payload);
 			} else {
-				var parsedBranch = head.substr(head.indexOf('-') + 1, head.length);
+				var parsedBranch = head.substr(head.indexOf('-') + 1, head.length),
+				    url = 'http://zzz-' + parsedBranch + '.s3-website-us-east-1.amazonaws.com/';
 
-				request((0, _utils.constructPost)(payload.pull_request.issue_url + '/comments', { body: '@' + payload.pull_request.user.login + ' - Thanks for the PR! Your feature branch is now [live](http://zzz-' + parsedBranch + '.s3-website-us-east-1.amazonaws.com/)' }));
+				request((0, _utils.constructPost)(payload.pull_request.issue_url + '/comments', { body: '@' + payload.pull_request.user.login + ' - Thanks for the PR! Your feature branch is now [live](' + url + ')' }));
+
+				_firebase2.default.log('github', payload.repository.full_name, 'reelio_deploy/feature', null, {
+					tickets: tickets.filter(_utils.uniqueTicketFilter),
+					fixed_count: tickets.filter(_utils.uniqueTicketFilter).length,
+					environment: parsedBranch,
+					target: 'url'
+				});
 			}
 
 			return 'New PR -- Complete';

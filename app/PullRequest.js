@@ -93,9 +93,17 @@ function handleNew(payload) {
 
 				firebase.log('github', payload.repository.full_name, 'pull_request', 'featureless', payload)
 			} else {
-				const parsedBranch = head.substr(head.indexOf('-') + 1, head.length)
+				const parsedBranch = head.substr(head.indexOf('-') + 1, head.length),
+					url = `http://zzz-${parsedBranch}.s3-website-us-east-1.amazonaws.com/`
 
-				request(constructPost(`${payload.pull_request.issue_url}/comments`, { body: `@${payload.pull_request.user.login} - Thanks for the PR! Your feature branch is now [live](http://zzz-${parsedBranch}.s3-website-us-east-1.amazonaws.com/)` }))
+				request(constructPost(`${payload.pull_request.issue_url}/comments`, { body: `@${payload.pull_request.user.login} - Thanks for the PR! Your feature branch is now [live](${url})` }))
+
+				firebase.log('github', payload.repository.full_name, 'reelio_deploy/feature', null, {
+					tickets: tickets.filter(uniqueTicketFilter),
+					fixed_count: tickets.filter(uniqueTicketFilter).length,
+					environment: parsedBranch,
+					target: 'url',
+				})
 
 			}
 
