@@ -10,6 +10,7 @@ exports.constructPost = constructPost;
 exports.constructPatch = constructPatch;
 exports.constructPut = constructPut;
 exports.constructDelete = constructDelete;
+exports.parseReviews = parseReviews;
 
 var _consts = require('./consts');
 
@@ -154,4 +155,33 @@ function constructDelete(url) {
 			'User-Agent': 'Kyle-Mendes'
 		}
 	};
+}
+
+function parseReviews(reviews) {
+	// grab the data we care about
+	var parsed = reviews.map(function (r) {
+		return {
+			state: r.state,
+			user: r.user.id,
+			submitted: new Date(r.submitted_at)
+		};
+	});
+
+	var data = {};
+
+	// group reviews by review author, and only keep the newest review
+	parsed.forEach(function (p) {
+		// Check if the new item was submitted AFTER
+		// the already saved review.  If it was, overwrite
+		if (data[p.user]) {
+			var submitted = data[p.user].submitted;
+			data[p.user] = submitted > p.submitted ? data[p.user] : p;
+		} else {
+			data[p.user] = p;
+		}
+	});
+
+	return Object.keys(data).map(function (k) {
+		return data[k];
+	});
 }

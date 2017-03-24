@@ -25,8 +25,6 @@ function handleRequestedChanges(payload) {
 		}));
 	}
 
-	// @TODO add slackbot that slacks a link to the PR to the person who opened the PR
-
 	return 'Review Changes Request';
 }
 

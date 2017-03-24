@@ -1,13 +1,12 @@
 import Hapi from 'hapi'
 
+import CheckReviewers from './CheckReviewers'
 import PullRequest from './PullRequest'
 import Review from './Review'
 import Status from './Status'
-import CheckReviewers from './CheckReviewers'
+import Jira from './Jira'
 import firebase from './firebase'
 
-// import request from 'request'
-// import { constructPost } from './utils'
 
 // Create a server with a host and port
 const server = new Hapi.Server()
@@ -30,7 +29,6 @@ function handleGithubEvent(req, reply) {
 		// Doesn't reply because we don't want to call it twice.
 		CheckReviewers(req, event)
 	}
-
 
 	if (event === 'pull_request') {
 		console.log('got a PR')
@@ -66,6 +64,10 @@ server.route({
 	handler: (request, reply) => {
 		if (request.headers['x-github-event']) {
 			return handleGithubEvent(request, reply)
+		}
+
+		if (request.payload && request.payload.transition) {
+			return reply(Jira.handleTransition(request))
 		}
 
 		console.log('Got it', request.params, request.method)

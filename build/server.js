@@ -4,6 +4,10 @@ var _hapi = require('hapi');
 
 var _hapi2 = _interopRequireDefault(_hapi);
 
+var _CheckReviewers = require('./CheckReviewers');
+
+var _CheckReviewers2 = _interopRequireDefault(_CheckReviewers);
+
 var _PullRequest = require('./PullRequest');
 
 var _PullRequest2 = _interopRequireDefault(_PullRequest);
@@ -16,18 +20,15 @@ var _Status = require('./Status');
 
 var _Status2 = _interopRequireDefault(_Status);
 
-var _CheckReviewers = require('./CheckReviewers');
+var _Jira = require('./Jira');
 
-var _CheckReviewers2 = _interopRequireDefault(_CheckReviewers);
+var _Jira2 = _interopRequireDefault(_Jira);
 
 var _firebase = require('./firebase');
 
 var _firebase2 = _interopRequireDefault(_firebase);
 
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
-
-// import request from 'request'
-// import { constructPost } from './utils'
 
 // Create a server with a host and port
 var server = new _hapi2.default.Server();
@@ -82,6 +83,10 @@ server.route({
 	handler: function handler(request, reply) {
 		if (request.headers['x-github-event']) {
 			return handleGithubEvent(request, reply);
+		}
+
+		if (request.payload && request.payload.transition) {
+			return reply(_Jira2.default.handleTransition(request));
 		}
 
 		console.log('Got it', request.params, request.method);

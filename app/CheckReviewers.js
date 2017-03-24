@@ -1,30 +1,7 @@
 import request from 'request'
-import { constructGet, constructDelete, constructPost } from './utils'
-
-function parseReviews(reviews) {
-	// grab the data we care about
-	const parsed = reviews.map(r => ({
-		state: r.state,
-		user: r.user.id,
-		submitted: new Date(r.submitted_at),
-	}))
-
-	const data = {}
-
-	// group reviews by review author, and only keep the newest review
-	parsed.forEach((p) => {
-		// Check if the new item was submitted AFTER
-		// the already saved review.  If it was, overwrite
-		if (data[p.user]) {
-			const submitted = data[p.user].submitted
-			data[p.user] = submitted > p.submitted ? data[p.user] : p
-		} else {
-			data[p.user] = p
-		}
-	})
-
-	return Object.keys(data).map(k => data[k].state)
-}
+import Jira from './Jira'
+import { jiraRegex } from './consts'
+import { constructGet, constructDelete, constructPost, parseReviews } from './utils'
 
 function CheckReviewers(req, event) {
 	const payload = req.payload,
@@ -44,8 +21,6 @@ function CheckReviewers(req, event) {
 
 	// Skip PRs that don't need reviews.
 	if (
-		base.includes('staging') ||
-		base.includes('production') ||
 		base.includes('master') ||
 		author.id.toString() === '25992031'
 	) {
@@ -54,15 +29,19 @@ function CheckReviewers(req, event) {
 			description: 'No reviews required',
 			context: 'ci/reelio',
 		}))
+
+		return 'Master Branch' // eslint-disable-line
 	}
 
 	request(constructGet(`${prUrl}/reviews`), (response, errors, body) => {
-		let reviews = JSON.parse(body)
+		let reviews = JSON.parse(body),
+			approved = []
 
 		// group by author keep latest
 		reviews = parseReviews(reviews)
-		const approved = reviews.filter(r => r.toLowerCase() === 'approved')
-		console.log('reviews', reviews, approved)
+		approved = reviews
+			.map(r => r.state)
+			.filter(r => r.toLowerCase() === 'approved')
 
 		if (
 			reviews.length > 1 &&
@@ -74,9 +53,14 @@ function CheckReviewers(req, event) {
 					description: 'At least 2 reviews, all reviews approved.',
 					context: 'ci/reelio',
 				}))
-				request(constructPost(`${payload.pull_request.issue_url}/labels`, ['approved']))
+				request(constructPost(`${payload.pull_request.issue_url}/labels`, ['approved', '$$qa']))
 				request(constructDelete(`${payload.pull_request.issue_url}/labels/%24%24review`))
+
+				// Move the tickets to "Ready for QA"
+				const tickets = payload.pull_request.body.match(jiraRegex) || []
+				Jira.transitionTickets(tickets, payload)
 			}
+
 			if (reviews.length !== approved.length) {
 				request(constructPost(`${payload.repository.url}/statuses/${sha}`, {
 					state: 'failure',
@@ -85,6 +69,7 @@ function CheckReviewers(req, event) {
 				}))
 				request(constructPost(`${payload.pull_request.issue_url}/labels`, ['$$review']))
 				request(constructDelete(`${payload.pull_request.issue_url}/labels/approved`))
+				request(constructDelete(`${payload.pull_request.issue_url}/labels/%24%24qa`))
 			}
 
 		} else {
@@ -94,6 +79,7 @@ function CheckReviewers(req, event) {
 				context: 'ci/reelio',
 			}))
 			request(constructPost(`${payload.pull_request.issue_url}/labels`, ['$$review']))
+			request(constructDelete(`${payload.pull_request.issue_url}/labels/%24%24qa`))
 			request(constructDelete(`${payload.pull_request.issue_url}/labels/approved`))
 
 		}
