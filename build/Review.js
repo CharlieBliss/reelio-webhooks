@@ -8,6 +8,12 @@ var _utils = require('./utils');
 
 var _consts = require('./consts');
 
+var _Slack = require('./Slack');
+
+var _Slack2 = _interopRequireDefault(_Slack);
+
+function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
+
 var request = require('request');
 
 function handleRequestedChanges(payload) {
@@ -17,12 +23,7 @@ function handleRequestedChanges(payload) {
 	request((0, _utils.constructDelete)(payload.pull_request.issue_url + '/labels/ready%20to%20review'));
 
 	if (user) {
-		request((0, _utils.constructPost)(_consts.SLACK_URL, {
-			channel: user.slack_id,
-			username: 'PR Bot',
-			icon_url: 'https://octodex.github.com/images/luchadortocat.png',
-			text: 'Hey there, ' + user.name + '.  Your pull request was flagged for changes.  Please review on <' + payload.review.html_url + '|GitHub>.'
-		}));
+		_Slack2.default.slackChangesRequested(payload, user);
 	}
 
 	return 'Review Changes Request';

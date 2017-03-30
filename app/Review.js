@@ -1,5 +1,7 @@
 import { constructDelete, constructPost } from './utils'
-import { SLACK_URL, FRONTEND_MEMBERS } from './consts'
+import { FRONTEND_MEMBERS } from './consts'
+
+import Slack from './Slack'
 
 const request = require('request')
 
@@ -10,12 +12,7 @@ function handleRequestedChanges(payload) {
 	request(constructDelete(`${payload.pull_request.issue_url}/labels/ready%20to%20review`))
 
 	if (user) {
-		request(constructPost(SLACK_URL, {
-			channel: user.slack_id,
-			username: 'PR Bot',
-			icon_url: 'https://octodex.github.com/images/luchadortocat.png',
-			text: `Hey there, ${user.name}.  Your pull request was flagged for changes.  Please review on <${payload.review.html_url}|GitHub>.`,
-		}))
+		Slack.slackChangesRequested(payload, user)
 	}
 
 	return 'Review Changes Request'
