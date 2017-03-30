@@ -22,7 +22,6 @@ function handleRequestedChanges(payload) {
 }
 
 function handleApproved(payload) {
-	request(constructDelete(`${payload.pull_request.issue_url}/labels/ready%20to%20review`))
 	request(constructDelete(`${payload.pull_request.issue_url}/labels/changes%20requested`))
 
 	return 'Review Changes Success'
