@@ -14,7 +14,7 @@ function triggerReviewReminder(user, payload) {
 		// get reviewers and send a reminder message for each of them to re-review
 		const reviewers = parseReviews(reviews)
 		reviewers.map((reviewer) => {
-			Slack('review reminder', payload, user, null, null, reviewer)
+			Slack.slackReviewReminder(payload, user, reviewer)
 			return 'Reviewer Reminded'
 		})
 	})

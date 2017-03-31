@@ -55,6 +55,7 @@ function CheckReviewers(req, event) {
 				}))
 				request(constructPost(`${payload.pull_request.issue_url}/labels`, ['approved', '$$qa']))
 				request(constructDelete(`${payload.pull_request.issue_url}/labels/%24%24review`))
+				request(constructDelete(`${payload.pull_request.issue_url}/labels/ready%20to%20review`))
 
 				// Move the tickets to "Ready for QA"
 				const tickets = payload.pull_request.body.match(jiraRegex) || []

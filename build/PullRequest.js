@@ -64,7 +64,7 @@ function createPullRequest(head, base, payload) {
 
 			// If making the issue fails, slack Kyle
 			if (body.errors) {
-				(0, _Slack2.default)('error', payload, null, null, resBody);
+				_Slack2.default.slackErrorWarning(payload, body);
 			} else {
 				var pr = {
 					issue: JSON.parse(body).number,
@@ -79,7 +79,7 @@ function createPullRequest(head, base, payload) {
 					resBody = JSON.parse(b);
 
 					if (e || !resBody.number) {
-						(0, _Slack2.default)('error', payload, null, null, resBody);
+						_Slack2.default.slackErrorWarning(payload, body);
 					}
 				});
 			}
@@ -165,12 +165,7 @@ function handleMerge(payload) {
 
 		// If the closed PRs target was the master branch, alert QA of impending release
 		if (base === 'master') {
-			var fixed = tickets.filter(_utils.uniqueTicketFilter),
-			    formattedFixed = fixed.map(function (t) {
-				return '<https://reelio.atlassian.net/browse/' + t + '|' + t + '>';
-			}).join('\n');
-
-			(0, _Slack2.default)('deploy', payload, null, formattedFixed);
+			_Slack2.default.slackDeployWarning(payload, tickets);
 
 			_firebase2.default.log('github', payload.repository.full_name, 'reelio_deploy', null, {
 				tickets: tickets.filter(_utils.uniqueTicketFilter),
@@ -191,7 +186,7 @@ function handleMerge(payload) {
 		}
 		// If the PR was merged without any changes requested, :tada: to the dev!
 		if (!reviews.includes('CHANGES_REQUESTED') && user.slack_id !== 'U28LB0AAH' && payload.pull_request.user.id.toString() !== '25992031') {
-			(0, _Slack2.default)('congrats', payload, user);
+			_Slack2.default.slackCongrats(payload, user);
 			_firebase2.default.log('github', payload.repository.full_name, 'pull_request', 'party_parrot', payload);
 		}
 	});

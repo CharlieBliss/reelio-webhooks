@@ -38,7 +38,7 @@ function createPullRequest(head, base, payload, newBody = '', labels = []) {
 
 			// If making the issue fails, slack Kyle
 			if (body.errors) {
-				Slack('error', payload, null, null, resBody)
+				Slack.slackErrorWarning(payload, body)
 			} else {
 				const pr = {
 					issue: JSON.parse(body).number,
@@ -53,7 +53,7 @@ function createPullRequest(head, base, payload, newBody = '', labels = []) {
 					resBody = JSON.parse(b)
 
 					if (e || !resBody.number) {
-						Slack('error', payload, null, null, resBody)
+						Slack.slackErrorWarning(payload, body)
 					}
 				})
 			}
@@ -139,10 +139,7 @@ function handleMerge(payload) {
 
 		// If the closed PRs target was the master branch, alert QA of impending release
 		if (base === 'master') {
-			const fixed = tickets.filter(uniqueTicketFilter),
-				formattedFixed = fixed.map(t => `<https://reelio.atlassian.net/browse/${t}|${t}>`).join('\n')
-
-			Slack('deploy', payload, null, formattedFixed)
+			Slack.slackDeployWarning(payload, tickets)
 
 			firebase.log('github', payload.repository.full_name, 'reelio_deploy', null, {
 				tickets: tickets.filter(uniqueTicketFilter),
@@ -165,7 +162,7 @@ function handleMerge(payload) {
 			user.slack_id !== 'U28LB0AAH' &&
 			payload.pull_request.user.id.toString() !== '25992031'
 		) {
-			Slack('congrats', payload, user)
+			Slack.slackCongrats(payload, user)
 			firebase.log('github', payload.repository.full_name, 'pull_request', 'party_parrot', payload)
 		}
 	})

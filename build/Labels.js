@@ -26,7 +26,7 @@ function triggerReviewReminder(user, payload) {
 		// get reviewers and send a reminder message for each of them to re-review
 		var reviewers = (0, _utils.parseReviews)(reviews);
 		reviewers.map(function (reviewer) {
-			(0, _Slack2.default)('review reminder', payload, user, null, null, reviewer);
+			_Slack2.default.slackReviewReminder(payload, user, reviewer);
 			return 'Reviewer Reminded';
 		});
 	});
