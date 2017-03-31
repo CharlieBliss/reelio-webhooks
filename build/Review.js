@@ -30,7 +30,6 @@ function handleRequestedChanges(payload) {
 }
 
 function handleApproved(payload) {
-	request((0, _utils.constructDelete)(payload.pull_request.issue_url + '/labels/ready%20to%20review'));
 	request((0, _utils.constructDelete)(payload.pull_request.issue_url + '/labels/changes%20requested'));
 
 	return 'Review Changes Success';

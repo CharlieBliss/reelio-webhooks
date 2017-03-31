@@ -66,6 +66,7 @@ function CheckReviewers(req, event) {
 				}));
 				(0, _request2.default)((0, _utils.constructPost)(payload.pull_request.issue_url + '/labels', ['approved', '$$qa']));
 				(0, _request2.default)((0, _utils.constructDelete)(payload.pull_request.issue_url + '/labels/%24%24review'));
+				(0, _request2.default)((0, _utils.constructDelete)(payload.pull_request.issue_url + '/labels/ready%20to%20review'));
 
 				// Move the tickets to "Ready for QA"
 				var tickets = payload.pull_request.body.match(_consts.jiraRegex) || [];

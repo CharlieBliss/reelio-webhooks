@@ -147,12 +147,13 @@ export function parseReviews(reviews) {
 
 	// group reviews by review author, and only keep the newest review
 	parsed.forEach((p) => {
-		// Check if the new item was submitted AFTER
-		// the already saved review.  If it was, overwrite
+		// we only care about reviews that are approved or denied.
 		if (p.state.toLowerCase() !== 'approved' || p.state.toLowerCase() !== 'changes_requested') {
 			return
 		}
 
+		// Check if the new item was submitted AFTER
+		// the already saved review.  If it was, overwrite
 		if (data[p.user]) {
 			const submitted = data[p.user].submitted
 			data[p.user] = submitted > p.submitted ? data[p.user] : p
