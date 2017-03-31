@@ -173,6 +173,10 @@ function parseReviews(reviews) {
 	parsed.forEach(function (p) {
 		// Check if the new item was submitted AFTER
 		// the already saved review.  If it was, overwrite
+		if (p.state.toLowerCase() !== 'approved' || p.state.toLowerCase() !== 'changes_requested') {
+			return;
+		}
+
 		if (data[p.user]) {
 			var submitted = data[p.user].submitted;
 			data[p.user] = submitted > p.submitted ? data[p.user] : p;

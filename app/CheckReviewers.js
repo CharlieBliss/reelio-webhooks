@@ -34,7 +34,7 @@ function CheckReviewers(req, event) {
 	}
 
 	request(constructGet(`${prUrl}/reviews`), (response, errors, body) => {
-		let reviews = JSON.parse(body),
+		let reviews = JSON.parse(body) || [],
 			approved = []
 
 		// group by author keep latest
