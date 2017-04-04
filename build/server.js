@@ -4,6 +4,8 @@ var _hapi = require('hapi');
 
 var _hapi2 = _interopRequireDefault(_hapi);
 
+var _lodash = require('lodash');
+
 var _CheckReviewers = require('./CheckReviewers');
 
 var _CheckReviewers2 = _interopRequireDefault(_CheckReviewers);
@@ -28,6 +30,10 @@ var _firebase = require('./firebase');
 
 var _firebase2 = _interopRequireDefault(_firebase);
 
+var _config = require('../config.json');
+
+var _config2 = _interopRequireDefault(_config);
+
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
 // Create a server with a host and port
@@ -38,7 +44,10 @@ server.connection({
 });
 
 function handleGithubEvent(req, reply) {
-	var repo = req.payload.repository.full_name;
+	var fullRepo = req.payload.repository.full_name,
+	    org = fullRepo.split('/')[0],
+	    repo = fullRepo.split('/')[1];
+
 	var event = req.headers['x-github-event'];
 	var action = req.payload.action;
 
@@ -46,25 +55,34 @@ function handleGithubEvent(req, reply) {
 
 	if (event === 'pull_request' || event === 'pull_request_review') {
 		// Doesn't reply because we don't want to call it twice.
-		(0, _CheckReviewers2.default)(req, event);
+		if ((0, _lodash.get)(_config2.default, [org, repo, 'require_reviews', 'enabled'])) {
+			(0, _CheckReviewers2.default)(req, event, (0, _lodash.get)(_config2.default, [org, repo, 'require_reviews', 'count']));
+		}
 	}
 
 	if (event === 'pull_request') {
 		console.log('got a PR');
-		response = (0, _PullRequest2.default)(req, reply);
+
+		if ((0, _lodash.get)(_config2.default, [org, repo, 'pull_request', 'enabled'])) {
+			response = (0, _PullRequest2.default)(req, reply);
+		}
 	}
 
 	if (event === 'pull_request_review') {
 		console.log('got a review');
-		response = (0, _Review2.default)(req, reply);
+
+		if ((0, _lodash.get)(_config2.default, [org, repo, 'pull_request_review', 'enabled'])) {
+			response = (0, _Review2.default)(req, reply);
+		}
 	}
 
 	if (event === 'status') {
 		console.log('got a status change');
-		response = (0, _Status2.default)(req, reply);
+
+		response = (0, _Status2.default)(req, reply, _config2.default, org, repo);
 	}
 
-	_firebase2.default.log('github', repo, event, action, req.payload);
+	_firebase2.default.log('github', fullRepo, event, action, req.payload);
 	return reply(response);
 }
 

@@ -4,6 +4,8 @@ Object.defineProperty(exports, "__esModule", {
 	value: true
 });
 
+var _lodash = require('lodash');
+
 var _consts = require('./consts');
 
 var _Slack = require('./Slack');
@@ -23,10 +25,10 @@ function handleError(payload) {
 	return 'CI Status fail';
 }
 
-function Status(req, reply) {
+function Status(req, reply, config, org, repo) {
 	var payload = req.payload;
 
-	if (payload.state === 'failure' && payload.context === 'ci/circleci') {
+	if (payload.state === 'failure' && payload.context === 'ci/circleci' && (0, _lodash.get)(config, [org, repo, 'status', 'enabled'])) {
 		return handleError(payload, reply);
 	}
 

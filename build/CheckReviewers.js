@@ -19,6 +19,8 @@ var _utils = require('./utils');
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
 function CheckReviewers(req, event) {
+	var count = arguments.length > 2 && arguments[2] !== undefined ? arguments[2] : 2;
+
 	var payload = req.payload,
 	    action = payload.action,
 	    base = payload.pull_request.base.ref,
@@ -57,11 +59,11 @@ function CheckReviewers(req, event) {
 			return r.toLowerCase() === 'approved';
 		});
 
-		if (reviews.length > 1 && approved.length > 1) {
+		if (reviews.length >= count && approved.length > count) {
 			if (reviews.length === approved.length) {
 				(0, _request2.default)((0, _utils.constructPost)(payload.repository.url + '/statuses/' + sha, {
 					state: 'success',
-					description: 'At least 2 reviews, all reviews approved.',
+					description: 'At least ' + count + ' reviews, all reviews approved.',
 					context: 'ci/reelio'
 				}));
 				(0, _request2.default)((0, _utils.constructPost)(payload.pull_request.issue_url + '/labels', ['approved', '$$qa']));
@@ -84,9 +86,11 @@ function CheckReviewers(req, event) {
 				(0, _request2.default)((0, _utils.constructDelete)(payload.pull_request.issue_url + '/labels/%24%24qa'));
 			}
 		} else {
+			var additional = count - approved.length;
+
 			(0, _request2.default)((0, _utils.constructPost)(payload.repository.url + '/statuses/' + sha, {
 				state: 'failure',
-				description: 'This PR requires ' + (approved.length === 1 ? 1 : 2) + ' more approved review' + (approved.length > 1 ? 's' : '') + ' to be merged.',
+				description: 'This PR requires ' + additional + ' more approved review' + (additional > 1 ? 's' : '') + ' to be merged.',
 				context: 'ci/reelio'
 			}));
 			(0, _request2.default)((0, _utils.constructPost)(payload.pull_request.issue_url + '/labels', ['$$review']));
