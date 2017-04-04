@@ -172,7 +172,7 @@ function parseReviews(reviews) {
 	// group reviews by review author, and only keep the newest review
 	parsed.forEach(function (p) {
 		// we only care about reviews that are approved or denied.
-		if (p.state.toLowerCase() !== 'approved' || p.state.toLowerCase() !== 'changes_requested') {
+		if (p.state.toLowerCase() !== 'approved' && p.state.toLowerCase() !== 'changes_requested') {
 			return;
 		}
 
