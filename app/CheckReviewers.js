@@ -45,7 +45,7 @@ function CheckReviewers(req, event, count = 2) {
 
 		if (
 			reviews.length >= count &&
-			approved.length > count
+			approved.length >= count
 		) {
 			if (reviews.length === approved.length) {
 				request(constructPost(`${payload.repository.url}/statuses/${sha}`, {
