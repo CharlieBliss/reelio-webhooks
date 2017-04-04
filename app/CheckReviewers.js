@@ -3,7 +3,7 @@ import Jira from './Jira'
 import { jiraRegex } from './consts'
 import { constructGet, constructDelete, constructPost, parseReviews } from './utils'
 
-function CheckReviewers(req, event) {
+function CheckReviewers(req, event, count = 2) {
 	const payload = req.payload,
 		action = payload.action,
 		base = payload.pull_request.base.ref,
@@ -44,13 +44,13 @@ function CheckReviewers(req, event) {
 			.filter(r => r.toLowerCase() === 'approved')
 
 		if (
-			reviews.length > 1 &&
-			approved.length > 1
+			reviews.length >= count &&
+			approved.length > count
 		) {
 			if (reviews.length === approved.length) {
 				request(constructPost(`${payload.repository.url}/statuses/${sha}`, {
 					state: 'success',
-					description: 'At least 2 reviews, all reviews approved.',
+					description: `At least ${count} reviews, all reviews approved.`,
 					context: 'ci/reelio',
 				}))
 				request(constructPost(`${payload.pull_request.issue_url}/labels`, ['approved', '$$qa']))
@@ -74,9 +74,11 @@ function CheckReviewers(req, event) {
 			}
 
 		} else {
+			const additional = count - approved.length
+
 			request(constructPost(`${payload.repository.url}/statuses/${sha}`, {
 				state: 'failure',
-				description: `This PR requires ${approved.length === 1 ? 1 : 2} more approved review${approved.length > 1 ? 's' : ''} to be merged.`,
+				description: `This PR requires ${additional} more approved review${additional > 1 ? 's' : ''} to be merged.`,
 				context: 'ci/reelio',
 			}))
 			request(constructPost(`${payload.pull_request.issue_url}/labels`, ['$$review']))

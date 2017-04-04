@@ -1,3 +1,5 @@
+import { get } from 'lodash'
+
 import { FRONTEND_MEMBERS } from './consts'
 import Slack from './Slack'
 
@@ -12,10 +14,14 @@ function handleError(payload) {
 	return 'CI Status fail'
 }
 
-function Status(req, reply) {
+function Status(req, reply, config, org, repo) {
 	const payload = req.payload
 
-	if (payload.state === 'failure' && payload.context === 'ci/circleci') {
+	if (
+		payload.state === 'failure' &&
+		payload.context === 'ci/circleci' &&
+		get(config, [org, repo, 'status', 'enabled'])
+	) {
 		return handleError(payload, reply)
 	}
 

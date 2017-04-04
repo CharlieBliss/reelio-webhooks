@@ -1,4 +1,5 @@
 import Hapi from 'hapi'
+import { get } from 'lodash'
 
 import CheckReviewers from './CheckReviewers'
 import PullRequest from './PullRequest'
@@ -6,6 +7,8 @@ import Review from './Review'
 import Status from './Status'
 import Jira from './Jira'
 import firebase from './firebase'
+
+import config from '../config.json'
 
 
 // Create a server with a host and port
@@ -16,7 +19,10 @@ server.connection({
 })
 
 function handleGithubEvent(req, reply) {
-	const repo = req.payload.repository.full_name
+	const fullRepo = req.payload.repository.full_name,
+		org = fullRepo.split('/')[0],
+		repo = fullRepo.split('/')[1]
+
 	const event = req.headers['x-github-event']
 	const action = req.payload.action
 
@@ -27,25 +33,34 @@ function handleGithubEvent(req, reply) {
 		event === 'pull_request_review'
 	) {
 		// Doesn't reply because we don't want to call it twice.
-		CheckReviewers(req, event)
+		if (get(config, [org, repo, 'require_reviews', 'enabled'])) {
+			CheckReviewers(req, event, get(config, [org, repo, 'require_reviews', 'count']))
+		}
 	}
 
 	if (event === 'pull_request') {
 		console.log('got a PR')
-		response = PullRequest(req, reply)
+
+		if (get(config, [org, repo, 'pull_request', 'enabled'])) {
+			response = PullRequest(req, reply)
+		}
 	}
 
 	if (event === 'pull_request_review') {
 		console.log('got a review')
-		response = Review(req, reply)
+
+		if (get(config, [org, repo, 'pull_request_review', 'enabled'])) {
+			response = Review(req, reply)
+		}
 	}
 
 	if (event === 'status') {
 		console.log('got a status change')
-		response = Status(req, reply)
+
+		response = Status(req, reply, config, org, repo)
 	}
 
-	firebase.log('github', repo, event, action, req.payload)
+	firebase.log('github', fullRepo, event, action, req.payload)
 	return reply(response)
 }
 
