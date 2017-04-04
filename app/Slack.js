@@ -76,4 +76,4 @@ class Slack {
 	}
 }
 
-export default Slack
+export default new Slack()

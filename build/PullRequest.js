@@ -4,6 +4,8 @@ Object.defineProperty(exports, "__esModule", {
 	value: true
 });
 
+var _typeof = typeof Symbol === "function" && typeof Symbol.iterator === "symbol" ? function (obj) { return typeof obj; } : function (obj) { return obj && typeof Symbol === "function" && obj.constructor === Symbol && obj !== Symbol.prototype ? "symbol" : typeof obj; };
+
 var _firebase = require('./firebase');
 
 var _firebase2 = _interopRequireDefault(_firebase);
@@ -19,6 +21,10 @@ var _Slack2 = _interopRequireDefault(_Slack);
 var _Labels = require('./Labels');
 
 var _Labels2 = _interopRequireDefault(_Labels);
+
+var _Tickets = require('./Tickets');
+
+var _Tickets2 = _interopRequireDefault(_Tickets);
 
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
@@ -91,52 +97,76 @@ function handleNew(payload) {
 	// Get the issue, not the PR
 	request((0, _utils.constructGet)(payload.pull_request.issue_url), function (err, res, body) {
 		if (res.statusCode >= 200 && res.statusCode < 300) {
-			console.log('NEW Labels:', JSON.parse(body).labels);
-			var labels = JSON.parse(body).labels || [];
+			var _ret = function () {
+				console.log('NEW Labels:', JSON.parse(body).labels);
 
-			var head = payload.pull_request.head.ref,
-			    prBody = payload.pull_request.body || '',
-			    tickets = prBody.match(_consts.jiraRegex);
+				var labels = JSON.parse(body).labels || [];
+				var repo = payload.repository.html_url;
+				var head = payload.pull_request.head.ref,
+				    prBody = payload.pull_request.body || '',
+				    tickets = prBody.match(_consts.jiraRegex);
 
-			if (head === 'staging') {
-				return 'New Pr -- Don\'t need to handle';
-			}
+				if (head === 'staging') {
+					return {
+						v: 'New Pr -- Don\'t need to handle'
+					};
+				}
 
-			// If there aren't any JIRA tickets in the body as well, warn them
-			if (!tickets && !labels.map(function (l) {
-				return l.name;
-			}).includes('$$webhook')) {
-				var feedback = '@' + payload.pull_request.user.login + ' - It looks like you didn\'t include JIRA ticket references in this ticket.  Are you sure you have none to reference?';
-				request((0, _utils.constructPost)(payload.pull_request.issue_url + '/comments', { body: feedback }));
-				request((0, _utils.constructPost)(payload.pull_request.issue_url + '/labels', ['$$ticketless']));
+				// If there aren't any JIRA tickets in the body as well, warn them
+				if (!tickets && !labels.map(function (l) {
+					return l.name;
+				}).includes('$$webhook')) {
+					var feedback = '@' + payload.pull_request.user.login + ' - It looks like you didn\'t include JIRA ticket references in this ticket.  Are you sure you have none to reference?';
+					request((0, _utils.constructPost)(payload.pull_request.issue_url + '/comments', { body: feedback }));
+					request((0, _utils.constructPost)(payload.pull_request.issue_url + '/labels', ['$$ticketless']));
 
-				_firebase2.default.log('github', payload.repository.full_name, 'pull_request', 'ticketless', payload);
-			}
+					_firebase2.default.log('github', payload.repository.full_name, 'pull_request', 'ticketless', payload);
+				}
 
-			// If the branch isn't a feature branch, ask about it
-			if (!head.includes('feature-') && !labels.map(function (l) {
-				return l.name;
-			}).includes('$$webhook')) {
-				var _feedback = '@' + payload.pull_request.user.login + ' - It looks like your branch doesn\'t contain `feature-`.  Are you sure this PR shouldn\'t be a feature branch?';
-				request((0, _utils.constructPost)(payload.pull_request.issue_url + '/comments', { body: _feedback }));
-				request((0, _utils.constructPost)(payload.pull_request.issue_url + '/labels', ['$$featureless']));
+				// If the branch isn't a feature branch, ask about it
+				if (!head.includes('feature-') && !labels.map(function (l) {
+					return l.name;
+				}).includes('$$webhook')) {
+					var _feedback = '@' + payload.pull_request.user.login + ' - It looks like your branch doesn\'t contain `feature-`.  Are you sure this PR shouldn\'t be a feature branch?';
+					request((0, _utils.constructPost)(payload.pull_request.issue_url + '/comments', { body: _feedback }));
+					request((0, _utils.constructPost)(payload.pull_request.issue_url + '/labels', ['$$featureless']));
 
-				_firebase2.default.log('github', payload.repository.full_name, 'pull_request', 'featureless', payload);
-			} else {
-				var parsedBranch = head.substr(head.indexOf('-') + 1, head.length),
-				    url = 'http://zzz-' + parsedBranch + '.s3-website-us-east-1.amazonaws.com/';
+					_firebase2.default.log('github', payload.repository.full_name, 'pull_request', 'featureless', payload);
+				} else {
+					(function () {
+						var parsedBranch = head.substr(head.indexOf('-') + 1, head.length),
+						    url = 'http://zzz-' + parsedBranch + '.s3-website-us-east-1.amazonaws.com/';
 
-				request((0, _utils.constructPost)(payload.pull_request.issue_url + '/comments', { body: '@' + payload.pull_request.user.login + ' - Thanks for the PR! Your feature branch is now [live](' + url + ')' }));
+						request((0, _utils.constructPost)(payload.pull_request.issue_url + '/comments', { body: '@' + payload.pull_request.user.login + ' - Thanks for the PR! Your feature branch is now [live](' + url + ')' }));
 
-				_firebase2.default.log('github', payload.repository.full_name, 'reelio_deploy/feature', null, {
-					tickets: tickets.filter(_utils.uniqueTicketFilter),
-					fixed_count: tickets.filter(_utils.uniqueTicketFilter).length,
-					environment: parsedBranch,
-					target: 'url'
-				});
-			}
+						var ticketBase = 'https://reelio.atlassian.net/rest/api/2/issue';
+						var responses = [];
+						var attempts = 0;
+						var uniqueTickets = tickets.filter(_utils.uniqueTicketFilter);
 
-			return 'New PR -- Complete';
+						uniqueTickets.map(function (t) {
+							return request((0, _utils.constructGet)(ticketBase + '/' + t, 'jira'), function (_, __, data) {
+								responses.push(JSON.parse(data));
+							});
+						});
+
+						_Tickets2.default.getTicketResponses(responses, tickets, attempts, repo, function (formattedTickets) {
+							_firebase2.default.log('github', payload.repository.full_name, 'reelio_deploy/feature', null, {
+								tickets: formattedTickets,
+								fixed_count: tickets.filter(_utils.uniqueTicketFilter).length,
+								environment: parsedBranch,
+								target: 'url'
+							});
+						});
+					})();
+				}
+
+				return {
+					v: 'New PR -- Complete'
+				};
+			}();
+
+			if ((typeof _ret === 'undefined' ? 'undefined' : _typeof(_ret)) === "object") return _ret.v;
 		}
 
 		return 'New PR -- Unhandled but requested';
@@ -146,9 +176,10 @@ function handleNew(payload) {
 function handleMerge(payload) {
 	var labels = [],
 	    reviews = [];
-
 	var tickets = payload.pull_request.body.match(_consts.jiraRegex) || [],
 	    newBody = '### Resolves:\n' + tickets.filter(_utils.uniqueTicketFilter).map(_utils.wrapJiraTicketsFromArray).join('\n\t');
+	var uniqueTickets = tickets.filter(_utils.uniqueTicketFilter);
+	var repo = payload.repository.html_url;
 
 	var user = _consts.FRONTEND_MEMBERS[payload.pull_request.user.id],
 	    base = payload.pull_request.base.ref; // target of the original PR
@@ -165,14 +196,32 @@ function handleMerge(payload) {
 
 		// If the closed PRs target was the master branch, alert QA of impending release
 		if (base === 'master') {
-			_Slack2.default.slackDeployWarning(payload, tickets);
+			(function () {
+				var fixed = tickets.filter(_utils.uniqueTicketFilter),
+				    formattedFixed = fixed.map(function (t) {
+					return '<https://reelio.atlassian.net/browse/' + t + '|' + t + '>';
+				}).join('\n');
+				_Slack2.default.slackDeployWarning(payload, formattedFixed);
 
-			_firebase2.default.log('github', payload.repository.full_name, 'reelio_deploy', null, {
-				tickets: tickets.filter(_utils.uniqueTicketFilter),
-				fixed_count: tickets.filter(_utils.uniqueTicketFilter).length,
-				environment: 'production',
-				target: 'pro.reelio.com'
-			});
+				var ticketBase = 'https://reelio.atlassian.net/rest/api/2/issue';
+				var responses = [];
+				var attempts = 0;
+
+				uniqueTickets.map(function (t) {
+					return request((0, _utils.constructGet)(ticketBase + '/' + t, 'jira'), function (_, __, data) {
+						responses.push(JSON.parse(data));
+					});
+				});
+
+				_Tickets2.default.getTicketResponses(responses, tickets, attempts, repo, function (formattedTickets) {
+					_firebase2.default.log('github', payload.repository.full_name, 'reelio_deploy', null, {
+						tickets: formattedTickets,
+						fixed_count: tickets.filter(_utils.uniqueTicketFilter).length,
+						environment: 'production',
+						target: 'pro.reelio.com'
+					});
+				});
+			})();
 		}
 	});
 

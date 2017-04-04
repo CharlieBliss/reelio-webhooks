@@ -97,4 +97,4 @@ var Slack = function () {
 	return Slack;
 }();
 
-exports.default = Slack;
+exports.default = new Slack();

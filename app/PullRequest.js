@@ -4,6 +4,7 @@ import { uniqueTicketFilter, wrapJiraTicketsFromArray, constructGet, constructPo
 
 import Slack from './Slack'
 import Labels from './Labels'
+import Tickets from './Tickets'
 
 const request = require('request')
 
@@ -66,8 +67,9 @@ function handleNew(payload) {
 	request(constructGet(payload.pull_request.issue_url), (err, res, body) => {
 		if (res.statusCode >= 200 && res.statusCode < 300) {
 			console.log('NEW Labels:', JSON.parse(body).labels)
-			const labels = JSON.parse(body).labels || []
 
+			const labels = JSON.parse(body).labels || []
+			const repo = payload.repository.html_url
 			const head = payload.pull_request.head.ref,
 				prBody = payload.pull_request.body || '',
 				tickets = prBody.match(jiraRegex)
@@ -98,13 +100,23 @@ function handleNew(payload) {
 
 				request(constructPost(`${payload.pull_request.issue_url}/comments`, { body: `@${payload.pull_request.user.login} - Thanks for the PR! Your feature branch is now [live](${url})` }))
 
-				firebase.log('github', payload.repository.full_name, 'reelio_deploy/feature', null, {
-					tickets: tickets.filter(uniqueTicketFilter),
-					fixed_count: tickets.filter(uniqueTicketFilter).length,
-					environment: parsedBranch,
-					target: 'url',
-				})
+				const ticketBase = 'https://reelio.atlassian.net/rest/api/2/issue'
+				const responses = []
+				const attempts = 0
+				const uniqueTickets = tickets.filter(uniqueTicketFilter)
 
+				uniqueTickets.map(t => request(constructGet(`${ticketBase}/${t}`, 'jira'), (_, __, data) => {
+					responses.push(JSON.parse(data))
+				}))
+
+				Tickets.getTicketResponses(responses, tickets, attempts, repo, (formattedTickets) => {
+					firebase.log('github', payload.repository.full_name, 'reelio_deploy/feature', null, {
+						tickets: formattedTickets,
+						fixed_count: tickets.filter(uniqueTicketFilter).length,
+						environment: parsedBranch,
+						target: 'url',
+					})
+				})
 			}
 
 			return 'New PR -- Complete'
@@ -117,9 +129,10 @@ function handleNew(payload) {
 function handleMerge(payload) {
 	let labels = [],
 		reviews = []
-
 	const tickets = payload.pull_request.body.match(jiraRegex) || [],
 		newBody = `### Resolves:\n${tickets.filter(uniqueTicketFilter).map(wrapJiraTicketsFromArray).join('\n\t')}`
+	const uniqueTickets = tickets.filter(uniqueTicketFilter)
+	const repo = payload.repository.html_url
 
 	const user = FRONTEND_MEMBERS[payload.pull_request.user.id],
 		base = payload.pull_request.base.ref // target of the original PR
@@ -139,16 +152,29 @@ function handleMerge(payload) {
 
 		// If the closed PRs target was the master branch, alert QA of impending release
 		if (base === 'master') {
-			Slack.slackDeployWarning(payload, tickets)
+			const fixed = tickets.filter(uniqueTicketFilter),
+				formattedFixed = fixed.map(t => `<https://reelio.atlassian.net/browse/${t}|${t}>`).join('\n')
+			Slack.slackDeployWarning(payload, formattedFixed)
 
-			firebase.log('github', payload.repository.full_name, 'reelio_deploy', null, {
-				tickets: tickets.filter(uniqueTicketFilter),
-				fixed_count: tickets.filter(uniqueTicketFilter).length,
-				environment: 'production',
-				target: 'pro.reelio.com',
+			const ticketBase = 'https://reelio.atlassian.net/rest/api/2/issue'
+			const responses = []
+			const attempts = 0
+
+			uniqueTickets.map(t => request(constructGet(`${ticketBase}/${t}`, 'jira'), (_, __, data) => {
+				responses.push(JSON.parse(data))
+			}))
+
+			Tickets.getTicketResponses(responses, tickets, attempts, repo, (formattedTickets) => {
+				firebase.log('github', payload.repository.full_name, 'reelio_deploy', null, {
+					tickets: formattedTickets,
+					fixed_count: tickets.filter(uniqueTicketFilter).length,
+					environment: 'production',
+					target: 'pro.reelio.com',
+				})
 			})
 		}
 	})
+
 
 	// Get the reviews
 	request(constructGet(`${payload.pull_request.url}/reviews`), (err, res, body) => {
