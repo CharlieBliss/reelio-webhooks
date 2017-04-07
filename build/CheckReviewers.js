@@ -59,7 +59,7 @@ function CheckReviewers(req, event) {
 			return r.toLowerCase() === 'approved';
 		});
 
-		if (reviews.length >= count && approved.length > count) {
+		if (reviews.length >= count && approved.length >= count) {
 			if (reviews.length === approved.length) {
 				(0, _request2.default)((0, _utils.constructPost)(payload.repository.url + '/statuses/' + sha, {
 					state: 'success',

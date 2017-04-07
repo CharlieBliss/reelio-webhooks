@@ -48,37 +48,37 @@ export const FRONTEND_MEMBERS = {
 	},
 	6333919: {
 		name: 'Steve',
-		id: 'U02B43L0M',
+		slack_id: 'U02B43L0M',
 		github_id: '6333919',
 	},
 	25992031: {
 		name: 'reelio-devops',
-		id: 'USLACKBOT',
+		slack_id: 'USLACKBOT',
 		github_id: '25992031',
 	},
 	243799: {
 		name: 'dave.p',
-		id: 'U2TEN9SUB',
+		slack_id: 'U2TEN9SUB',
 		github_id: '243799',
 	},
 	17497667: {
 		name: 'khaledanyc',
-		id: 'U32AUKGKU',
+		slack_id: 'U32AUKGKU',
 		github_id: '17497667',
 	},
 	3579209: {
 		name: 'joaquin',
-		id: 'U0ACJ1VNC',
+		slack_id: 'U0ACJ1VNC',
 		github_id: '3579209',
 	},
 	1347347: {
 		name: 'dash',
-		id: 'U40RFFWQ1',
+		slack_id: 'U40RFFWQ1',
 		github_id: '1347347',
 	},
 	3439646: {
 		name: 'anthonyalmarza',
-		id: 'U02B7MKKT',
+		slack_id: 'U02B7MKKT',
 		github_id: '3439646',
 	},
 }

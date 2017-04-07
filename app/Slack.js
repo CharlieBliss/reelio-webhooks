@@ -66,12 +66,12 @@ class Slack {
 		}))
 	}
 
-	slackCircleFailure(user) {
+	slackCircleFailure(user, commit) {
 		request(constructPost(SLACK_URL, {
 			channel: user.slack_id,
 			username: 'Circle Bot',
 			icon_url: 'https://octodex.github.com/images/socialite.jpg',
-			text: `Hey there, ${user.name}.  Your commit did not pass Circle CI's test suite.  Please review on <https://github.com/hangarunderground/reelio-front/pulls|GitHub>.`,
+			text: `Hey there, ${user.name}.  Your commit did not pass Circle CI's test suite.  Please review on <${commit}|GitHub>.`,
 		}))
 	}
 }
