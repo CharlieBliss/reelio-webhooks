@@ -6,9 +6,11 @@ import Slack from './Slack'
 // This component can't easily link to PRs because statuses are for specific commits, not PRs
 
 function handleError(payload) {
-	const user = FRONTEND_MEMBERS[payload.commit.author.id]
+	const user = FRONTEND_MEMBERS[payload.commit.author.id],
+		commit = payload.commit.html_url
+
 	if (user) {
-		Slack.slackCircleFailure(user)
+		Slack.slackCircleFailure(user, commit)
 	}
 
 	return 'CI Status fail'

@@ -17,9 +17,11 @@ function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { de
 // This component can't easily link to PRs because statuses are for specific commits, not PRs
 
 function handleError(payload) {
-	var user = _consts.FRONTEND_MEMBERS[payload.commit.author.id];
+	var user = _consts.FRONTEND_MEMBERS[payload.commit.author.id],
+	    commit = payload.commit.html_url;
+
 	if (user) {
-		_Slack2.default.slackCircleFailure(user);
+		_Slack2.default.slackCircleFailure(user, commit);
 	}
 
 	return 'CI Status fail';
