@@ -3,15 +3,8 @@
     "env": {
         "browser": true,
         "node": true,
-        "es6": true,
-        "jest": true
+        "es6": false,
     },
-    "globals": {
-        "React":true
-    },
-    "plugins": [
-        "react"
-    ],
     "extends": "airbnb",
 
     "rules": {
@@ -31,8 +24,8 @@
         "semi": [2, "never"],
         "new-cap": 0,
 
+        "import/prefer-default-export": 0,
         "import/no-named-as-default": 0,
-        "import/no-unresolved": [2, { "ignore": ['constants','components','actions','reelioUtil', 'schemas', 'thunks', 'selectors'] } ],
         "import/no-extraneous-dependencies": 0,
 
         "jsx-a11y/href-no-hash": 0,
