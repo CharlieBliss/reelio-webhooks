@@ -24,7 +24,7 @@ function handleApproved(payload) {
 	return 'Review Changes Success'
 }
 
-function Review(event, payload) {
+function Review(payload) {
 	if (payload.review.state === 'changes_requested') {
 		return handleRequestedChanges(payload)
 	}

@@ -4,8 +4,9 @@
   "description": "Reelio Webhookspack",
   "main": "index.js",
   "dependencies": {
-    "firebase-admin": "^4.2.0",
+    "firebase-admin": "^4.2.1",
     "lodash": "^4.17.4",
+    "moment": "^2.18.1",
     "request": "^2.81.0"
   },
   "devDependencies": {
@@ -17,7 +18,8 @@
     "serverless-offline": "^3.13.2"
   },
   "scripts": {
-    "test": "sls invoke test --compilers js:babel-register"
+    "test:handlers": "sls invoke test --compilers js:babel-register",
+    "test:helpers": "mocha test/helper_tests --compilers js:babel-register"
   },
   "babel": {
     "presets": [
