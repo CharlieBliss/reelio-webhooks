@@ -2,7 +2,7 @@ export const pullRequestOpenedStaging = {
   "action": "opened",
   "number": 1,
   "pull_request": {
-    "url": "https://api.github.com/repos/baxterthehacker/public-repo/pulls/1",
+    "url": "https://api.github.com/repos/baxterthehacker/public-repo/pulls/2",
     "id": 34778301,
     "html_url": "https://github.com/baxterthehacker/public-repo/pull/1",
     "diff_url": "https://github.com/baxterthehacker/public-repo/pull/1.diff",
@@ -827,4 +827,14 @@ export const pullRequestOpenedMaster = {
   "installation": {
     "id": 234
   }
+}
+
+export const pullRequestBadAction = {
+  "action": "closed",
+	"pull_request": {
+		"user": "test",
+		"base": {
+			"ref": "test",
+		},
+	},
 }

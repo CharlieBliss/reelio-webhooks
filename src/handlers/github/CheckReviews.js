@@ -12,7 +12,7 @@ function CheckReviews(payload, event, count = 2) {
 
 	// We don't want to run this check on things like PR closed
 	if (event === 'pull_request' && !actions.includes(action)) {
-		return
+		return 'Invalid Action'
 	}
 
 	const prUrl = payload.pull_request.url,
@@ -33,7 +33,7 @@ function CheckReviews(payload, event, count = 2) {
 	}
 
 	request(Github.get(`${prUrl}/reviews`), (response, errors, body) => {
-		let reviews = JSON.parse(body) || [],
+		let reviews = body ? JSON.parse(body) : [],
 			approved = []
 
 		// group by author keep latest
