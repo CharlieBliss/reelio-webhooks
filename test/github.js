@@ -18,6 +18,34 @@ describe('github', () => {
 			nock.cleanAll()
 		})
 
+		it('Returns 400 for no github event', (done) => {
+			const request = Object.assign({}, { headers: headers.github }, { body: payloads.review.approved })
+			request.headers['X-Github-Event'] = null
+
+			wrapped.run(request).then((response) => {
+				setTimeout(() => {
+					expect(response).to.not.be.empty
+					expect(response.body).to.equal('Github -- Not a valid github event.')
+					expect(response.statusCode).to.equal(400)
+					done()
+				}, 10)
+			})
+		})
+
+		it('Returns 400 for no github action', (done) => {
+			const request = Object.assign({}, { headers: headers.github }, { body: payloads.review.noAction })
+			request.headers['X-Github-Event'] = payloads.review.event
+
+			wrapped.run(request).then((response) => {
+				setTimeout(() => {
+					expect(response).to.not.be.empty
+					expect(response.body).to.equal('Github -- No action given.')
+					expect(response.statusCode).to.equal(400)
+					done()
+				}, 10)
+			})
+		})
+
 		it('handles approved reviews', (done) => {
 			const request = Object.assign({}, { headers: headers.github }, { body: payloads.review.approved })
 			request.headers['X-Github-Event'] = payloads.review.event

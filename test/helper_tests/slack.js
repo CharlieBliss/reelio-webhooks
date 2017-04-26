@@ -8,7 +8,6 @@ describe('helpers -- slack', () => {
 	beforeEach(() => {
 		nock.cleanAll()
 	})
-
 	it('Should be able to alert when changes are requested', (done) => {
 		const payload = {
 			review: {

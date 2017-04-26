@@ -308,3 +308,14 @@ export const denied = JSON.stringify({
 		},
 	},
 })
+
+export const noAction = JSON.stringify({
+	"action": null,
+	"review": {
+		"id": 2626884,
+		"user": {
+			"login": "baxterthehacker",
+			"id": 6752317,
+		},
+	}
+})
