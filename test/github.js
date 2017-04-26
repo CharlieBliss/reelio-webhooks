@@ -46,6 +46,20 @@ describe('github', () => {
 			})
 		})
 
+		it('Takes no action with unhandled events', (done) => {
+			const request = Object.assign({}, { headers: headers.github }, { body: payloads.review.approved })
+			request.headers['X-Github-Event'] = "Labeled"
+
+			wrapped.run(request).then((response) => {
+				setTimeout(() => {
+					expect(response).to.not.be.empty
+					expect(response.body).to.equal('Github -- No actions taken.')
+					expect(response.statusCode).to.equal(200)
+					done()
+				}, 10)
+			})
+		})
+
 		it('handles approved reviews', (done) => {
 			const request = Object.assign({}, { headers: headers.github }, { body: payloads.review.approved })
 			request.headers['X-Github-Event'] = payloads.review.event
