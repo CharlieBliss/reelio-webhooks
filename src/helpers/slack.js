@@ -23,6 +23,15 @@ class Slack {
 		})
 	}
 
+	reviewReminder(payload, user) {
+		sendMessage({
+			channel: user.slack_id,
+			username: 'PR Bot',
+			icon_url: 'https://octodex.github.com/images/luchadortocat.png',
+			text: `Hey there, ${user.name}.  Your pull request was flagged for changes.  Please review on <${payload.review.html_url}|GitHub>.`,
+		})
+	}
+
 	tableFailed(ticket, resp) {
 		sendMessage({
 			channel: 'U28LB0AAH',

@@ -4,7 +4,6 @@ import Github from '../helpers/github'
 import Slack from '../helpers/slack'
 
 class LabelsHelper {
-
 	parseReviews(reviews) {
 		// grab the data we care about
 		const parsed = reviews.map(r => ({
