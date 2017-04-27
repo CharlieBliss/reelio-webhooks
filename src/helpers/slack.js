@@ -1,6 +1,6 @@
 import request from 'request'
 
-import { SLACK_URL } from '../consts'
+import { SLACK_URL, FRONTEND_MEMBERS } from '../consts'
 
 function sendMessage(payload) {
 	request({
@@ -23,12 +23,12 @@ class Slack {
 		})
 	}
 
-	reviewReminder(payload, user) {
+	reviewReminder(payload, user, reviewer) {
 		sendMessage({
 			channel: user.slack_id,
-			username: 'PR Bot',
-			icon_url: 'https://octodex.github.com/images/luchadortocat.png',
-			text: `Hey there, ${user.name}.  Your pull request was flagged for changes.  Please review on <${payload.review.html_url}|GitHub>.`,
+			username: 'Review Bot',
+			icon_url: 'https://octodex.github.com/images/steroidtocat.png',
+			text: `Hi there, ${FRONTEND_MEMBERS[reviewer.user].name}. ${user.name}'s <${payload.pull_request.html_url}|Pull Request> has been updated. Please re-review the PR for approval.`,
 		})
 	}
 
