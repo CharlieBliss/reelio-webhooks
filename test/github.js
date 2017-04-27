@@ -34,12 +34,11 @@ describe('github', () => {
 
 		it('Returns 400 for no github action', (done) => {
 			const request = Object.assign({}, { headers: headers.github }, { body: payloads.review.noAction })
-			request.headers['X-Github-Event'] = payloads.review.event
+			request.headers['X-Github-Event'] = 'pull_request_review_comment'
 
 			wrapped.run(request).then((response) => {
 				setTimeout(() => {
 					expect(response).to.not.be.empty
-					expect(response.body).to.equal('Github -- No action given.')
 					expect(response.statusCode).to.equal(400)
 					done()
 				}, 10)
@@ -65,7 +64,7 @@ describe('github', () => {
 			request.headers['X-Github-Event'] = payloads.review.event
 
 			const remove = nock('https://api.github.com')
-				.delete('/repos/baxterthehacker/public-repo/issues/8/labels/changes%20requested')
+				.delete('/repos/baxterthehacker/public-repo/issues/1/labels/changes%20requested')
 				.reply(200)
 
 			wrapped.run(request).then((response) => {
@@ -86,11 +85,41 @@ describe('github', () => {
 			request.headers['X-Github-Event'] = payloads.review.event
 
 			const add = nock('https://api.github.com')
-				.post('/repos/baxterthehacker/public-repo/issues/8/labels', ['changes requested'])
+				.post('/repos/baxterthehacker/public-repo/issues/1/labels', ['changes requested'])
 				.reply(200)
 
 			const remove = nock('https://api.github.com')
-				.delete('/repos/baxterthehacker/public-repo/issues/8/labels/ready%20to%20review')
+				.delete('/repos/baxterthehacker/public-repo/issues/1/labels/ready%20to%20review')
+				.reply(200)
+
+			const slack = nock(slackUrl)
+				.post('')
+				.reply(200)
+
+			wrapped.run(request).then((response) => {
+				setTimeout(() => {
+					expect(response).to.not.be.empty
+					expect(response.body).to.equal('Github -- Review Changes Request')
+					expect(add.isDone()).to.be.true
+					expect(remove.isDone()).to.be.true
+					expect(slack.isDone()).to.be.true
+					expect(nock.pendingMocks()).to.be.empty
+
+					done()
+				}, 10)
+			})
+		})
+
+		it('handles comments between reviews', (done) => {
+			const request = Object.assign({}, { headers: headers.github }, { body: payloads.review.denied })
+			request.headers['X-Github-Event'] = payloads.review.event
+
+			const add = nock('https://api.github.com')
+				.post('/repos/baxterthehacker/public-repo/issues/1/labels', ['changes requested'])
+				.reply(200)
+
+			const remove = nock('https://api.github.com')
+				.delete('/repos/baxterthehacker/public-repo/issues/1/labels/ready%20to%20review')
 				.reply(200)
 
 			const slack = nock(slackUrl)
