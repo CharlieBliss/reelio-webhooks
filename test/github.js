@@ -101,7 +101,6 @@ describe('github', () => {
 				setTimeout(() => {
 					expect(response).to.not.be.empty
 					expect(response.body).to.equal('Github -- Review Changes Request')
-
 					expect(add.isDone()).to.be.true
 					expect(remove.isDone()).to.be.true
 					expect(slack.isDone()).to.be.true
