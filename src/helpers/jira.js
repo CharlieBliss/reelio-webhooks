@@ -4,6 +4,8 @@ import request from 'request'
 import Slack from '../helpers/slack'
 import Firebase from '../helpers/firebase'
 import JiraTickets from '../helpers/jiraTickets'
+import Github from '../helpers/github'
+import { jiraRegex, uniqueTicketFilter } from '../helpers/utils'
 
 import { JIRA_TOKEN } from '../consts'
 
@@ -102,6 +104,90 @@ class JiraHelper {
 
 			return 'Tickets marked up'
 		})
+	}
+
+	handleTransition(req) {
+		console.log('TRANSITION', req.payload.transition.transitionId)
+		// GOOD Transition ID = 51
+		// if transition.id !== 51, status = declined
+		if (req.payload.transition.transitionId === 51) {
+			console.log(req.payload.issue)
+			const TicketTable = req.payload.issue.fields.customfield_10900
+
+			if (!TicketTable) {
+				// Warn Kyle.  This should be impossible
+				Slack.noTable(req)
+				return 'No table ticket!!!'
+			}
+
+			const PRRoute = TicketTable.match(/\[\(internal use\)\|([^\]]*)\]/)[1]
+			request(this.get(PRRoute), (err, res, resBody) => {
+				const PR = JSON.parse(resBody),
+					body = PR.body || '',
+					tickets = body.match(jiraRegex) || [],
+					uniqueTickets = tickets.filter(uniqueTicketFilter),
+					sha = PR.head.sha
+
+				// If there's only one ticket, it was just approved so this PR is good
+				if (uniqueTickets.length === 1) {
+					request(Github.post(`${PR.head.repo.url}/statuses/${sha}`, {
+						state: 'success',
+						description: 'All tickets marked as complete.',
+						context: 'ci/qa-team',
+					}))
+
+					request(Github.post(`${PR.issue_url}/labels`, ['$$qa approved']))
+					request(Github.delete(`${PR.issue_url}/labels/%24%24qa`))
+				} else {
+					const ticketBase = 'https://reelio.atlassian.net/rest/api/2/issue'
+
+					const responses = []
+					let attempts = 0
+
+					tickets.map(t => request(this.get(`${ticketBase}/${t}`, 'jira'), (_, __, data) => {
+						responses.push(JSON.parse(data))
+					}))
+
+					// @TODO move this out
+					function getTicketResponses() { // eslint-disable-line
+						if (
+							responses.length < uniqueTickets.length &&
+							attempts < 20
+						) {
+							setTimeout(() => {
+								getTicketResponses()
+								attempts += 1
+								console.log('LOOPING', responses.length, attempts)
+							}, 1000)
+
+						} else {
+							const resolved = responses.filter(ticket => ticket.fields.status.id === '10001')
+
+							if (resolved.length === uniqueTickets.length) {
+								request(Github.post(`${PR.head.repo.url}/statuses/${sha}`, {
+									state: 'success',
+									description: 'All tickets marked as complete.',
+									context: 'ci/qa-team',
+								}))
+
+								request(Github.post(`${PR.issue_url}/labels`, ['$$qa approved']))
+								request(Github.delete(`${PR.issue_url}/labels/%24%24qa`))
+
+							} else {
+								const unresolved = uniqueTickets.length - resolved.length
+								request(Github.post(`${PR.head.repo.url}/statuses/${sha}`, {
+									state: 'failure',
+									description: `Waiting on ${unresolved} ticket${unresolved > 1 ? 's' : ''} to be marked as "done".`,
+									context: 'ci/qa-team',
+								}))
+							}
+						}
+					}
+					getTicketResponses()
+				}
+			})
+		}
+		return 'PR status updated'
 	}
 }
 

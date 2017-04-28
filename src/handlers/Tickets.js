@@ -1,5 +1,5 @@
 import request from 'request'
-import { constructGet } from './utils'
+import Jira from '../helpers/jira'
 
 class Tickets {
 
@@ -35,7 +35,7 @@ class Tickets {
 		const ticketBase = 'https://reelio.atlassian.net/rest/api/2/issue'
 		let firebaseInfo
 
-		request(constructGet(`${ticketBase}/${ticket}`, 'jira'), (_, __, data) => {
+		request(Jira.get(`${ticketBase}/${ticket}`, 'jira'), (_, __, data) => {
 			const ticketInfo = (JSON.parse(data))
 			const board = ticketInfo.fields.project.key
 			firebaseInfo = {
