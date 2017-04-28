@@ -2,6 +2,7 @@ import helper from '../../helpers/github'
 import Review from './Review'
 import CheckReviews from './CheckReviews'
 import Labels from '../Labels'
+import PullRequest from './PullRequest'
 
 export function handle(event, context, callback) {
 	const headers = event.headers,
@@ -31,6 +32,18 @@ export function handle(event, context, callback) {
 		// if (get(config, [org, repo, 'require_reviews', 'enabled'])) {
 		// CheckReviews(payload, get(config, [org, repo, 'require_reviews', 'count']))
 		CheckReviews(payload, event)
+		// }
+	}
+
+	if (event === 'pull_request') {
+		// if (get(config, [org, repo, 'pull_request', 'enabled'])) {
+		PullRequest(payload)
+		// }
+	}
+
+	if (event === 'pull_request_review') {
+		// if (get(config, [org, repo, 'pull_request_review', 'enabled'])) {
+		Review(payload)
 		// }
 	}
 

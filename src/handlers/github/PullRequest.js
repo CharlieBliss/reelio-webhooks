@@ -199,19 +199,18 @@ function handleMerge(payload) {
 	return 'Merged!'
 }
 
-function PullRequest(req, reply) {
-	const payload = req.payload
+function PullRequest(payload) {
 
 	if (payload.action === 'labeled' || payload.action === 'unlabeled') {
 		Labels(payload)
 	}
 
 	if (payload.action === 'opened') {
-		return handleNew(payload, reply)
+		return handleNew(payload)
 	}
 
 	if (payload.action === 'closed' && payload.pull_request.merged_at) {
-		return handleMerge(payload, reply)
+		return handleMerge(payload)
 	}
 
 	return 'Got a pull request!!!'
