@@ -1,6 +1,7 @@
 import helper from '../../helpers/github'
 import Review from './Review'
 import CheckReviews from './CheckReviews'
+import Labels from '../labels'
 
 export function handle(event, context, callback) {
 	const headers = event.headers,
@@ -31,6 +32,10 @@ export function handle(event, context, callback) {
 		// CheckReviews(payload, get(config, [org, repo, 'require_reviews', 'count']))
 		CheckReviews(payload, event)
 		// }
+	}
+
+	if (event === 'label') {
+		Labels(payload)
 	}
 
 	if (githubEvent === 'pull_request_review') {

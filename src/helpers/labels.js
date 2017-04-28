@@ -3,7 +3,7 @@ import { FRONTEND_MEMBERS } from '../consts/slack'
 import Github from '../helpers/github'
 import Slack from '../helpers/slack'
 
-class LabelsHelper {
+class LabelHelper {
 	parseReviews(reviews) {
 		// grab the data we care about
 		const parsed = reviews.map(r => ({
@@ -34,16 +34,17 @@ class LabelsHelper {
 		return Object.keys(data).map(k => data[k])
 	}
 
-	triggerReviewReminder(user, payload) {
+	triggerReviewReminder(payload) {
+		const user = FRONTEND_MEMBERS[payload.pull_request.user.id]
 		request(Github.get(`${payload.pull_request.url}/reviews`), (err, res, body) => {
 			let reviews
 			if (res.statusCode >= 200 && res.statusCode < 300) {
 				reviews = JSON.parse(body) || []
 			}
-			// get reviewers and send a reminder message for each of them to re-review
+				// get reviewers and send a reminder message for each of them to re-review
 			const reviewers = this.parseReviews(reviews)
 			reviewers.map((reviewer) => {
-				Slack.slackReviewReminder(payload, user, reviewer)
+				Slack.reviewReminder(payload, user, reviewer)
 				return 'Reviewer Reminded'
 			})
 		})
@@ -57,28 +58,14 @@ class LabelsHelper {
 	}
 
 	handleUnlabel(payload) {
-		const user = FRONTEND_MEMBERS[payload.pull_request.user.id]
-
 		if (payload.label.name === 'changes requested') {
-			this.triggerReviewReminder(user, payload)
+			this.triggerReviewReminder(payload)
 		}
 
 		if (payload.label.name === 'WIP') {
 			request(Github.post(`${payload.pull_request.issue_url}/labels`, ['$$review', 'ready to review']))
 		}
 	}
-
-	Labels(payload) {
-		if (payload.action === 'labeled') {
-			return this.handleAddLabel(payload)
-		}
-
-		if (payload.action === 'unlabeled') {
-			return this.handleUnlabel(payload)
-		}
-
-		return 'Got a label change'
-	}
 }
 
-export default LabelsHelper
+export default new LabelHelper()
