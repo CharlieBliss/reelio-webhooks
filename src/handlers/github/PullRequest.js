@@ -7,7 +7,7 @@ import Slack from '../../helpers/slack'
 import Firebase from '../../helpers/firebase'
 
 import Labels from '../Labels'
-import Tickets from './Tickets'
+import Tickets from '../Tickets'
 
 const request = require('request')
 

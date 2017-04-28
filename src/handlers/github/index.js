@@ -1,7 +1,7 @@
 import helper from '../../helpers/github'
 import Review from './Review'
 import CheckReviews from './CheckReviews'
-import Labels from '../labels'
+import Labels from '../Labels'
 
 export function handle(event, context, callback) {
 	const headers = event.headers,
