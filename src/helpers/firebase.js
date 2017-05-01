@@ -126,4 +126,4 @@ class Firebase {
 	}
 }
 
-export default new Firebase(serviceAccount)
+export default Firebase(serviceAccount)

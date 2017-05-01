@@ -54,6 +54,7 @@ functions:
       - http:
           path: jira
           method: post
+
   github:
     handler: src/handlers/github/index.handle
     events:
