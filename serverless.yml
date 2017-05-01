@@ -49,7 +49,11 @@ custom:
 
 functions:
   jira:
-    handler: src/handlers/jira.jira
+    handler: src/handlers/jira/index.handle
+    events:
+      - http:
+          path: jira
+          method: post
   github:
     handler: src/handlers/github/index.handle
     events:

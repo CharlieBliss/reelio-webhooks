@@ -20,8 +20,9 @@
     "eslint-plugin-jsx-a11y": "^4.0.0",
     "eslint-plugin-react": "^6.10.3",
     "nock": "^9.0.11",
+    "serverless": "^1.12.1",
     "serverless-mocha-plugin": "git://github.com/ryof/serverless-mocha-plugin.git#add-mocha-compilers-option",
-    "serverless-offline": "^3.13.2"
+    "serverless-offline": "^3.13.5"
   },
   "scripts": {
     "test": "mocha test --compilers js:babel-register",
