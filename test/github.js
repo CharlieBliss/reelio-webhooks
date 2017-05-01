@@ -71,10 +71,8 @@ describe('github', () => {
 				setTimeout(() => {
 					expect(response).to.not.be.empty
 					expect(response.body).to.equal('Github -- Review Changes Success')
-
 					expect(remove.isDone()).to.be.true
 					expect(nock.pendingMocks()).to.be.empty
-
 					done()
 				}, 10)
 			})
