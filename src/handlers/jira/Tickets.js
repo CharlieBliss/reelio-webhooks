@@ -1,5 +1,5 @@
 import request from 'request'
-import Jira from '../helpers/jira'
+import Jira from '../../helpers/jira'
 
 class Tickets {
 

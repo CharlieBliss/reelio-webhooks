@@ -43,12 +43,12 @@ class Slack {
 		console.log('TICKET TABLE FAILED', resp)
 	}
 
-	noTable(req) {
+	noTable(payload) {
 		sendMessage({
 			channel: 'U28LB0AAH',
 			username: 'PR Bot',
 			icon_url: 'https://octodex.github.com/images/yaktocat.png',
-			text: `There was no table for ticket <https://reelio.atlassian.net/browse/${req.payload.issue.key}|${req.payload.issue.key}>`,
+			text: `There was no table for ticket <https://reelio.atlassian.net/browse/${payload.issue.key}|${payload.issue.key}>`,
 		})
 	}
 

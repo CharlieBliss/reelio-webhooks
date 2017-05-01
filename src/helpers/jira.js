@@ -3,7 +3,7 @@ import request from 'request'
 
 import Slack from '../helpers/slack'
 import Firebase from '../helpers/firebase'
-import JiraTickets from '../helpers/jiraTickets'
+import Tickets from '../helpers/tickets'
 import Github from '../helpers/github'
 import { jiraRegex, uniqueTicketFilter } from '../helpers/utils'
 
@@ -63,6 +63,13 @@ class JiraHelper {
 		}
 	}
 
+	respond(message, statusCode = 200) {
+		return {
+			statusCode,
+			body: `Jira -- ${message}`,
+		}
+	}
+
 	transitionTickets(tickets, payload) {
 		const head = payload.pull_request.head.ref
 		const parsedBranch = head.substr(head.indexOf('-') + 1, head.length)
@@ -79,7 +86,7 @@ class JiraHelper {
 				},
 			}))
 
-			JiraTickets.getTicketFirebaseInfo(ticket, repo, (board, data) => {
+			Tickets.getTicketFirebaseInfo(ticket, repo, (board, data) => {
 				Firebase.log('JIRA', board, 'transition', 'QA', { ticket: data })
 			})
 			// Update the ticket with our new table
@@ -89,7 +96,7 @@ class JiraHelper {
 				},
 			}), (_, __, resBody) => {
 				if (!resBody) {
-					JiraTickets.getTicketFirebaseInfo(ticket, repo, (board, data) => {
+					Tickets.getTicketFirebaseInfo(ticket, repo, (board, data) => {
 						Firebase.log('JIRA', board, 'table', 'updated', { ticket: data })
 					})
 					return
@@ -106,17 +113,17 @@ class JiraHelper {
 		})
 	}
 
-	handleTransition(req) {
-		console.log('TRANSITION', req.payload.transition.transitionId)
+	handleTransition(payload) {
+		console.log('TRANSITION', payload.transition.transitionId)
 		// GOOD Transition ID = 51
 		// if transition.id !== 51, status = declined
-		if (req.payload.transition.transitionId === 51) {
-			console.log(req.payload.issue)
-			const TicketTable = req.payload.issue.fields.customfield_10900
+		if (payload.transition.transitionId === 51) {
+			console.log(payload.issue)
+			const TicketTable = payload.issue.fields.customfield_10900
 
 			if (!TicketTable) {
 				// Warn Kyle.  This should be impossible
-				Slack.noTable(req)
+				Slack.noTable(payload)
 				return 'No table ticket!!!'
 			}
 
