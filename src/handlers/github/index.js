@@ -1,7 +1,7 @@
 import helper from '../../helpers/github'
 import Review from './Review'
 import CheckReviews from './CheckReviews'
-import Labels from '../Labels'
+import Labels from './Labels'
 import PullRequest from './PullRequest'
 
 export function handle(event, context, callback) {

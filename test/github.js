@@ -64,7 +64,7 @@ describe('github', () => {
 			request.headers['X-Github-Event'] = payloads.review.event
 
 			const remove = nock('https://api.github.com')
-				.delete('/repos/baxterthehacker/public-repo/issues/1/labels/changes%20requested')
+				.delete('/repos/Kyle-Mendes/public-repo/issues/1/labels/changes%20requested')
 				.reply(200)
 
 			wrapped.run(request).then((response) => {
@@ -85,11 +85,11 @@ describe('github', () => {
 			request.headers['X-Github-Event'] = payloads.review.event
 
 			const add = nock('https://api.github.com')
-				.post('/repos/baxterthehacker/public-repo/issues/1/labels', ['changes requested'])
+				.post('/repos/Kyle-Mendes/public-repo/issues/1/labels', ['changes requested'])
 				.reply(200)
 
 			const remove = nock('https://api.github.com')
-				.delete('/repos/baxterthehacker/public-repo/issues/1/labels/ready%20to%20review')
+				.delete('/repos/Kyle-Mendes/public-repo/issues/1/labels/ready%20to%20review')
 				.reply(200)
 
 			const slack = nock(slackUrl)
@@ -115,11 +115,11 @@ describe('github', () => {
 		// 	request.headers['X-Github-Event'] = payloads.review.event
 		//
 		// 	const add = nock('https://api.github.com')
-		// 		.post('/repos/baxterthehacker/public-repo/issues/1/labels', ['changes requested'])
+		// 		.post('/repos/Kyle-Mendes/public-repo/issues/1/labels', ['changes requested'])
 		// 		.reply(200)
 		//
 		// 	const remove = nock('https://api.github.com')
-		// 		.delete('/repos/baxterthehacker/public-repo/issues/1/labels/ready%20to%20review')
+		// 		.delete('/repos/Kyle-Mendes/public-repo/issues/1/labels/ready%20to%20review')
 		// 		.reply(200)
 		//
 		// 	const slack = nock(slackUrl)

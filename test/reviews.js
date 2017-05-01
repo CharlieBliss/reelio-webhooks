@@ -31,7 +31,7 @@ describe('github', () => {
 			const payload = payloads.pullRequest.pullRequestOpenedMaster
 			const sha = payload.pull_request.head.sha
 			const successCI = nock('https://api.github.com')
-				.post(`/repos/baxterthehacker/public-repo/statuses/${sha}`,
+				.post(`/repos/Kyle-Mendes/public-repo/statuses/${sha}`,
 					{
 						state: 'success',
 						description: 'No reviews required',
@@ -53,7 +53,7 @@ describe('github', () => {
 			const sha = payload.pull_request.head.sha
 
 			const failureCI = nock('https://api.github.com')
-				.post(`/repos/baxterthehacker/public-repo/statuses/${sha}`,
+				.post(`/repos/Kyle-Mendes/public-repo/statuses/${sha}`,
 					{
 						state: 'failure',
 						description: `This PR requires 1 more approved review to be merged.`,
@@ -62,7 +62,7 @@ describe('github', () => {
 				.reply(200)
 
 			const reviews = nock('https://api.github.com')
-				.get('/repos/baxterthehacker/public-repo/pulls/2/reviews')
+				.get('/repos/Kyle-Mendes/public-repo/pulls/2/reviews')
 				.reply(200,
 					 [
 						 { state: 'approved', user: { id: 7416637 }, submitted_at: 1489426108738 },
@@ -70,13 +70,13 @@ describe('github', () => {
 				 )
 
 			const add = nock('https://api.github.com')
-				.post('/repos/baxterthehacker/public-repo/issues/1/labels', ['$$review'])
+				.post('/repos/Kyle-Mendes/public-repo/issues/1/labels', ['$$review'])
 				.reply(200)
 			const removeQA = nock('https://api.github.com')
-				.delete('/repos/baxterthehacker/public-repo/issues/1/labels/%24%24qa')
+				.delete('/repos/Kyle-Mendes/public-repo/issues/1/labels/%24%24qa')
 				.reply(200)
 			const removeApproved = nock('https://api.github.com')
-				.delete('/repos/baxterthehacker/public-repo/issues/1/labels/approved')
+				.delete('/repos/Kyle-Mendes/public-repo/issues/1/labels/approved')
 				.reply(200)
 
 			CheckReviews(payload, 'pull_request')
@@ -95,7 +95,7 @@ describe('github', () => {
 			const sha = payload.pull_request.head.sha
 
 			const failureCI = nock('https://api.github.com')
-				.post(`/repos/baxterthehacker/public-repo/statuses/${sha}`,
+				.post(`/repos/Kyle-Mendes/public-repo/statuses/${sha}`,
 					{
 						state: 'failure',
 						description: 'This PR is blocked from merging due to a pending request for changes.',
@@ -104,7 +104,7 @@ describe('github', () => {
 				.reply(200)
 
 			const reviews = nock('https://api.github.com')
-				.get('/repos/baxterthehacker/public-repo/pulls/2/reviews')
+				.get('/repos/Kyle-Mendes/public-repo/pulls/2/reviews')
 				.reply(200,
 					 [
 						 { state: 'approved', user: { id: 7416637 }, submitted_at: 1489426108742 },
@@ -114,13 +114,13 @@ describe('github', () => {
 				 )
 
 			const add = nock('https://api.github.com')
-				.post('/repos/baxterthehacker/public-repo/issues/1/labels', ['$$review'])
+				.post('/repos/Kyle-Mendes/public-repo/issues/1/labels', ['$$review'])
 				.reply(200)
 			const removeQA = nock('https://api.github.com')
-				.delete('/repos/baxterthehacker/public-repo/issues/1/labels/%24%24qa')
+				.delete('/repos/Kyle-Mendes/public-repo/issues/1/labels/%24%24qa')
 				.reply(200)
 			const removeApproved = nock('https://api.github.com')
-				.delete('/repos/baxterthehacker/public-repo/issues/1/labels/approved')
+				.delete('/repos/Kyle-Mendes/public-repo/issues/1/labels/approved')
 				.reply(200)
 
 			CheckReviews(payload, 'pull_request')
@@ -139,7 +139,7 @@ describe('github', () => {
 			const sha = payload.pull_request.head.sha
 
 			const successCI = nock('https://api.github.com')
-				.post(`/repos/baxterthehacker/public-repo/statuses/${sha}`,
+				.post(`/repos/Kyle-Mendes/public-repo/statuses/${sha}`,
 					{
 						state: 'success',
 						description: `At least 2 reviews, all reviews approved.`,
@@ -148,7 +148,7 @@ describe('github', () => {
 				.reply(200)
 
 			const reviews = nock('https://api.github.com')
-				.get('/repos/baxterthehacker/public-repo/pulls/2/reviews')
+				.get('/repos/Kyle-Mendes/public-repo/pulls/2/reviews')
 				.reply(200,
 					 [
 						 { state: 'approved', user: { id: 7416637 }, submitted_at: 1489426108742 },
@@ -157,13 +157,13 @@ describe('github', () => {
 				 )
 
 			const add = nock('https://api.github.com')
-				.post('/repos/baxterthehacker/public-repo/issues/1/labels', ["approved","$$qa"])
+				.post('/repos/Kyle-Mendes/public-repo/issues/1/labels', ["approved","$$qa"])
 				.reply(200)
 			const removeReview = nock('https://api.github.com')
-				.delete('/repos/baxterthehacker/public-repo/issues/1/labels/%24%24review')
+				.delete('/repos/Kyle-Mendes/public-repo/issues/1/labels/%24%24review')
 				.reply(200)
 			const removeReadyToReview = nock('https://api.github.com')
-				.delete('/repos/baxterthehacker/public-repo/issues/1/labels/ready%20to%20review')
+				.delete('/repos/Kyle-Mendes/public-repo/issues/1/labels/ready%20to%20review')
 				.reply(200)
 
 			CheckReviews(payload, 'pull_request')
@@ -182,7 +182,7 @@ describe('github', () => {
 			const sha = payload.pull_request.head.sha
 
 			const successCI = nock('https://api.github.com')
-				.post(`/repos/baxterthehacker/public-repo/statuses/${sha}`,
+				.post(`/repos/Kyle-Mendes/public-repo/statuses/${sha}`,
 					{
 						state: 'success',
 						description: `At least 2 reviews, all reviews approved.`,
@@ -191,7 +191,7 @@ describe('github', () => {
 				.reply(200)
 
 			const reviews = nock('https://api.github.com')
-				.get('/repos/baxterthehacker/public-repo/pulls/2/reviews')
+				.get('/repos/Kyle-Mendes/public-repo/pulls/2/reviews')
 				.reply(200,
 					 [
 						 { state: 'approved', user: { id: 7416637 }, submitted_at: 1489426108742 },
@@ -201,13 +201,13 @@ describe('github', () => {
 				 )
 
 			const add = nock('https://api.github.com')
-				.post('/repos/baxterthehacker/public-repo/issues/1/labels', ["approved","$$qa"])
+				.post('/repos/Kyle-Mendes/public-repo/issues/1/labels', ["approved","$$qa"])
 				.reply(200)
 			const removeReview = nock('https://api.github.com')
-				.delete('/repos/baxterthehacker/public-repo/issues/1/labels/%24%24review')
+				.delete('/repos/Kyle-Mendes/public-repo/issues/1/labels/%24%24review')
 				.reply(200)
 			const removeReadyToReview = nock('https://api.github.com')
-				.delete('/repos/baxterthehacker/public-repo/issues/1/labels/ready%20to%20review')
+				.delete('/repos/Kyle-Mendes/public-repo/issues/1/labels/ready%20to%20review')
 				.reply(200)
 
 			CheckReviews(payload, 'pull_request')
@@ -226,7 +226,7 @@ describe('github', () => {
 			// 	const sha = payload.pull_request.head.sha
 			//
 			// 	let failureCI = nock('https://api.github.com')
-			// 		.post(`/repos/baxterthehacker/public-repo/statuses/${sha}`,
+			// 		.post(`/repos/Kyle-Mendes/public-repo/statuses/${sha}`,
 			// 			{
 			// 				state: 'failure',
 			// 				description: `This PR requires 1 more approved review to be merged.`,
@@ -235,7 +235,7 @@ describe('github', () => {
 			// 		.reply(200)
 			//
 			// 	let reviews = nock('https://api.github.com')
-			// 		.get('/repos/baxterthehacker/public-repo/pulls/2/reviews')
+			// 		.get('/repos/Kyle-Mendes/public-repo/pulls/2/reviews')
 			// 		.reply(200,
 			// 			 [
 			// 				 { state: 'approved', user: { id: 7416637 }, submitted_at: 1489426108742 },
@@ -243,19 +243,19 @@ describe('github', () => {
 			// 		 )
 			//
 			//  let add = nock('https://api.github.com')
-			// 	 .post('/repos/baxterthehacker/public-repo/issues/1/labels', ['$$review'])
+			// 	 .post('/repos/Kyle-Mendes/public-repo/issues/1/labels', ['$$review'])
 			// 	 .reply(200)
 			//  let changes = nock('https://api.github.com')
-			// 	 .post('/repos/baxterthehacker/public-repo/issues/1/labels', ['changes requested'])
+			// 	 .post('/repos/Kyle-Mendes/public-repo/issues/1/labels', ['changes requested'])
 			// 	 .reply(200)
 			//  let removeReadyToReview = nock('https://api.github.com')
- 		// 		.delete('/repos/baxterthehacker/public-repo/issues/1/labels/ready%20to%20review')
+ 		// 		.delete('/repos/Kyle-Mendes/public-repo/issues/1/labels/ready%20to%20review')
  		// 		.reply(200)
 			//  let removeQA = nock('https://api.github.com')
-			// 	 .delete('/repos/baxterthehacker/public-repo/issues/1/labels/%24%24qa')
+			// 	 .delete('/repos/Kyle-Mendes/public-repo/issues/1/labels/%24%24qa')
 			// 	 .reply(200)
 			//  let removeApproved = nock('https://api.github.com')
-			// 	 .delete('/repos/baxterthehacker/public-repo/issues/1/labels/approved')
+			// 	 .delete('/repos/Kyle-Mendes/public-repo/issues/1/labels/approved')
 			// 	 .reply(200)
 			//
 			//  const request = Object.assign({}, { headers: headers.github }, { body: payloads.review.denied })

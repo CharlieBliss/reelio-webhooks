@@ -1,4 +1,4 @@
-import LabelHelper from '../helpers/labels'
+import LabelHelper from '../../helpers/labels'
 
 function Label(payload) {
 	if (payload.action === 'labeled') {

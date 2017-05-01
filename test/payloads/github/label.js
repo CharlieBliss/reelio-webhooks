@@ -7,7 +7,7 @@ export const addWIP = {
     "color":"ff0000"
   },
 	"pull_request": {
-		"issue_url": "https://api.github.com/repos/baxterandthehackers/public-repo/issues/1",
+		"issue_url": "https://api.github.com/repos/Kyle-Mendes/public-repo/issues/1",
 	}
 }
 
@@ -18,7 +18,7 @@ export const removeWIP = {
     "color":"ff0000"
   },
 	"pull_request": {
-	"issue_url": "https://api.github.com/repos/baxterandthehackers/public-repo/issues/1",
+	"issue_url": "https://api.github.com/repos/Kyle-Mendes/public-repo/issues/1",
 	},
 }
 
@@ -32,7 +32,7 @@ export const removeChanges = {
 	"user": {
 		"id": "7416637",
 	},
-	"url": 'https://api.github.com/repos/baxterthehacker/public-repo/pulls/2',
-	"issue_url": "https://api.github.com/repos/baxterandthehackers/public-repo/issues/1",
+	"url": 'https://api.github.com/repos/Kyle-Mendes/public-repo/pulls/2',
+	"issue_url": "https://api.github.com/repos/Kyle-Mendes/public-repo/issues/1",
 	},
 }
