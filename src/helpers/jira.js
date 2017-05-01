@@ -114,7 +114,7 @@ class JiraHelper {
 	}
 
 	handleTransition(payload) {
-		console.log('TRANSITION', payload.transition.transitionId)
+		// console.log('TRANSITION', payload.transition.transitionId)
 		// GOOD Transition ID = 51
 		// if transition.id !== 51, status = declined
 		if (payload.transition.transitionId === 51) {
@@ -128,7 +128,7 @@ class JiraHelper {
 			}
 
 			const PRRoute = TicketTable.match(/\[\(internal use\)\|([^\]]*)\]/)[1]
-			request(this.get(PRRoute), (err, res, resBody) => {
+			request(Github.get(PRRoute), (err, res, resBody) => {
 				const PR = JSON.parse(resBody),
 					body = PR.body || '',
 					tickets = body.match(jiraRegex) || [],

@@ -5,8 +5,8 @@ import Slack from './slack'
 const serviceAccount = require('../consts/firebase-auth.json')
 
 class Firebase {
-	constructor(account) {
-		this.serviceAccount = account
+	constructor() {
+		this.serviceAccount = serviceAccount
 
 		// Initialize the firebase app
 		admin.initializeApp({
@@ -126,4 +126,4 @@ class Firebase {
 	}
 }
 
-export default Firebase(serviceAccount)
+export default Firebase
