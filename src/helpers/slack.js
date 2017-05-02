@@ -39,8 +39,6 @@ class Slack {
 			icon_url: 'https://octodex.github.com/images/yaktocat.png',
 			text: `Something went wrong when trying to update the table for: <https://reelio.atlassian.net/browse/${ticket}|${ticket}>.\n\n\`\`\`${resp.errorMessages.join('\n')}\`\`\``,
 		})
-
-		console.log('TICKET TABLE FAILED', resp)
 	}
 
 	noTable(payload) {
@@ -52,15 +50,13 @@ class Slack {
 		})
 	}
 
-	firebaseFailed(err) {
+	firebaseFailed() {
 		sendMessage({
 			channel: 'U28LB0AAH',
 			username: 'Firebase Bot',
 			icon_url: 'https://octodex.github.com/images/yaktocat.png',
 			text: 'Something went wrong when trying to trim firebase payload size. Check server logs, scrub',
 		})
-
-		console.warn('FIREBASE NO WORK -- ', err)
 	}
 
 }

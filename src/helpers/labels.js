@@ -2,7 +2,7 @@ import request from 'request'
 import { FRONTEND_MEMBERS } from '../consts/slack'
 import Github from '../helpers/github'
 import Slack from '../helpers/slack'
-import parseReviews from '../helpers/utils'
+import { parseReviews } from './utils'
 
 class LabelHelper {
 

@@ -116,14 +116,15 @@ class Firebase {
 			} catch (err) {
 				Slack.firebaseFailed(err)
 			}
-
 			if (action) {
+				console.log(action)
 				this.db.ref(`${service}/${project}/${event}/${action}/${Date.now()}`).set(payload)
 			} else {
 				this.db.ref(`${service}/${project}/${event}/${Date.now()}`).set(payload)
 			}
 		}, 5000)
+		return `Logged ${event}`
 	}
 }
 
-export default Firebase
+export default new Firebase()

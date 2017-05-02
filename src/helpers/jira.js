@@ -15,7 +15,6 @@ class JiraHelper {
 			headers: {
 				Accept: 'application/json',
 				Authorization: `Basic ${JIRA_TOKEN}`,
-				'content-type': 'application/json',
 			},
 		}
 	}

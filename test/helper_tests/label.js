@@ -3,10 +3,10 @@ const nock = require('nock')
 
 const expect = mochaPlugin.chai.expect
 
-const headers = require('./payloads/headers')
-const payloads = require('./payloads/github')
-const Labels = require('../src/handlers/github/Labels').default
-const slackUrl = require('../src/consts/slack').SLACK_URL
+const headers = require('../payloads/headers')
+const payloads = require('../payloads/github')
+const Labels = require('../../src/handlers/github/Labels').default
+const slackUrl = require('../../src/consts/slack').SLACK_URL
 
 describe('PR labeling', () => {
 	describe('Properly handles Adding Label', () => {
