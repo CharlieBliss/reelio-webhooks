@@ -52,7 +52,7 @@ describe('Properly Logs events to Firebase', () => {
 			expect(Firebase.log(service, project, event, payload, 10)).to.equal(`Logged ${event}`)
 			expect(firebaseLog.isDone()).to.be.true
 			done()
-		}, 20)
+		}, 30)
 	})
 
 })

@@ -17,7 +17,7 @@ describe('helpers -- tickets', () => {
 	})
 
 	it('Should handle JIRA ticket transitions from QA => Done (single ticket)', (done) => {
-		Jira.handleTransition(jiraPayloads.transition.qaToDoneSingle)
+		Jira.handleTransition(jiraPayloads.transition.qaToDone)
 
 		const sha = githubPayloads.pullRequest.pullRequestOpenedStaging.pull_request.head.sha
 
@@ -42,19 +42,19 @@ describe('helpers -- tickets', () => {
 			expect(successCI.isDone()).to.be.true
 			expect(removeQA.isDone()).to.be.true
 			expect(addQAApproved.isDone()).to.be.true
-			expect(Jira.handleTransition(jiraPayloads.transition.qaToDoneSingle)).to.equal('PR status updated')
+			expect(Jira.handleTransition(jiraPayloads.transition.qaToDone)).to.equal('PR status updated')
 			done()
 		}, 10)
 	})
 
-	it('Should handle JIRA ticket transitions from QA => Done (multiple tickets)', (done) => {
-		Jira.handleTransition(jiraPayloads.transition.qaToDoneSingle)
+	it('Should handle JIRA ticket transitions from QA => Done (multiple tickets, all approved)', (done) => {
+		Jira.handleTransition(jiraPayloads.transition.qaToDone)
 
-		const sha = githubPayloads.pullRequest.pullRequestOpenedStaging.pull_request.head.sha
+		const sha = githubPayloads.pullRequest.pullRequestMultiTickets.pull_request.head.sha
 
 		const PRRoute = nock('https://api.github.com')
 		.get('/repos/dillonmcroberts/Webhook-test/pulls/26')
-		.reply(200, githubPayloads.pullRequest.pullRequestOpenedStaging.pull_request)
+		.reply(200, githubPayloads.pullRequest.pullRequestMultiTickets.pull_request)
 
 		const successCI = nock('https://api.github.com')
 		.post(`/repos/Kyle-Mendes/public-repo/statuses/${sha}`)

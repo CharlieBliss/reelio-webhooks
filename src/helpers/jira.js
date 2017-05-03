@@ -161,10 +161,8 @@ class JiraHelper {
 								attempts += 1
 								console.log('LOOPING', responses.length, attempts)
 							}, 1000)
-
 						} else {
 							const resolved = responses.filter(ticket => ticket.fields.status.id === '10001')
-
 							if (resolved.length === uniqueTickets.length) {
 								request(Github.post(`${PR.head.repo.url}/statuses/${sha}`, {
 									state: 'success',

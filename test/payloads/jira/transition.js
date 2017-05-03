@@ -1,4 +1,4 @@
-export const qaToDoneSingle = {
+export const qaToDone = {
     "transition": {
         "workflowId": 32854,
         "workflowName": "XYZ workflow with vetting",
