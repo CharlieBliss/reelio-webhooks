@@ -18,7 +18,7 @@ class Firebase {
 
 	// Logs an action into the right event, project and service
 	// For example: Github -> reelio-front -> pull_request -> opened
-	log(service, project, event, action, payload) {
+	log(service, project, event, action, payload, timeout = 5000) {
 		setTimeout(() => {
 			if (
 				event === 'create' ||
@@ -120,7 +120,7 @@ class Firebase {
 			} else {
 				request.put(`https://webhooks-front.firebaseio.com/${service}/${project}/${event}/${Date.now()}.json?access_token=${this.token}`, { body: JSON.stringify(payload) })
 			}
-		}, 5000)
+		}, timeout)
 		return `Logged ${event}`
 	}
 }
