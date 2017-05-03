@@ -1,7 +1,6 @@
 const mochaPlugin = require('serverless-mocha-plugin')
 const nock = require('nock')
 const expect = mochaPlugin.chai.expect
-
 const payloads = require('../payloads/github')
 
 import Firebase from '../../src/helpers/firebase'

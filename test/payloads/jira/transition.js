@@ -1,4 +1,4 @@
-export const qaToDone = {
+export const qaToDoneSingle = {
     "transition": {
         "workflowId": 32854,
         "workflowName": "XYZ workflow with vetting",
@@ -13,12 +13,6 @@ export const qaToDone = {
         "name": "dillon",
         "key": "dillon",
         "emailAddress": "dillon@reeliolabs.com",
-        "avatarUrls": {
-            "48x48": "https://avatar-cdn.atlassian.com/a7d0bd6cb73a0de4a1ceb504779c1070?s=48&d=https%3A%2F%2Freelio.atlassian.net%2Fsecure%2Fuseravatar%3FavatarId%3D10350%26noRedirect%3Dtrue",
-            "24x24": "https://avatar-cdn.atlassian.com/a7d0bd6cb73a0de4a1ceb504779c1070?s=24&d=https%3A%2F%2Freelio.atlassian.net%2Fsecure%2Fuseravatar%3Fsize%3Dsmall%26avatarId%3D10350%26noRedirect%3Dtrue",
-            "16x16": "https://avatar-cdn.atlassian.com/a7d0bd6cb73a0de4a1ceb504779c1070?s=16&d=https%3A%2F%2Freelio.atlassian.net%2Fsecure%2Fuseravatar%3Fsize%3Dxsmall%26avatarId%3D10350%26noRedirect%3Dtrue",
-            "32x32": "https://avatar-cdn.atlassian.com/a7d0bd6cb73a0de4a1ceb504779c1070?s=32&d=https%3A%2F%2Freelio.atlassian.net%2Fsecure%2Fuseravatar%3Fsize%3Dmedium%26avatarId%3D10350%26noRedirect%3Dtrue"
-        },
         "displayName": "Dillon McRoberts",
         "active": true,
         "timeZone": "America/New_York"

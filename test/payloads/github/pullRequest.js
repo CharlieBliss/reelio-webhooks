@@ -31,7 +31,7 @@ export const pullRequestOpenedStaging = {
       "type": "User",
       "site_admin": false
     },
-    "body": "This is a pretty simple change that we need to pull into staging.",
+    "body": "This is a pretty simple change that we need to pull into staging. XYZ-2",
     "created_at": "2015-05-05T23:40:27Z",
     "updated_at": "2015-05-05T23:40:27Z",
     "closed_at": null,

@@ -2,7 +2,11 @@ const expect = require('chai').expect
 const nock = require('nock')
 
 const Tickets = require('../../src/helpers/tickets').default
-const Slack = require('../../src/helpers/slack').default
+const Jira = require('../../src/helpers/jira').default
+
+const jiraPayloads = require('../payloads/jira')
+const githubPayloads = require('../payloads/github')
+
 const consts = require('../../src/consts/slack')
 
 
@@ -11,24 +15,65 @@ describe('helpers -- tickets', () => {
 	beforeEach(() => {
 		nock.cleanAll()
 	})
-	it('Should be able to alert when changes are requested', (done) => {
-		const payload = {
-			review: {
-				html_url: 'http://reelio.com',
-			},
-		}
 
-		const user = consts.FRONTEND_MEMBERS[6400039]
-		const textRegexp = new RegExp(`^(?=.*\\b${user.name}\\b)(?=.*\\bhttp:\\/\\/reelio\\.com\\b).*$`)
-		const slack = nock(consts.SLACK_URL)
-			.post('', { channel: user.slack_id, text: textRegexp })
+	it('Should handle JIRA ticket transitions from QA => Done (single ticket)', (done) => {
+		Jira.handleTransition(jiraPayloads.transition.qaToDoneSingle)
+
+		const sha = githubPayloads.pullRequest.pullRequestOpenedStaging.pull_request.head.sha
+
+		const PRRoute = nock('https://api.github.com')
+		.get('/repos/dillonmcroberts/Webhook-test/pulls/26')
+		.reply(200, githubPayloads.pullRequest.pullRequestOpenedStaging.pull_request)
+
+		const successCI = nock('https://api.github.com')
+		.post(`/repos/Kyle-Mendes/public-repo/statuses/${sha}`)
+		.reply(200)
+
+		const removeQA = nock('https://api.github.com')
+			.delete('/repos/Kyle-Mendes/public-repo/issues/1/labels/%24%24qa')
 			.reply(200)
 
-		Slack.changesRequested(payload, user)
+		const addQAApproved = nock('https://api.github.com')
+			.post('/repos/Kyle-Mendes/public-repo/issues/1/labels', ['$$qa approved'])
+			.reply(200)
 
 		setTimeout(() => {
-			expect(slack.isDone()).to.be.true
-			expect(nock.pendingMocks()).to.be.empty
+			expect(PRRoute.isDone()).to.be.true
+			expect(successCI.isDone()).to.be.true
+			expect(removeQA.isDone()).to.be.true
+			expect(addQAApproved.isDone()).to.be.true
+			expect(Jira.handleTransition(jiraPayloads.transition.qaToDoneSingle)).to.equal('PR status updated')
+			done()
+		}, 10)
+	})
+
+	it('Should handle JIRA ticket transitions from QA => Done (multiple tickets)', (done) => {
+		Jira.handleTransition(jiraPayloads.transition.qaToDoneSingle)
+
+		const sha = githubPayloads.pullRequest.pullRequestOpenedStaging.pull_request.head.sha
+
+		const PRRoute = nock('https://api.github.com')
+		.get('/repos/dillonmcroberts/Webhook-test/pulls/26')
+		.reply(200, githubPayloads.pullRequest.pullRequestOpenedStaging.pull_request)
+
+		const successCI = nock('https://api.github.com')
+		.post(`/repos/Kyle-Mendes/public-repo/statuses/${sha}`)
+		.reply(200)
+
+		const removeQA = nock('https://api.github.com')
+			.delete('/repos/Kyle-Mendes/public-repo/issues/1/labels/%24%24qa')
+			.reply(200)
+
+		const addQAApproved = nock('https://api.github.com')
+			.post('/repos/Kyle-Mendes/public-repo/issues/1/labels', ['$$qa approved'])
+			.reply(200)
+
+		setTimeout(() => {
+			expect(PRRoute.isDone()).to.be.true
+			expect(successCI.isDone()).to.be.true
+			expect(removeQA.isDone()).to.be.true
+			expect(addQAApproved.isDone()).to.be.true
+			expect(Jira.handleTransition(jiraPayloads.transition.qaToDoneSingle)).to.equal('PR status updated')
 			done()
 		}, 10)
 	})
