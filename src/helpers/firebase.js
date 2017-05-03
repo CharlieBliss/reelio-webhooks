@@ -1,4 +1,5 @@
 import * as admin from 'firebase-admin'
+import request from 'request'
 
 import Slack from './slack'
 
@@ -8,13 +9,11 @@ class Firebase {
 	constructor() {
 		this.serviceAccount = serviceAccount
 
-		// Initialize the firebase app
-		admin.initializeApp({
-			credential: admin.credential.cert(this.serviceAccount),
-			databaseURL: 'https://webhooks-front.firebaseio.com',
+		admin.credential.cert(this.serviceAccount).getAccessToken().then((res) => {
+			this.token = res.access_token
+		}).catch((e) => {
+			console.warn(`\nFirebase authentication failed. ${e}\n`)
 		})
-
-		this.db = admin.database()
 	}
 
 	// Logs an action into the right event, project and service
@@ -117,10 +116,9 @@ class Firebase {
 				Slack.firebaseFailed(err)
 			}
 			if (action) {
-				console.log(action)
-				this.db.ref(`${service}/${project}/${event}/${action}/${Date.now()}`).set(payload)
+				request.put(`https://webhooks-front.firebaseio.com/${service}/${project}/${event}/${action}/${Date.now()}.json?access_token=${this.token}`, { body: JSON.stringify(payload) })
 			} else {
-				this.db.ref(`${service}/${project}/${event}/${Date.now()}`).set(payload)
+				request.put(`https://webhooks-front.firebaseio.com/${service}/${project}/${event}/${Date.now()}.json?access_token=${this.token}`, { body: JSON.stringify(payload) })
 			}
 		}, 5000)
 		return `Logged ${event}`
