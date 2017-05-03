@@ -20,7 +20,7 @@ describe('jira', () => {
 		wrapped.run(request).then((response) => {
 			setTimeout(() => {
 				expect(response).to.not.be.empty
-				expect(response.body).to.equal('Jira -- Not a valid github event.')
+				expect(response.body).to.equal('Jira -- Not a valid Jira event.')
 				expect(response.statusCode).to.equal(400)
 				done()
 			}, 10)

@@ -12,10 +12,8 @@ import { JIRA_TOKEN, jiraRegex } from '../consts'
 class JiraHelper {
 	get headers() {
 		return {
-			headers: {
-				Accept: 'application/json',
-				Authorization: `Basic ${JIRA_TOKEN}`,
-			},
+			Accept: 'application/json',
+			Authorization: `Basic ${JIRA_TOKEN}`,
 		}
 	}
 
@@ -149,11 +147,8 @@ class JiraHelper {
 					let attempts = 0
 
 					tickets.map(t => request(this.get(`${ticketBase}/${t}`), (_, __, data) => {
-						console.log(`${ticketBase}/${t}`)
 						responses.push(JSON.parse(data))
 					}))
-
-					console.log('RESPONSES', responses)
 
 					// @TODO move this out
 					function getTicketResponses() { // eslint-disable-line
@@ -168,10 +163,7 @@ class JiraHelper {
 							}, 1000)
 
 						} else {
-							const resolved = responses.filter((ticket) => {
-								console.log('TICKET', ticket)
-								// ticket.fields.status.id === '10001'
-							})
+							const resolved = responses.filter(ticket => ticket.fields.status.id === '10001')
 
 							if (resolved.length === uniqueTickets.length) {
 								request(Github.post(`${PR.head.repo.url}/statuses/${sha}`, {
