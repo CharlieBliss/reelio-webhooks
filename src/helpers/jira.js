@@ -5,9 +5,9 @@ import Slack from '../helpers/slack'
 import Firebase from '../helpers/firebase'
 import Tickets from '../helpers/tickets'
 import Github from '../helpers/github'
-import { jiraRegex, uniqueTicketFilter } from '../helpers/utils'
+import { uniqueTicketFilter } from '../helpers/utils'
 
-import { JIRA_TOKEN } from '../consts'
+import { JIRA_TOKEN, jiraRegex } from '../consts'
 
 class JiraHelper {
 	get headers() {
@@ -113,11 +113,9 @@ class JiraHelper {
 	}
 
 	handleTransition(payload) {
-		// console.log('TRANSITION', payload.transition.transitionId)
 		// GOOD Transition ID = 51
 		// if transition.id !== 51, status = declined
 		if (payload.transition.transitionId === 51) {
-			console.log(payload.issue)
 			const TicketTable = payload.issue.fields.customfield_10900
 
 			if (!TicketTable) {
@@ -150,9 +148,12 @@ class JiraHelper {
 					const responses = []
 					let attempts = 0
 
-					tickets.map(t => request(this.get(`${ticketBase}/${t}`, 'jira'), (_, __, data) => {
+					tickets.map(t => request(this.get(`${ticketBase}/${t}`), (_, __, data) => {
+						console.log(`${ticketBase}/${t}`)
 						responses.push(JSON.parse(data))
 					}))
+
+					console.log('RESPONSES', responses)
 
 					// @TODO move this out
 					function getTicketResponses() { // eslint-disable-line
@@ -167,7 +168,10 @@ class JiraHelper {
 							}, 1000)
 
 						} else {
-							const resolved = responses.filter(ticket => ticket.fields.status.id === '10001')
+							const resolved = responses.filter((ticket) => {
+								console.log('TICKET', ticket)
+								// ticket.fields.status.id === '10001'
+							})
 
 							if (resolved.length === uniqueTickets.length) {
 								request(Github.post(`${PR.head.repo.url}/statuses/${sha}`, {
