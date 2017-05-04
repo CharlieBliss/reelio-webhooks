@@ -846,6 +846,22 @@ export const pullRequestMultiTickets = {
   },
 }
 
+export const pullRequestMultiTicketsUnapproved = {
+  "action": "opened",
+  "number": 1,
+  "pull_request": {
+		"body": "This is a pretty simple change that we need to pull into staging. XYZ-5 XYZ-2",
+    "url": "https://api.github.com/repos/Kyle-Mendes/public-repo/pulls/2",
+		"issue_url": "https://api.github.com/repos/Kyle-Mendes/public-repo/issues/1",
+    "head": {
+      "sha": "0d1a26e67d8f5eaf1f6ba5c57fc3c7d91ac0fd1c",
+      "repo": {
+        "url": "https://api.github.com/repos/Kyle-Mendes/public-repo",
+			}
+    },
+  },
+}
+
 export const pullRequestBadAction = {
   "action": "closed",
 	"pull_request": {

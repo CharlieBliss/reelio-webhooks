@@ -73,9 +73,35 @@ describe('helpers -- tickets', () => {
 			expect(successCI.isDone()).to.be.true
 			expect(removeQA.isDone()).to.be.true
 			expect(addQAApproved.isDone()).to.be.true
-			expect(Jira.handleTransition(jiraPayloads.transition.qaToDoneSingle)).to.equal('PR status updated')
+			expect(Jira.handleTransition(jiraPayloads.transition.qaToDone)).to.equal('PR status updated')
 			done()
-		}, 10)
+		}, 1500)
+	})
+
+	it('Should handle JIRA ticket transitions from QA => Done (multiple tickets, not approved)', (done) => {
+		Jira.handleTransition(jiraPayloads.transition.qaToDone)
+
+		const sha = githubPayloads.pullRequest.pullRequestMultiTicketsUnapproved.pull_request.head.sha
+
+		const PRRoute = nock('https://api.github.com')
+		.get('/repos/dillonmcroberts/Webhook-test/pulls/26')
+		.reply(200, githubPayloads.pullRequest.pullRequestMultiTicketsUnapproved.pull_request)
+
+		const failureCI = nock('https://api.github.com')
+		.post(`/repos/Kyle-Mendes/public-repo/statuses/${sha}`,
+			{
+				state: 'failure',
+				description: `Waiting on 1 ticket to be marked as "done".`,
+				context: 'ci/qa-team',
+			})
+		.reply(200)
+
+		setTimeout(() => {
+			expect(PRRoute.isDone()).to.be.true
+			expect(failureCI.isDone()).to.be.true
+			expect(Jira.handleTransition(jiraPayloads.transition.qaToDone)).to.equal('PR status updated')
+			done()
+		}, 1500)
 	})
 
 })
