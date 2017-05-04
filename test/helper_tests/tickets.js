@@ -48,7 +48,6 @@ describe('helpers -- tickets', () => {
 	})
 
 	it('Should handle JIRA ticket transitions from QA => Done (multiple tickets, all approved)', (done) => {
-		Jira.handleTransition(jiraPayloads.transition.qaToDone)
 
 		const sha = githubPayloads.pullRequest.pullRequestMultiTickets.pull_request.head.sha
 
@@ -68,18 +67,18 @@ describe('helpers -- tickets', () => {
 			.post('/repos/Kyle-Mendes/public-repo/issues/1/labels', ['$$qa approved'])
 			.reply(200)
 
+		Jira.handleTransition(jiraPayloads.transition.qaToDone)
 		setTimeout(() => {
 			expect(PRRoute.isDone()).to.be.true
 			expect(successCI.isDone()).to.be.true
 			expect(removeQA.isDone()).to.be.true
 			expect(addQAApproved.isDone()).to.be.true
-			expect(Jira.handleTransition(jiraPayloads.transition.qaToDone)).to.equal('PR status updated')
 			done()
 		}, 1500)
 	})
 
 	it('Should handle JIRA ticket transitions from QA => Done (multiple tickets, not approved)', (done) => {
-		Jira.handleTransition(jiraPayloads.transition.qaToDone)
+
 
 		const sha = githubPayloads.pullRequest.pullRequestMultiTicketsUnapproved.pull_request.head.sha
 
@@ -96,10 +95,10 @@ describe('helpers -- tickets', () => {
 			})
 		.reply(200)
 
+		Jira.handleTransition(jiraPayloads.transition.qaToDone)
 		setTimeout(() => {
 			expect(PRRoute.isDone()).to.be.true
 			expect(failureCI.isDone()).to.be.true
-			expect(Jira.handleTransition(jiraPayloads.transition.qaToDone)).to.equal('PR status updated')
 			done()
 		}, 1500)
 	})
