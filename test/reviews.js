@@ -48,47 +48,47 @@ describe('github', () => {
 				}, 10)
 			})
 
-		// it('Returns CI failure if fewer than 2 reviews', (done) => {
-		// 	const payload = payloads.pullRequest.pullRequestOpenedStaging
-		// 	const sha = payload.pull_request.head.sha
-		//
-		// 	const failureCI = nock('https://api.github.com')
-		// 		.post(`/repos/Kyle-Mendes/public-repo/statuses/${sha}`,
-		// 			{
-		// 				state: 'failure',
-		// 				description: `This PR requires 1 more approved review to be merged.`,
-		// 				context: 'ci/reelio',
-		// 			})
-		// 		.reply(200)
-		//
-		// 	const reviews = nock('https://api.github.com')
-		// 		.get('/repos/Kyle-Mendes/public-repo/pulls/2/reviews')
-		// 		.reply(200,
-		// 			 [
-		// 				 { state: 'approved', user: { id: 7416637 }, submitted_at: 1489426108738 },
-		// 			 ],
-		// 		 )
-		//
-		// 	const add = nock('https://api.github.com')
-		// 		.post('/repos/Kyle-Mendes/public-repo/issues/1/labels', ['$$review'])
-		// 		.reply(200)
-		// 	const removeQA = nock('https://api.github.com')
-		// 		.delete('/repos/Kyle-Mendes/public-repo/issues/1/labels/%24%24qa')
-		// 		.reply(200)
-		// 	const removeApproved = nock('https://api.github.com')
-		// 		.delete('/repos/Kyle-Mendes/public-repo/issues/1/labels/approved')
-		// 		.reply(200)
-		//
-		// 	CheckReviews(payload, 'pull_request')
-		// 		setTimeout(() => {
-		// 			expect(failureCI.isDone()).to.be.true
-		// 			expect(add.isDone()).to.be.true
-		// 			expect(removeQA.isDone()).to.be.true
-		// 			expect(removeApproved.isDone()).to.be.true
-		// 			expect(nock.pendingMocks()).to.be.empty
-		// 			done()
-		// 		}, 10)
-		// 	})
+		it('Returns CI failure if fewer than 2 reviews', (done) => {
+			const payload = payloads.pullRequest.pullRequestOpenedStaging
+			const sha = payload.pull_request.head.sha
+
+			const failureCI = nock('https://api.github.com')
+				.post(`/repos/Kyle-Mendes/public-repo/statuses/${sha}`,
+					{
+						state: 'failure',
+						description: `This PR requires 1 more approved review to be merged.`,
+						context: 'ci/reelio',
+					})
+				.reply(200)
+
+			const reviews = nock('https://api.github.com')
+				.get('/repos/Kyle-Mendes/public-repo/pulls/2/reviews')
+				.reply(200,
+					 [
+						 { state: 'approved', user: { id: 7416637 }, submitted_at: 1489426108738 },
+					 ],
+				 )
+
+			const add = nock('https://api.github.com')
+				.post('/repos/Kyle-Mendes/public-repo/issues/1/labels', ['$$review'])
+				.reply(200)
+			const removeQA = nock('https://api.github.com')
+				.delete('/repos/Kyle-Mendes/public-repo/issues/1/labels/%24%24qa')
+				.reply(200)
+			const removeApproved = nock('https://api.github.com')
+				.delete('/repos/Kyle-Mendes/public-repo/issues/1/labels/approved')
+				.reply(200)
+
+			CheckReviews(payload, 'pull_request')
+				setTimeout(() => {
+					expect(failureCI.isDone()).to.be.true
+					expect(add.isDone()).to.be.true
+					expect(removeQA.isDone()).to.be.true
+					expect(removeApproved.isDone()).to.be.true
+					expect(nock.pendingMocks()).to.be.empty
+					done()
+				}, 10)
+			})
 
 		it('Returns CI failure if not all reviews are approved', (done) => {
 			const payload = payloads.pullRequest.pullRequestOpenedStaging
