@@ -1,5 +1,5 @@
 import request from 'request'
-import Jira from '../../helpers/jira'
+import Tickets from '../../helpers/tickets'
 import { jiraRegex } from '../../consts'
 import Github from '../../helpers/github'
 
@@ -58,7 +58,7 @@ function CheckReviews(payload, event, count = 2) {
 
 				// Move the tickets to "Ready for QA"
 				const tickets = payload.pull_request.body.match(jiraRegex) || []
-				Jira.transitionTickets(tickets, payload)
+				Tickets.transitionTickets(tickets, payload)
 			}
 
 			if (reviews.length !== approved.length) {
