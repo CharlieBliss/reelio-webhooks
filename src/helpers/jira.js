@@ -110,7 +110,7 @@ class JiraHelper {
 		})
 	}
 
-	handleTransition(payload) {
+	Transition(payload) {
 		// GOOD Transition ID = 51
 		// if transition.id !== 51, status = declined
 		if (payload.transition.transitionId === 51) {

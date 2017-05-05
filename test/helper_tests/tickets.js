@@ -4,6 +4,8 @@ const nock = require('nock')
 const Tickets = require('../../src/helpers/tickets').default
 const Jira = require('../../src/helpers/jira').default
 
+import Transition from '../../src/handlers/jira/Transition'
+
 const jiraPayloads = require('../payloads/jira')
 const githubPayloads = require('../payloads/github')
 
@@ -17,7 +19,7 @@ describe('helpers -- tickets', () => {
 	})
 
 	it('Should handle JIRA ticket transitions from QA => Done (single ticket)', (done) => {
-		Jira.handleTransition(jiraPayloads.transition.qaToDone)
+		Transition(jiraPayloads.transition.qaToDone)
 
 		const sha = githubPayloads.pullRequest.pullRequestOpenedStaging.pull_request.head.sha
 
@@ -42,7 +44,7 @@ describe('helpers -- tickets', () => {
 			expect(successCI.isDone()).to.be.true
 			expect(removeQA.isDone()).to.be.true
 			expect(addQAApproved.isDone()).to.be.true
-			expect(Jira.handleTransition(jiraPayloads.transition.qaToDone)).to.equal('PR status updated')
+			expect(Transition(jiraPayloads.transition.qaToDone)).to.equal('PR status updated')
 			done()
 		}, 10)
 	})
@@ -67,7 +69,7 @@ describe('helpers -- tickets', () => {
 			.post('/repos/Kyle-Mendes/public-repo/issues/1/labels', ['$$qa approved'])
 			.reply(200)
 
-		Jira.handleTransition(jiraPayloads.transition.qaToDone)
+		Transition(jiraPayloads.transition.qaToDone)
 		setTimeout(() => {
 			expect(PRRoute.isDone()).to.be.true
 			expect(successCI.isDone()).to.be.true
@@ -95,7 +97,7 @@ describe('helpers -- tickets', () => {
 			})
 		.reply(200)
 
-		Jira.handleTransition(jiraPayloads.transition.qaToDone)
+		Transition(jiraPayloads.transition.qaToDone)
 		setTimeout(() => {
 			expect(PRRoute.isDone()).to.be.true
 			expect(failureCI.isDone()).to.be.true
