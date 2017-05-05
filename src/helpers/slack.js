@@ -25,7 +25,7 @@ class Slack {
 
 	reviewReminder(payload, user, reviewer) {
 		sendMessage({
-			channel: user.slack_id,
+			channel: FRONTEND_MEMBERS[reviewer.user].slack_id,
 			username: 'Review Bot',
 			icon_url: 'https://octodex.github.com/images/steroidtocat.png',
 			text: `Hi there, ${FRONTEND_MEMBERS[reviewer.user].name}. ${user.name}'s <${payload.pull_request.html_url}|Pull Request> has been updated. Please re-review the PR for approval.`,

@@ -202,6 +202,7 @@ function PullRequest(payload) {
 
 	if (payload.action === 'labeled' || payload.action === 'unlabeled') {
 		Labels(payload)
+		return 'Pull Request -- Labels Handled'
 	}
 
 	if (payload.action === 'opened') {
@@ -212,7 +213,7 @@ function PullRequest(payload) {
 		return handleMerge(payload)
 	}
 
-	return 'Got a pull request!!!'
+	return 'Pull Request -- No action taken'
 }
 
 export default PullRequest

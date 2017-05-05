@@ -6,10 +6,18 @@ provider:
   runtime: nodejs6.10
 
 plugins:
+  - serverless-plugin-optimize
   - serverless-offline
   - serverless-mocha-plugin
 
+package:
+  individually: true
+
 custom:
+  optimize:
+    extensions: [".json"]
+    presets: ["es2015", "stage-2"]
+
   serverless-offline:
     babelOptions:
       presets: ["es2015", "stage-2"]

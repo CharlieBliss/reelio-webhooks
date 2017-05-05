@@ -15,10 +15,11 @@ class LabelHelper {
 			}
 				// get reviewers and send a reminder message for each of them to re-review
 			const reviewers = parseReviews(reviews)
-			reviewers.map((reviewer) => {
+			reviewers.forEach((reviewer) => {
 				Slack.reviewReminder(payload, user, reviewer)
-				return 'Reviewer Reminded'
 			})
+
+			return 'Labels -- Reviewers Reminded'
 		})
 	}
 
@@ -31,12 +32,14 @@ class LabelHelper {
 
 	handleUnlabel(payload) {
 		if (payload.label.name === 'changes requested') {
-			this.triggerReviewReminder(payload)
+			return this.triggerReviewReminder(payload)
 		}
 
 		if (payload.label.name === 'WIP') {
 			request(Github.post(`${payload.pull_request.issue_url}/labels`, ['$$review', 'ready to review']))
 		}
+
+		return 'Label -- Unlabeled'
 	}
 }
 

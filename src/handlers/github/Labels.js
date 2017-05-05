@@ -1,6 +1,6 @@
 import LabelHelper from '../../helpers/labels'
 
-function Label(payload) {
+function Labels(payload) {
 	if (payload.action === 'labeled') {
 		return LabelHelper.handleAddLabel(payload)
 	}
@@ -12,4 +12,4 @@ function Label(payload) {
 	return 'Got a label change'
 }
 
-export default Label
+export default Labels
