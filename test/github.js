@@ -82,12 +82,35 @@ describe('github', () => {
 			const request = Object.assign({}, { headers: headers.github }, { body: payloads.review.denied })
 			request.headers['X-Github-Event'] = payloads.review.event
 
+			const sha = 'b7a1f9c27caa4e03c14a88feb56e2d4f7500aa63'
+
 			const add = nock('https://api.github.com')
 				.post('/repos/Kyle-Mendes/public-repo/issues/1/labels', ['changes requested'])
 				.reply(200)
 
+			const addReview = nock('https://api.github.com')
+				.post('/repos/Kyle-Mendes/public-repo/issues/1/labels', ['$$review'])
+				.reply(200)
+
 			const remove = nock('https://api.github.com')
 				.delete('/repos/Kyle-Mendes/public-repo/issues/1/labels/ready%20to%20review')
+				.reply(200)
+
+			const removeQA = nock('https://api.github.com')
+				.delete('/repos/Kyle-Mendes/public-repo/issues/1/labels/%24%24qa')
+				.reply(200)
+
+			const removeApproved = nock('https://api.github.com')
+				.delete('/repos/Kyle-Mendes/public-repo/issues/1/labels/approved')
+				.reply(200)
+
+			const failureCI = nock('https://api.github.com')
+				.post(`/repos/Kyle-Mendes/public-repo/statuses/${sha}`,
+					{
+						state: 'failure',
+						description: `This PR requires 2 more approved reviews to be merged.`,
+						context: 'ci/reelio',
+					})
 				.reply(200)
 
 			const slack = nock(slackUrl)
@@ -99,12 +122,15 @@ describe('github', () => {
 					expect(response).to.not.be.empty
 					expect(response.body).to.equal('Github -- Review Changes Request')
 					expect(add.isDone()).to.be.true
+					expect(addReview.isDone()).to.be.true
 					expect(remove.isDone()).to.be.true
+					expect(removeQA.isDone()).to.be.true
+					expect(removeApproved.isDone()).to.be.true
 					expect(slack.isDone()).to.be.true
+					expect(failureCI.isDone()).to.be.true
 					expect(nock.pendingMocks()).to.be.empty
-
 					done()
-				}, 10)
+				}, 50)
 			})
 		})
 

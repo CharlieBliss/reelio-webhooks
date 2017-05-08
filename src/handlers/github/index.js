@@ -4,7 +4,7 @@ import Labels from './Labels'
 import PullRequest from './PullRequest'
 
 import helper from '../../helpers/github'
-import firebase from '../../helpers/firebase'
+// import firebase from '../../helpers/firebase'
 
 
 export function handle(event, context, callback) {
@@ -13,7 +13,7 @@ export function handle(event, context, callback) {
 		payload = JSON.parse(event.body),
 		action = payload.action
 
-	const fullRepo = payload.repository.full_name
+	// const fullRepo = payload.repository.full_name
 		// org = fullRepo.split('/')[0],
 		// repo = fullRepo.split('/')[1]
 
@@ -23,7 +23,7 @@ export function handle(event, context, callback) {
 	console.log('---------------------------------');
 	/* eslint-enable */
 
-	firebase.log('github', fullRepo, githubEvent, action, payload)
+	// firebase.log('github', fullRepo, githubEvent, action, payload)
 
 	if (!githubEvent) {
 		return callback(null, helper.respond('Not a valid github event.', 400))
@@ -37,11 +37,7 @@ export function handle(event, context, callback) {
 		githubEvent === 'pull_request' ||
 		githubEvent === 'pull_request_review'
 	) {
-		// Doesn't reply because we don't want to call it twice.
-		// if (get(config, [org, repo, 'require_reviews', 'enabled'])) {
-		// CheckReviews(payload, get(config, [org, repo, 'require_reviews', 'count']))
-		CheckReviews(payload, event)
-		// }
+		return callback(null, helper.respond(CheckReviews(payload)))
 	}
 
 	if (githubEvent === 'pull_request') {

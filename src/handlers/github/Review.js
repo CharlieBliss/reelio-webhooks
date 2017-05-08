@@ -32,8 +32,6 @@ function Review(payload) {
 	if (payload.review.state === 'approved') {
 		return handleApproved(payload)
 	}
-
-	return 'Review Success'
 }
 
 export default Review
