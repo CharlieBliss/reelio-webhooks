@@ -129,10 +129,6 @@ describe('github', () => {
 				.delete('/repos/Kyle-Mendes/public-repo/issues/1/labels/ready%20to%20review')
 				.reply(200)
 
-			const removeApproved = nock('https://api.github.com')
-				.delete('/repos/Kyle-Mendes/public-repo/issues/1/labels/approved')
-				.reply(200)
-
 			const successCI = nock('https://api.github.com')
 				.post(`/repos/Kyle-Mendes/public-repo/statuses/${sha}`)
 				.reply(200)
@@ -147,7 +143,7 @@ describe('github', () => {
 					expect(successCI.isDone()).to.be.true
 					expect(nock.pendingMocks()).to.be.empty
 					done()
-				}, 10)
+				}, 50)
 			})
 		})
 
