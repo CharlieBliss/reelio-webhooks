@@ -18,6 +18,7 @@ export const approved = JSON.stringify({
 	"pull_request": {
 		"url": "https://api.github.com/repos/Kyle-Mendes/public-repo/pulls/1",
 		"issue_url": "https://api.github.com/repos/Kyle-Mendes/public-repo/issues/1",
+		"html_url": "https://github.com/repos/Kyle-Mendes/public-repo/pulls/1",
 		"id": 87811438,
 		"number": 8,
 		"state": "open",
@@ -152,6 +153,9 @@ export const approved = JSON.stringify({
 				"default_branch": "master"
 			}
 		},
+	},
+	"repository": {
+		"html_url": "https://github.com/Kyle-Mendes/public-repo",
 	},
 })
 

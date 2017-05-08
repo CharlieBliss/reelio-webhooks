@@ -1,3 +1,6 @@
+import request from 'request'
+import rp from 'request-promise'
+
 import { jiraRegex, FRONTEND_MEMBERS } from '../../consts'
 import { uniqueTicketFilter, wrapJiraTicketsFromArray } from '../../helpers/utils'
 
@@ -7,8 +10,6 @@ import Tickets from '../../helpers/tickets'
 import Slack from '../../helpers/slack'
 import Firebase from '../../helpers/firebase'
 import Labels from './Labels'
-
-const request = require('request')
 
 function createPullRequest(head, base, payload, newBody = '', labels = []) {
 	// Check if there is a PR between the head and branch already.  If there is, we don't need to make a new PR
@@ -107,9 +108,11 @@ function handleNew(payload) {
 				const attempts = 0
 				const uniqueTickets = tickets.filter(uniqueTicketFilter)
 
-				uniqueTickets.map(t => request(Jira.post(`${ticketBase}/${t}`, 'jira'), (_, __, data) => {
+				Promise.all(uniqueTickets.map(t => rp(Jira.get(`${ticketBase}/${t}`)) //eslint-disable-line
+				.then((data) => {
 					responses.push(JSON.parse(data))
-				}))
+				}),
+			))
 
 				Tickets.getTicketResponses(responses, tickets, attempts, repo, (formattedTickets) => {
 					Firebase.log('github', payload.repository.full_name, 'reelio_deploy/feature', null, {

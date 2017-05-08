@@ -109,7 +109,6 @@ describe('github', () => {
 					 [
 						 { state: 'approved', user: { id: 7416637 }, submitted_at: 1489426108742 },
 						 { state: 'approved', user: { id: 25992031 }, submitted_at: 1489426108738 },
-						 { state: 'changes_requested', user: { id: 6400039 }, submitted_at: 1489426108755 },
 					 ],
 				 )
 

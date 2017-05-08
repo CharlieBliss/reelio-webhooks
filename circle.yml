@@ -1,0 +1,9 @@
+machine:
+  node:
+    version: 6.10.0
+
+test:
+  override:
+    - npm run test:helpers
+    - npm run test:handlers
+    - npm run lint

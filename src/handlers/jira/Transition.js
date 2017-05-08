@@ -8,6 +8,7 @@ const request = require('request')
 const rp = require('request-promise')
 
 export function Transition(payload) {
+
 	// GOOD Transition ID = 51
 	// if transition.id !== 51, status = declined
 	if (payload.transition.transitionId === 51) {
@@ -20,12 +21,14 @@ export function Transition(payload) {
 		}
 
 		const PRRoute = TicketTable.match(/\[\(internal use\)\|([^\]]*)\]/)[1]
+
 		request(Github.get(PRRoute), (err, res, resBody) => {
 			const PR = JSON.parse(resBody),
 				body = PR.body || '',
 				tickets = body.match(jiraRegex) || [],
 				uniqueTickets = tickets.filter(uniqueTicketFilter),
 				sha = PR.head.sha
+
 
 			// If there's only one ticket, it was just approved so this PR is good
 			if (uniqueTickets.length === 1) {

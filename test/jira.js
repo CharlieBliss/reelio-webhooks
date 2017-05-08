@@ -28,18 +28,18 @@ describe('jira', () => {
 		})
 	})
 
-	it('Handles Jira transition Event', (done) => {
+	it('Handles Jira transition Event (2+ approved reviews)', (done) => {
 		const request = Object.assign({}, { headers: headers.jira }, { body: JSON.stringify(jiraPayloads.transition.qaToDone) })
 
-		const sha = githubPayloads.pullRequest.pullRequestOpenedStaging.pull_request.head.sha
+		const sha = githubPayloads.pullRequest.pullRequestMultiTickets.pull_request.head.sha
 
 		const PRRoute = nock('https://api.github.com')
-		.get('/repos/dillonmcroberts/Webhook-test/pulls/26')
-		.reply(200, githubPayloads.pullRequest.pullRequestOpenedStaging.pull_request)
+			.get('/repos/dillonmcroberts/Webhook-test/pulls/26')
+			.reply(200, githubPayloads.pullRequest.pullRequestMultiTickets.pull_request)
 
 		const successCI = nock('https://api.github.com')
-		.post(`/repos/Kyle-Mendes/public-repo/statuses/${sha}`)
-		.reply(200)
+			.post(`/repos/Kyle-Mendes/public-repo/statuses/${sha}`)
+			.reply(200)
 
 		const removeQA = nock('https://api.github.com')
 			.delete('/repos/Kyle-Mendes/public-repo/issues/1/labels/%24%24qa')
@@ -56,7 +56,67 @@ describe('jira', () => {
 				expect(removeQA.isDone()).to.be.true
 				expect(addQAApproved.isDone()).to.be.true
 				done()
-			}, 10)
+			}, 1500)
 		})
 	})
+
+	it('Handles Jira transition Event (1 approved review)', (done) => {
+		const request = Object.assign({}, { headers: headers.jira }, { body: JSON.stringify(jiraPayloads.transition.qaToDone) })
+
+		const sha = githubPayloads.pullRequest.pullRequestMultiTicketsUnapproved.pull_request.head.sha
+
+		const PRRoute = nock('https://api.github.com')
+		.get('/repos/dillonmcroberts/Webhook-test/pulls/26')
+		.reply(200, githubPayloads.pullRequest.pullRequestMultiTicketsUnapproved.pull_request)
+
+		const failureCI = nock('https://api.github.com')
+		.post(`/repos/Kyle-Mendes/public-repo/statuses/${sha}`,
+			{
+				state: 'failure',
+				description: `Waiting on 1 ticket to be marked as "done".`,
+				context: 'ci/qa-team',
+			})
+		.reply(200)
+
+		wrapped.run(request).then((response) => {
+			setTimeout(() => {
+				expect(PRRoute.isDone()).to.be.true
+				expect(failureCI.isDone()).to.be.true
+				done()
+			}, 1500)
+		})
+	})
+
+	it('Handles Jira transition Event (Single Ticket)', (done) => {
+		const request = Object.assign({}, { headers: headers.jira }, { body: JSON.stringify(jiraPayloads.transition.qaToDone) })
+
+		const sha = githubPayloads.pullRequest.pullRequestOpenedStaging.pull_request.head.sha
+
+		const PRRoute = nock('https://api.github.com')
+			.get('/repos/dillonmcroberts/Webhook-test/pulls/26')
+			.reply(200, githubPayloads.pullRequest.pullRequestOpenedStaging.pull_request)
+
+		const successCI = nock('https://api.github.com')
+			.post(`/repos/Kyle-Mendes/public-repo/statuses/${sha}`)
+			.reply(200)
+
+		const removeQA = nock('https://api.github.com')
+			.delete('/repos/Kyle-Mendes/public-repo/issues/1/labels/%24%24qa')
+			.reply(200)
+
+		const addQAApproved = nock('https://api.github.com')
+			.post('/repos/Kyle-Mendes/public-repo/issues/1/labels', ['$$qa approved'])
+			.reply(200)
+
+		wrapped.run(request).then((response) => {
+			setTimeout(() => {
+				expect(PRRoute.isDone()).to.be.true
+				expect(successCI.isDone()).to.be.true
+				expect(removeQA.isDone()).to.be.true
+				expect(addQAApproved.isDone()).to.be.true
+				done()
+			}, 1500)
+		})
+	})
+
 })

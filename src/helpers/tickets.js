@@ -8,28 +8,16 @@ import Jira from './jira'
 class Tickets {
 
 	getTicketResponses(responses, tickets, attempts, repo, logData) {
-		let formattedTickets
-		if (
-			responses.length < tickets.length &&
-			attempts < 20
-		) {
-			setTimeout(() => {
-				Jira.getTicketResponses(responses, tickets, attempts, repo, logData)
-				attempts += 1
-				console.log('LOOPING', responses.length, attempts)
-			}, 1000)
-
-		} else {
-			formattedTickets = responses.map(ticket => (
-				{
-					name: ticket.key,
-					assignee: ticket.fields.assignee.displayName || 'not provided',
-					reporter: ticket.fields.reporter.displayName || 'not provided',
-					points: ticket.fields.customfield_10004 || 'not provided',
-					repository: repo,
-				}
-			),
-			)
+		const formattedTickets = responses.map(ticket => (
+			{
+				name: ticket.key,
+				assignee: ticket.fields.assignee.displayName || 'not provided',
+				reporter: ticket.fields.reporter.displayName || 'not provided',
+				points: ticket.fields.customfield_10004 || 'not provided',
+				repository: repo,
+			}
+			))
+		if (formattedTickets) {
 			return logData(formattedTickets)
 		}
 		return 'No Tickets'
