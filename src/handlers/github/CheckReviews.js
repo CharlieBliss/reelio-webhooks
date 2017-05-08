@@ -46,7 +46,6 @@ function CheckReviews(payload, event, count = 2) {
 			reviews.length >= count &&
 			approved.length >= count
 		) {
-			console.log('WHAT?!', reviews, approved)
 			if (reviews.length === approved.length) {
 				request(Github.post(`${payload.pull_request.head.repo.url}/statuses/${sha}`, {
 					state: 'success',

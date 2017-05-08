@@ -63,7 +63,7 @@ export function PullRequestReview() {
 					.reply(200)
 
 				const reviews = nock('https://api.github.com')
-					.get('/repos/Kyle-Mendes/public-repo/pulls/2/reviews')
+					.get('/repos/Kyle-Mendes/public-repo/pulls/1/reviews')
 					.reply(200,
 						 [
 							 { state: 'approved', user: { id: 7416637 }, submitted_at: 1489426108738 },
@@ -91,7 +91,7 @@ export function PullRequestReview() {
 					}, 10)
 				})
 
-			it.only('Returns CI failure if not all reviews are approved', (done) => {
+			it('Returns CI failure if not all reviews are approved', (done) => {
 				const payload = payloads.pullRequest.pullRequestOpenedStaging
 				const sha = payload.pull_request.head.sha
 
@@ -126,12 +126,10 @@ export function PullRequestReview() {
 
 				CheckReviews(payload, 'pull_request')
 					setTimeout(() => {
-						console.warn("SHA", sha)
 						expect(failureCI.isDone()).to.be.true
 						expect(add.isDone()).to.be.true
 						expect(removeQA.isDone()).to.be.true
 						expect(removeApproved.isDone()).to.be.true
-						console.warn("DIDN'T FIRE", nock.pendingMocks())
 						expect(nock.pendingMocks()).to.be.empty
 						done()
 					}, 50)
@@ -151,7 +149,7 @@ export function PullRequestReview() {
 					.reply(200)
 
 				const reviews = nock('https://api.github.com')
-					.get('/repos/Kyle-Mendes/public-repo/pulls/2/reviews')
+					.get('/repos/Kyle-Mendes/public-repo/pulls/1/reviews')
 					.reply(200,
 						 [
 							 { state: 'approved', user: { id: 7416637 }, submitted_at: 1489426108742 },
@@ -194,7 +192,7 @@ export function PullRequestReview() {
 					.reply(200)
 
 				const reviews = nock('https://api.github.com')
-					.get('/repos/Kyle-Mendes/public-repo/pulls/2/reviews')
+					.get('/repos/Kyle-Mendes/public-repo/pulls/1/reviews')
 					.reply(200,
 						 [
 							 { state: 'approved', user: { id: 7416637 }, submitted_at: 1489426108742 },
