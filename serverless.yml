@@ -56,12 +56,12 @@ custom:
 #    - exclude-me-dir/**
 
 functions:
-  jira:
-    handler: src/handlers/jira/index.handle
-    events:
-      - http:
-          path: jira
-          method: post
+  # jira:
+  #   handler: src/handlers/jira/index.handle
+  #   events:
+  #     - http:
+  #         path: jira
+  #         method: post
 
   github:
     handler: src/handlers/github/index.handle

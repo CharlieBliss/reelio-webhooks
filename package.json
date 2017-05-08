@@ -22,14 +22,14 @@
     "nock": "^9.0.11",
     "request-promise": "^4.2.1",
     "serverless": "^1.12.1",
-    "serverless-mocha-plugin": "git://github.com/ryof/serverless-mocha-plugin.git#add-mocha-compilers-option",
+    "serverless-mocha-plugin": "^1.3.5",
     "serverless-offline": "^3.13.5",
     "serverless-plugin-optimize": "^2.0.1-rc.1"
   },
   "scripts": {
-    "test:handlers": "sls invoke test --compilers js:babel-register",
+    "test:handlers": "sls invoke test --compilers js:babel-register --path test/handlers",
     "test:helpers": "mocha test/helper_tests --compilers js:babel-register",
-		"lint": "eslint src"
+    "lint": "eslint src"
   },
   "babel": {
     "presets": [

@@ -2,7 +2,7 @@ export const pullRequestOpenedStaging = {
   "action": "opened",
   "number": 1,
   "pull_request": {
-    "url": "https://api.github.com/repos/Kyle-Mendes/public-repo/pulls/2",
+    "url": "https://api.github.com/repos/Kyle-Mendes/public-repo/pulls/1",
     "id": 34778301,
     "html_url": "https://github.com/Kyle-Mendes/public-repo/pull/1",
     "diff_url": "https://github.com/Kyle-Mendes/public-repo/pull/1.diff",
