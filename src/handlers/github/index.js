@@ -37,7 +37,7 @@ export function handle(event, context, callback) {
 		githubEvent === 'pull_request' ||
 		githubEvent === 'pull_request_review'
 	) {
-		return callback(null, helper.respond(CheckReviews(payload)))
+		CheckReviews(payload)
 	}
 
 	if (githubEvent === 'pull_request') {
