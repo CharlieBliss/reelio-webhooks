@@ -20,11 +20,11 @@ describe('JIRA', () => {
 		wrapped.run(request).then((response) => {
 			setTimeout(() => {
 				expect(response).to.not.be.empty
-				expect(response.body).to.equal('Jira -- Not a valid JIRA event.')
-				expect(response.statusCode).to.equal(400)
+				expect(response.body).to.equal('Jira -- Event not handled')
+				expect(response.statusCode).to.equal(200)
 				done()
 			}, 10)
 		})
 	})
 
-})	
+})

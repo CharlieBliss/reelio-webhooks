@@ -1,5 +1,9 @@
 export const failure = JSON.stringify(
 	{
+		"repository": {
+			"html_url": "https://github.com/Kyle-Mendes/public-repo",
+			"full_name": "Kyle-Mendes/public-repo",
+		},
 	  "name": "Kyle-Mendes/public-repo",
 	  "context": "ci/circleci",
 	  "state": "failure",
@@ -13,6 +17,10 @@ export const failure = JSON.stringify(
 export const success = JSON.stringify(
 	{
 	  "name": "Kyle-Mendes/public-repo",
+		"repository": {
+			"html_url": "https://github.com/Kyle-Mendes/public-repo",
+			"full_name": "Kyle-Mendes/public-repo",
+		},
 	  "context": "ci/circleci",
 	  "state": "success",
 		"commit":

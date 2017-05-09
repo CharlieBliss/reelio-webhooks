@@ -162,8 +162,8 @@ export function PullRequestReview() {
 			const removeReview = nock('https://api.github.com')
 				.delete('/repos/Kyle-Mendes/public-repo/issues/1/labels/%24%24review')
 				.reply(200)
-			const removeReadyToReview = nock('https://api.github.com')
-				.delete('/repos/Kyle-Mendes/public-repo/issues/1/labels/ready%20to%20review')
+			const removeChanges = nock('https://api.github.com')
+				.delete('/repos/Kyle-Mendes/public-repo/issues/1/labels/changes%20requested')
 				.reply(200)
 
 			CheckReviews(payload, 'pull_request')
@@ -171,7 +171,7 @@ export function PullRequestReview() {
 					expect(successCI.isDone()).to.be.true
 					expect(add.isDone()).to.be.true
 					expect(removeReview.isDone()).to.be.true
-					expect(removeReadyToReview.isDone()).to.be.true
+					expect(removeChanges.isDone()).to.be.true
 					expect(nock.pendingMocks()).to.be.empty
 					done()
 				}, 10)
@@ -203,11 +203,11 @@ export function PullRequestReview() {
 			const add = nock('https://api.github.com')
 				.post('/repos/Kyle-Mendes/public-repo/issues/1/labels', ["approved","$$qa"])
 				.reply(200)
+			const removeChanges = nock('https://api.github.com')
+				.delete('/repos/Kyle-Mendes/public-repo/issues/1/labels/changes%20requested')
+				.reply(200)
 			const removeReview = nock('https://api.github.com')
 				.delete('/repos/Kyle-Mendes/public-repo/issues/1/labels/%24%24review')
-				.reply(200)
-			const removeReadyToReview = nock('https://api.github.com')
-				.delete('/repos/Kyle-Mendes/public-repo/issues/1/labels/ready%20to%20review')
 				.reply(200)
 
 			CheckReviews(payload, 'pull_request')
@@ -215,7 +215,7 @@ export function PullRequestReview() {
 					expect(successCI.isDone()).to.be.true
 					expect(add.isDone()).to.be.true
 					expect(removeReview.isDone()).to.be.true
-					expect(removeReadyToReview.isDone()).to.be.true
+					expect(removeChanges.isDone()).to.be.true
 					expect(nock.pendingMocks()).to.be.empty
 					done()
 				}, 10)
@@ -227,12 +227,8 @@ export function PullRequestReview() {
 
 				const sha = 'b7a1f9c27caa4e03c14a88feb56e2d4f7500aa63'
 
-				const add = nock('https://api.github.com')
+				const addReview = nock('https://api.github.com')
 					.post('/repos/Kyle-Mendes/public-repo/issues/1/labels', ['$$review'])
-					.reply(200)
-
-				const remove = nock('https://api.github.com')
-					.delete('/repos/Kyle-Mendes/public-repo/issues/1/labels/changes%20requested')
 					.reply(200)
 
 				const removeQA = nock('https://api.github.com')
@@ -251,12 +247,11 @@ export function PullRequestReview() {
 					setTimeout(() => {
 						expect(response).to.not.be.empty
 						expect(response.body).to.equal('Github -- Review Changes Success')
-						expect(add.isDone()).to.be.true
-						expect(remove.isDone()).to.be.true
+						expect(addReview.isDone()).to.be.true
 						expect(successCI.isDone()).to.be.true
 						expect(nock.pendingMocks()).to.be.empty
 						done()
-					}, 10)
+					}, 50)
 				})
 			})
 
@@ -285,10 +280,6 @@ export function PullRequestReview() {
 
 				const removeReview = nock('https://api.github.com')
 					.delete('/repos/Kyle-Mendes/public-repo/issues/1/labels/%24%24review')
-					.reply(200)
-
-				const removeReadyToReview = nock('https://api.github.com')
-					.delete('/repos/Kyle-Mendes/public-repo/issues/1/labels/ready%20to%20review')
 					.reply(200)
 
 				const successCI = nock('https://api.github.com')
@@ -323,10 +314,6 @@ export function PullRequestReview() {
 					.post('/repos/Kyle-Mendes/public-repo/issues/1/labels', ['$$review'])
 					.reply(200)
 
-				const remove = nock('https://api.github.com')
-					.delete('/repos/Kyle-Mendes/public-repo/issues/1/labels/ready%20to%20review')
-					.reply(200)
-
 				const removeQA = nock('https://api.github.com')
 					.delete('/repos/Kyle-Mendes/public-repo/issues/1/labels/%24%24qa')
 					.reply(200)
@@ -354,7 +341,6 @@ export function PullRequestReview() {
 						expect(response.body).to.equal('Github -- Review Changes Request')
 						expect(add.isDone()).to.be.true
 						expect(addReview.isDone()).to.be.true
-						expect(remove.isDone()).to.be.true
 						expect(removeQA.isDone()).to.be.true
 						expect(removeApproved.isDone()).to.be.true
 						expect(slack.isDone()).to.be.true

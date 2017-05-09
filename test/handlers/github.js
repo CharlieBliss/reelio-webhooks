@@ -29,21 +29,21 @@ describe('github', () => {
 			wrapped.run(request).then((response) => {
 				setTimeout(() => {
 					expect(response).to.not.be.empty
-					expect(response.body).to.equal('Github -- Not a valid github event.')
+					expect(response.body).to.equal('Github -- No event provided.')
 					expect(response.statusCode).to.equal(400)
 					done()
 				}, 10)
 			})
 		})
 
-		it('Returns 400 for no github action', (done) => {
+		it('Returns 200 for no github action', (done) => {
 			const request = Object.assign({}, { headers: headers.github }, { body: payloads.review.noAction })
 			request.headers['X-Github-Event'] = 'pull_request_review_comment'
 
 			wrapped.run(request).then((response) => {
 				setTimeout(() => {
 					expect(response).to.not.be.empty
-					expect(response.statusCode).to.equal(400)
+					expect(response.statusCode).to.equal(200)
 					done()
 				}, 10)
 			})

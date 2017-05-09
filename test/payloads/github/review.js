@@ -156,11 +156,16 @@ export const approved = JSON.stringify({
 	},
 	"repository": {
 		"html_url": "https://github.com/Kyle-Mendes/public-repo",
+		"full_name": "Kyle-Mendes/public-repo",
 	},
 })
 
 export const denied = JSON.stringify({
 	"action": "submitted",
+	"repository": {
+		"html_url": "https://github.com/Kyle-Mendes/public-repo",
+		"full_name": "Kyle-Mendes/public-repo",
+	},
 	"review": {
 		"id": 2626884,
 		"user": {
@@ -315,6 +320,10 @@ export const denied = JSON.stringify({
 
 export const noAction = JSON.stringify({
 	"action": null,
+	"repository": {
+		"html_url": "https://github.com/Kyle-Mendes/public-repo",
+		"full_name": "Kyle-Mendes/public-repo",
+	},
 	"review": {
 		"id": 2626884,
 		"user": {

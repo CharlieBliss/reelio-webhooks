@@ -10,6 +10,7 @@ class Tickets {
 
 	getTicketResponses(responses, tickets, attempts, repo, logData) {
 		const formattedTickets = responses.map((ticket) => {
+			console.log('TICKET', ticket)
 			const assignee = ticket.fields.assignee || null
 
 			return {

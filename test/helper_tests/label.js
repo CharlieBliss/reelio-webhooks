@@ -19,14 +19,10 @@ describe('Properly handles Adding Label', () => {
 		const removeReview = nock('https://api.github.com')
 			.delete('/repos/Kyle-Mendes/public-repo/issues/1/labels/$$review')
 			.reply(200)
-		const removeReady = nock('https://api.github.com')
-			.delete('/repos/Kyle-Mendes/public-repo/issues/1/labels/ready%20to%20review')
-			.reply(200)
 
 			Labels(payload)
 			setTimeout(() => {
 				expect(removeReview.isDone()).to.be.true
-				expect(removeReady.isDone()).to.be.true
 				expect(nock.pendingMocks()).to.be.empty
 				done()
 			}, 10)
@@ -42,7 +38,7 @@ describe('Properly handles Removing Labels', () => {
 		let payload = payloads.label.removeWIP
 
 		const add = nock('https://api.github.com')
-			.post('/repos/Kyle-Mendes/public-repo/issues/1/labels', ['$$review', 'ready to review'])
+			.post('/repos/Kyle-Mendes/public-repo/issues/1/labels', ['$$review'])
 			.reply(200)
 
 			Labels(payload)

@@ -252,6 +252,10 @@ export function PullRequest() {
 				.get('/repos/Kyle-Mendes/public-repo/issues/1')
 				.reply(200, payloads.issue.ticketless)
 
+			const jira = nock('https://reelio.atlassian.net')
+				.get('/rest/api/2/issue/XYZ-2')
+				.reply(200)
+
 			const failureCI = nock('https://api.github.com')
 				.post(`/repos/Kyle-Mendes/public-repo/statuses/${sha}`,
 					{
@@ -265,7 +269,7 @@ export function PullRequest() {
 				.filteringPath(function(path) {
 					 return '';
 				 })
-				.put('')
+				.put('').times(2)
 				.reply(200)
 
 			const featureBranchComment = nock('https://api.github.com')
@@ -293,6 +297,7 @@ export function PullRequest() {
 			setTimeout(() => {
 				expect(reviews.isDone()).to.be.true
 				expect(removeQA.isDone()).to.be.true
+				expect(jira.isDone()).to.be.true
 				expect(removeApproved.isDone()).to.be.true
 				expect(failureCI.isDone()).to.be.true
 				expect(featureBranchComment.isDone()).to.be.true
@@ -300,7 +305,7 @@ export function PullRequest() {
 				expect(ticketResponse.isDone()).to.be.true
 				expect(firebaseLog.isDone()).to.be.true
 				done()
-			}, 50)
+			}, 100)
 		})
 	})
 
@@ -312,11 +317,15 @@ export function PullRequest() {
 				.get('/repos/Kyle-Mendes/public-repo/issues/1')
 				.reply(200, payloads.issue.ticketless)
 
+			const jira = nock('https://reelio.atlassian.net')
+				.get('/rest/api/2/issue/XYZ-2')
+				.reply(200)
+
 			const firebaseLog = nock('https://webhooks-front.firebaseio.com')
 				.filteringPath(function(path) {
 					 return '';
 				 })
-				.put('')
+				.put('').times(2)
 				.reply(200)
 
 			const failureCI = nock('https://api.github.com')
@@ -357,6 +366,7 @@ export function PullRequest() {
 			setTimeout(() => {
 				expect(reviews.isDone()).to.be.true
 				expect(removeQA.isDone()).to.be.true
+				expect(jira.isDone()).to.be.true
 				expect(removeApproved.isDone()).to.be.true
 				expect(failureCI.isDone()).to.be.true
 				expect(featureBranchComment.isDone()).to.be.true
@@ -365,7 +375,7 @@ export function PullRequest() {
 				expect(ticketResponse2.isDone()).to.be.true
 				expect(firebaseLog.isDone()).to.be.true
 				done()
-			}, 50)
+			}, 100)
 		})
 	})
 

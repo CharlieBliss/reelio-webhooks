@@ -53,6 +53,14 @@ export function Transition() {
 
 			const sha = githubPayloads.pullRequest.pullRequestMultiTicketsUnapproved.pull_request.head.sha
 
+			const addQA = nock('https://api.github.com')
+				.post('/repos/Kyle-Mendes/public-repo/issues/1/labels', ["$$qa"])
+				.reply(200)
+
+			const removeQAApproved = nock('https://api.github.com')
+				.delete('/repos/Kyle-Mendes/public-repo/issues/1/labels/%24%24qa%20approved')
+				.reply(200)
+
 			const PRRoute = nock('https://api.github.com')
 			.get('/repos/dillonmcroberts/Webhook-test/pulls/26')
 			.reply(200, githubPayloads.pullRequest.pullRequestMultiTicketsUnapproved.pull_request)
@@ -69,6 +77,8 @@ export function Transition() {
 			wrapped.run(request).then((response) => {
 				setTimeout(() => {
 					expect(PRRoute.isDone()).to.be.true
+					expect(addQA.isDone()).to.be.true
+					expect(removeQAApproved.isDone()).to.be.true
 					expect(failureCI.isDone()).to.be.true
 					done()
 				}, 1500)
@@ -92,7 +102,7 @@ export function Transition() {
 				.delete('/repos/Kyle-Mendes/public-repo/issues/1/labels/%24%24qa')
 				.reply(200)
 
-			const addQAApproved = nock('https://api.github.com')
+			const add = nock('https://api.github.com')
 				.post('/repos/Kyle-Mendes/public-repo/issues/1/labels', ['$$qa approved'])
 				.reply(200)
 
@@ -101,7 +111,7 @@ export function Transition() {
 					expect(PRRoute.isDone()).to.be.true
 					expect(successCI.isDone()).to.be.true
 					expect(removeQA.isDone()).to.be.true
-					expect(addQAApproved.isDone()).to.be.true
+					expect(add.isDone()).to.be.true
 					done()
 				}, 1500)
 			})

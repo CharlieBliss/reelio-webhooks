@@ -106,17 +106,18 @@ function handleNew(payload) {
 				const uniqueTickets = tickets.filter(uniqueTicketFilter)
 
 				Promise.all(uniqueTickets.map(t => rp(Jira.get(`${ticketBase}/${t}`)) //eslint-disable-line
-				.then((data) => {
-					responses.push(data)
-				}),
-			))
-
-				Tickets.getTicketResponses(responses, tickets, attempts, repo, (formattedTickets) => {
-					Firebase.log('github', payload.repository.full_name, 'reelio_deploy/feature', null, {
-						tickets: formattedTickets,
-						fixed_count: tickets.filter(uniqueTicketFilter).length,
-						environment: parsedBranch,
-						target: 'url',
+					.then((data) => {
+						responses.push(data)
+					})),
+				).then(() => {
+					console.log('RESPONSES', responses)
+					Tickets.getTicketResponses(responses, tickets, attempts, repo, (formattedTickets) => {
+						Firebase.log('github', payload.repository.full_name, 'reelio_deploy/feature', null, {
+							tickets: formattedTickets,
+							fixed_count: tickets.filter(uniqueTicketFilter).length,
+							environment: parsedBranch,
+							target: 'url',
+						})
 					})
 				})
 			}
@@ -131,8 +132,10 @@ function handleNew(payload) {
 function handleMerge(payload) {
 	let labels = [],
 		reviews = []
+
 	const tickets = payload.pull_request.body.match(jiraRegex) || [],
 		newBody = `### Resolves:\n${tickets.filter(uniqueTicketFilter).map(wrapJiraTicketsFromArray).join('\n\t')}`
+
 	const uniqueTickets = tickets.filter(uniqueTicketFilter)
 	const repo = payload.repository.html_url
 
@@ -162,16 +165,18 @@ function handleMerge(payload) {
 			const responses = []
 			const attempts = 0
 
-			uniqueTickets.map(t => request(Jira.get(`${ticketBase}/${t}`, 'jira'), (_, __, data) => {
-				responses.push(JSON.parse(data))
-			}))
-
-			Tickets.getTicketResponses(responses, tickets, attempts, repo, (formattedTickets) => {
-				Firebase.log('github', payload.repository.full_name, 'reelio_deploy', null, {
-					tickets: formattedTickets,
-					fixed_count: tickets.filter(uniqueTicketFilter).length,
-					environment: 'production',
-					target: 'pro.reelio.com',
+			Promise.all(uniqueTickets.map(t => rp(Jira.get(`${ticketBase}/${t}`)) //eslint-disable-line
+				.then((data) => {
+					responses.push(data)
+				}),
+			)).then(() => {
+				Tickets.getTicketResponses(responses, tickets, attempts, repo, (formattedTickets) => {
+					Firebase.log('github', payload.repository.full_name, 'reelio_deploy', null, {
+						tickets: formattedTickets,
+						fixed_count: tickets.filter(uniqueTicketFilter).length,
+						environment: 'production',
+						target: 'pro.reelio.com',
+					})
 				})
 			})
 		}

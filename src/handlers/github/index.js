@@ -28,7 +28,7 @@ export function handle(event, context, callback) {
 	firebase.log('github', fullRepo, githubEvent, action, payload)
 
 	if (!githubEvent) {
-		return callback(null, helper.respond('Not a valid github event.', 400))
+		return callback(null, helper.respond('No event provided.', 400))
 	}
 
 	if (!action && githubEvent !== 'status') {

@@ -82,6 +82,14 @@ describe('helpers -- tickets', () => {
 
 		const sha = githubPayloads.pullRequest.pullRequestMultiTicketsUnapproved.pull_request.head.sha
 
+		const addQA = nock('https://api.github.com')
+			.post('/repos/Kyle-Mendes/public-repo/issues/1/labels', ["$$qa"])
+			.reply(200)
+
+		const removeQAApproved = nock('https://api.github.com')
+			.delete('/repos/Kyle-Mendes/public-repo/issues/1/labels/%24%24qa%20approved')
+			.reply(200)
+
 		const PRRoute = nock('https://api.github.com')
 		.get('/repos/dillonmcroberts/Webhook-test/pulls/26')
 		.reply(200, githubPayloads.pullRequest.pullRequestMultiTicketsUnapproved.pull_request)
@@ -98,6 +106,8 @@ describe('helpers -- tickets', () => {
 		Transition(jiraPayloads.transition.qaToDone)
 		setTimeout(() => {
 			expect(PRRoute.isDone()).to.be.true
+			expect(addQA.isDone()).to.be.true
+			expect(removeQAApproved.isDone()).to.be.true
 			expect(failureCI.isDone()).to.be.true
 			done()
 		}, 1500)

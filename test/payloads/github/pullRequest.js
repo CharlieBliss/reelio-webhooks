@@ -494,6 +494,9 @@ export const ticketAndFeatureless = {
 export const pullRequestMultiTickets = {
   "action": "opened",
   "number": 1,
+	"repository": {
+		"full_name": "Kyle-Mendes/public-repo",
+	},
   "pull_request": {
 		"body": "This is a pretty simple change that we need to pull into staging. XYZ-3 XYZ-2",
     "url": "https://api.github.com/repos/Kyle-Mendes/public-repo/pulls/2",
@@ -510,6 +513,9 @@ export const pullRequestMultiTickets = {
 export const pullRequestMultiTicketsUnapproved = {
   "action": "opened",
   "number": 1,
+	"repository": {
+		"full_name": "Kyle-Mendes/public-repo",
+	},
   "pull_request": {
 		"body": "This is a pretty simple change that we need to pull into staging. XYZ-5 XYZ-2",
     "url": "https://api.github.com/repos/Kyle-Mendes/public-repo/pulls/2",
@@ -525,6 +531,9 @@ export const pullRequestMultiTicketsUnapproved = {
 
 export const pullRequestBadAction = {
   "action": "closed",
+	"repository": {
+		"full_name": "Kyle-Mendes/public-repo",
+	},
 	"pull_request": {
 		"user": "test",
 		"base": {
