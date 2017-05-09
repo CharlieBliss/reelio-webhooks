@@ -67,6 +67,35 @@ class Slack {
 		})
 	}
 
+	slackDeployWarning(payload, tickets) {
+		const versionText = '<http://pro.reelio.com|production>'
+		sendMessage({
+			channel: '#frontend-deploys',
+			username: 'Deploy Bot',
+			icon_url: 'https://octodex.github.com/images/welcometocat.png',
+			text: `*A deploy has been made to ${versionText}.*  The changes will be ready in ~15 minutes.\n\nThe deploy is based off of <${payload.pull_request.html_url}|PR ${payload.pull_request.number}>.\n\n*\`-- Fixes --\`*`,
+			attachments: [
+				{
+					text: tickets,
+					color: '#36a64f',
+				},
+				{
+					text: versionText,
+					color: '#de2656',
+				},
+			],
+		})
+	}
+
+	slackCongrats(payload, user) {
+		sendMessage({
+			channel: user.slack_id,
+			username: 'Merge Bot',
+			icon_url: 'https://octodex.github.com/images/welcometocat.png',
+			text: `:tada::party_parrot::tada:Nice work, ${user.name}!  Your <${payload.pull_request.html_url}|pull request> was merged without needing changes! Keep up the good work! :tada::party_parrot::tada:`,
+		})
+	}
+
 }
 
 export default new Slack()
