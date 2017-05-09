@@ -59,6 +59,15 @@ class Slack {
 		})
 	}
 
+	slackCircleFailure(user, commit) {
+		sendMessage({
+			channel: user.slack_id,
+			username: 'Circle Bot',
+			icon_url: 'https://octodex.github.com/images/socialite.jpg',
+			text: `Hey there, ${user.name}.  Your commit did not pass Circle CI's test suite.  Please review on <${commit}|GitHub>.`,
+		})
+	}
+
 }
 
 export default new Slack()

@@ -1,7 +1,8 @@
-import Review from './Review'
 import CheckReviews from './CheckReviews'
 import Labels from './Labels'
 import PullRequest from './PullRequest'
+import Review from './Review'
+import Status from './Status'
 
 import helper from '../../helpers/github'
 // import firebase from '../../helpers/firebase'
@@ -56,6 +57,10 @@ export function handle(event, context, callback) {
 
 		// if (get(config, [org, repo, 'pull_request_review', 'enabled'])) {
 		// }
+	}
+
+	if (githubEvent === 'status') {
+		return callback(null, helper.respond(Status(payload)))
 	}
 
 	return callback(null, helper.respond('No actions taken.'))
