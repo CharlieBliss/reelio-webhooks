@@ -41,6 +41,7 @@ export function Status() {
 				{ body: payloads.status.success })
 			request.headers['X-Github-Event'] = 'status'
 
+			const pendingMock = `POST https://hooks.slack.com:443/services/T02B43L0D/B3SJ6HDK3/n6ZCY3suXPXdgmBEfU8s5xDJ`
 			const slack = nock(slackUrl)
 				.post('')
 				.reply(200)
@@ -48,7 +49,7 @@ export function Status() {
 			wrapped.run(request).then((response) => {
 				setTimeout(() => {
 					expect(slack.isDone()).to.not.be.true
-					expect(nock.pendingMocks()).to.not.be.empty
+					expect(nock.pendingMocks()[0]).to.equal(pendingMock)
 					done()
 				}, 10)
 			})
