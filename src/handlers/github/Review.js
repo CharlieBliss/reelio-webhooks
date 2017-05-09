@@ -1,8 +1,7 @@
 import request from 'request'
-
 import { FRONTEND_MEMBERS } from '../../consts'
-import Slack from '../../helpers/slack'
 import Github from '../../helpers/github'
+import Slack from '../../helpers/slack'
 
 
 function handleRequestedChanges(payload) {

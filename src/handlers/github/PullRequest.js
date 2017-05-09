@@ -6,10 +6,10 @@ import { uniqueTicketFilter, wrapJiraTicketsFromArray } from '../../helpers/util
 
 import Github from '../../helpers/github'
 import Jira from '../../helpers/jira'
-import Tickets from '../../helpers/tickets'
-import Slack from '../../helpers/slack'
 import Firebase from '../../helpers/firebase'
 import Labels from './Labels'
+import Slack from '../../helpers/slack'
+import Tickets from '../../helpers/tickets'
 
 function createPullRequest(head, base, payload, newBody = '', labels = []) {
 	// Check if there is a PR between the head and branch already.  If there is, we don't need to make a new PR

@@ -1,9 +1,10 @@
 import request from 'request'
 import moment from 'moment'
 
-import Slack from '../helpers/slack'
 import Firebase from '../helpers/firebase'
 import Jira from './jira'
+import Slack from '../helpers/slack'
+
 
 class Tickets {
 

@@ -1,7 +1,6 @@
 import { FRONTEND_MEMBERS } from '../../consts'
 import Slack from '../../helpers/slack'
 
-
 // This component can't easily link to PRs because statuses are for specific commits, not PRs
 
 function handleError(payload) {

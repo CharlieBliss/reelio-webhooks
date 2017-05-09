@@ -1,7 +1,8 @@
 import request from 'request'
-import Tickets from '../../helpers/tickets'
 import { jiraRegex } from '../../consts'
+import { parseReviews } from '../../helpers/utils'
 import Github from '../../helpers/github'
+import Tickets from '../../helpers/tickets'
 
 function CheckReviews(payload, event, count = 2) {
 	const action = payload.action,
@@ -37,7 +38,7 @@ function CheckReviews(payload, event, count = 2) {
 			approved = []
 
 		// group by author keep latest
-		reviews = Github.parseReviews(reviews)
+		reviews = parseReviews(reviews)
 		approved = reviews
 			.map(r => r.state)
 			.filter(r => r.toLowerCase() === 'approved')

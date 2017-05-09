@@ -1,5 +1,5 @@
-import Transition from './Transition'
 import helper from '../../helpers/jira'
+import Transition from './Transition'
 
 export function handle(event, context, callback) {
 	const payload = JSON.parse(event.body)

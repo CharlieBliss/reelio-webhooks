@@ -1,11 +1,12 @@
-import Slack from '../../helpers/slack'
-import Github from '../../helpers/github'
-import Jira from '../../helpers/jira'
+import request from 'request'
+import rp from 'request-promise'
+
 import { uniqueTicketFilter } from '../../helpers/utils'
 import { jiraRegex } from '../../consts'
 
-const request = require('request')
-const rp = require('request-promise')
+import Github from '../../helpers/github'
+import Jira from '../../helpers/jira'
+import Slack from '../../helpers/slack'
 
 export function Transition(payload) {
 

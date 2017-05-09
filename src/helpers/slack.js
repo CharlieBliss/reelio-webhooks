@@ -1,5 +1,4 @@
 import request from 'request'
-
 import { SLACK_URL, FRONTEND_MEMBERS } from '../consts'
 
 function sendMessage(payload) {
