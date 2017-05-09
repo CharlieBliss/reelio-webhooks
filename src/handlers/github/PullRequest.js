@@ -104,6 +104,8 @@ function handleNew(payload) {
 				const responses = []
 				const uniqueTickets = tickets.filter(uniqueTicketFilter)
 
+				request(Github.post(`${payload.pull_request.issue_url}/labels`, ['$$review']))
+
 				Promise.all(uniqueTickets.map(t => rp(Jira.get(`${ticketBase}/${t}`)) //eslint-disable-line
 					.then((data) => {
 						responses.push(JSON.parse(data))
