@@ -55,7 +55,7 @@ function CheckReviews(payload, event, count = 2) {
 				}))
 				request(Github.post(`${payload.pull_request.issue_url}/labels`, ['approved', '$$qa']))
 				request(Github.delete(`${payload.pull_request.issue_url}/labels/%24%24review`))
-				request(Github.delete(`${payload.pull_request.issue_url}/labels/ready%20to%20review`))
+				request(Github.delete(`${payload.pull_request.issue_url}/labels/changes%20requested`))
 
 				// Move the tickets to "Ready for QA"
 
@@ -63,15 +63,17 @@ function CheckReviews(payload, event, count = 2) {
 				Tickets.transitionTickets(tickets, payload)
 			}
 
+			// PR has outstanding requests for changes
 			if (reviews.length !== approved.length) {
 				request(Github.post(`${payload.pull_request.head.repo.url}/statuses/${sha}`, {
 					state: 'failure',
 					description: 'This PR is blocked from merging due to a pending request for changes.',
 					context: 'ci/reelio',
 				}))
+
 				request(Github.post(`${payload.pull_request.issue_url}/labels`, ['$$review']))
-				request(Github.delete(`${payload.pull_request.issue_url}/labels/approved`))
 				request(Github.delete(`${payload.pull_request.issue_url}/labels/%24%24qa`))
+				request(Github.delete(`${payload.pull_request.issue_url}/labels/approved`))
 			}
 
 		} else {
@@ -82,6 +84,7 @@ function CheckReviews(payload, event, count = 2) {
 				description: `This PR requires ${additional} more approved review${additional > 1 ? 's' : ''} to be merged.`,
 				context: 'ci/reelio',
 			}))
+
 			request(Github.post(`${payload.pull_request.issue_url}/labels`, ['$$review']))
 			request(Github.delete(`${payload.pull_request.issue_url}/labels/%24%24qa`))
 			request(Github.delete(`${payload.pull_request.issue_url}/labels/approved`))

@@ -6,7 +6,7 @@ export function wrapJiraTicketsFromArray(ticket) {
 	return `[${ticket.toUpperCase()}](https://reelio.atlassian.net/browse/${ticket.toUpperCase()})`
 }
 
-export function parseReviews(reviews) {
+export function parseReviews(reviews = []) {
 	// grab the data we care about
 	const parsed = reviews.map(r => ({
 		state: r.state,

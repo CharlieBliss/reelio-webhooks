@@ -8,7 +8,6 @@ function handleRequestedChanges(payload) {
 	const user = FRONTEND_MEMBERS[payload.pull_request.user.id]
 
 	request(Github.post(`${payload.pull_request.issue_url}/labels`, ['changes requested']))
-	request(Github.delete(`${payload.pull_request.issue_url}/labels/ready%20to%20review`))
 
 	if (user) {
 		Slack.changesRequested(payload, user)
@@ -17,9 +16,7 @@ function handleRequestedChanges(payload) {
 	return 'Review Changes Request'
 }
 
-function handleApproved(payload) {
-	request(Github.delete(`${payload.pull_request.issue_url}/labels/changes%20requested`))
-
+function handleApproved() {
 	return 'Review Changes Success'
 }
 

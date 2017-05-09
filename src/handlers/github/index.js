@@ -5,7 +5,7 @@ import Review from './Review'
 import Status from './Status'
 
 import helper from '../../helpers/github'
-// import firebase from '../../helpers/firebase'
+import firebase from '../../helpers/firebase'
 
 
 export function handle(event, context, callback) {
@@ -14,7 +14,8 @@ export function handle(event, context, callback) {
 		githubEvent = headers['X-GitHub-Event'] || headers['X-Github-Event'],
 		payload = JSON.parse(event.body),
 		action = payload.action
-	// const fullRepo = payload.repository.full_name
+
+	const fullRepo = payload.repository.full_name
 		// org = fullRepo.split('/')[0],
 		// repo = fullRepo.split('/')[1]
 
@@ -24,21 +25,21 @@ export function handle(event, context, callback) {
 	console.log('---------------------------------');
 	/* eslint-enable */
 
-	// firebase.log('github', fullRepo, githubEvent, action, payload)
+	firebase.log('github', fullRepo, githubEvent, action, payload)
 
 	if (!githubEvent) {
 		return callback(null, helper.respond('Not a valid github event.', 400))
 	}
 
 	if (!action && githubEvent !== 'status') {
-		return callback(null, helper.respond('No action given.', 400))
+		return callback(null, helper.respond('No action given.', 200))
 	}
 
 	if (
 		githubEvent === 'pull_request' ||
 		githubEvent === 'pull_request_review'
 	) {
-		CheckReviews(payload)
+		CheckReviews(payload, githubEvent)
 	}
 
 	if (githubEvent === 'pull_request') {

@@ -1,5 +1,6 @@
 import * as admin from 'firebase-admin'
 import request from 'request'
+import { cloneDeep } from 'lodash'
 
 import Slack from './slack'
 
@@ -20,7 +21,7 @@ class Firebase {
 	// For example: Github -> reelio-front -> pull_request -> opened
 
 	log(service, project, event, action, originalPayload) {
-		const payload = Object.assign({}, originalPayload)
+		const payload = cloneDeep(originalPayload)
 
 		if (
 			event === 'create' ||

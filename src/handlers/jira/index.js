@@ -6,7 +6,8 @@ export function handle(event, context, callback) {
 
 	if (payload && payload.transition) {
 		Transition(payload)
+		return callback(null, helper.respond('Handling transition', 200))
 	}
 
-	return callback(null, helper.respond('Not a valid JIRA event.', 400))
+	return callback(null, helper.respond('Event not handled', 200))
 }

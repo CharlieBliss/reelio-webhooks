@@ -13,7 +13,8 @@ class LabelHelper {
 			if (res.statusCode >= 200 && res.statusCode < 300) {
 				reviews = JSON.parse(body) || []
 			}
-				// get reviewers and send a reminder message for each of them to re-review
+
+			// get reviewers and send a reminder message for each of them to re-review
 			const reviewers = parseReviews(reviews)
 			reviewers.forEach((reviewer) => {
 				Slack.reviewReminder(payload, user, reviewer)
@@ -26,7 +27,6 @@ class LabelHelper {
 	handleAddLabel(payload) {
 		if (payload.label.name === 'WIP') {
 			request(Github.delete(`${payload.pull_request.issue_url}/labels/$$review`))
-			request(Github.delete(`${payload.pull_request.issue_url}/labels/ready%20to%20review`))
 		}
 	}
 
@@ -36,7 +36,7 @@ class LabelHelper {
 		}
 
 		if (payload.label.name === 'WIP') {
-			request(Github.post(`${payload.pull_request.issue_url}/labels`, ['$$review', 'ready to review']))
+			request(Github.post(`${payload.pull_request.issue_url}/labels`, ['$$review']))
 		}
 
 		return 'Label -- Unlabeled'

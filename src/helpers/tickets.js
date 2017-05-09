@@ -9,18 +9,23 @@ import Slack from '../helpers/slack'
 class Tickets {
 
 	getTicketResponses(responses, tickets, attempts, repo, logData) {
-		const formattedTickets = responses.map(ticket => (
-			{
+		const formattedTickets = responses.map((ticket) => {
+			const assignee = ticket.fields.assignee || null
+
+			return {
 				name: ticket.key,
-				assignee: ticket.fields.assignee.displayName || 'not provided',
+				assignee: assignee ? assignee.displayName : 'not provided',
 				reporter: ticket.fields.reporter.displayName || 'not provided',
 				points: ticket.fields.customfield_10004 || 'not provided',
 				repository: repo,
 			}
-			))
+
+		})
+
 		if (formattedTickets) {
 			return logData(formattedTickets)
 		}
+
 		return 'No Tickets'
 	}
 
@@ -31,9 +36,11 @@ class Tickets {
 		request(Jira.get(`${ticketBase}/${ticket}`, 'jira'), (_, __, data) => {
 			const ticketInfo = (JSON.parse(data))
 			const board = ticketInfo.fields.project.key
+			const assignee = ticketInfo.fields.assignee || null
+
 			firebaseInfo = {
 				name: ticketInfo.key || 'not provided',
-				assignee: ticketInfo.fields.assignee.displayName || 'not provided',
+				assignee: assignee ? assignee.displayName : 'not provided',
 				reporter: ticketInfo.fields.reporter.displayName || 'not provided',
 				points: ticketInfo.fields.customfield_10004 || 'not provided',
 				repository: repo,

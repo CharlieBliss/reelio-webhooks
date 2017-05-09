@@ -46,9 +46,9 @@ export function Transition(payload) {
 				const responses = []
 
 				Promise.all(tickets.map(t => rp(Jira.get(`${ticketBase}/${t}`)) //eslint-disable-line
-				.then((data) => {
-					responses.push(JSON.parse(data))
-				}),
+					.then((data) => {
+						responses.push(JSON.parse(data))
+					}),
 			))
 				.then(() => {
 					const resolved = responses.filter(ticket => ticket.fields.status.id === '10001')
@@ -69,6 +69,9 @@ export function Transition(payload) {
 							description: `Waiting on ${unresolved} ticket${unresolved > 1 ? 's' : ''} to be marked as "done".`,
 							context: 'ci/qa-team',
 						}))
+
+						request(Github.post(`${PR.issue_url}/labels`, ['$$qa']))
+						request(Github.delete(`${PR.issue_url}/labels/%24%24qa%20approved`))
 					}
 				})
 			}
