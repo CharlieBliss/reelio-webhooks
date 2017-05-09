@@ -8,6 +8,7 @@ import helper from '../../helpers/github'
 
 
 export function handle(event, context, callback) {
+
 	const headers = event.headers,
 		githubEvent = headers['X-GitHub-Event'] || headers['X-Github-Event'],
 		payload = JSON.parse(event.body),

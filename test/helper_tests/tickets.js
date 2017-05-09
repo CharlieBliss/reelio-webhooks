@@ -11,8 +11,6 @@ const githubPayloads = require('../payloads/github')
 
 const consts = require('../../src/consts/slack')
 
-
-
 describe('helpers -- tickets', () => {
 	beforeEach(() => {
 		nock.cleanAll()

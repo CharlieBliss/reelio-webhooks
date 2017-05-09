@@ -11,15 +11,20 @@ const wrapped = lambdaWrapper.wrap(mod, { handler: 'handle' })
 
 Object.keys(tests).forEach(test => tests[test]())
 
-it('Returns 400 for no jira event', (done) => {
-	const request = Object.assign({}, { headers: headers.jira }, { body: githubPayloads.review.approved })
 
-	wrapped.run(request).then((response) => {
-		setTimeout(() => {
-			expect(response).to.not.be.empty
-			expect(response.body).to.equal('Jira -- Not a valid JIRA event.')
-			expect(response.statusCode).to.equal(400)
-			done()
-		}, 10)
+describe('JIRA', () => {
+
+	it('Returns 400 for no jira event', (done) => {
+		const request = Object.assign({}, { headers: headers.jira }, { body: githubPayloads.review.approved })
+
+		wrapped.run(request).then((response) => {
+			setTimeout(() => {
+				expect(response).to.not.be.empty
+				expect(response.body).to.equal('Jira -- Not a valid JIRA event.')
+				expect(response.statusCode).to.equal(400)
+				done()
+			}, 10)
+		})
 	})
-})
+
+})	

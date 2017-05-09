@@ -30,7 +30,7 @@ function createPullRequest(head, base, payload, newBody = '', labels = []) {
 			}
 		}
 
-		// create Issue.  To add lables to the PR on creation, it needs to start as an issue
+		// create Issue.  To add labels to the PR on creation, it needs to start as an issue
 		const issue = {
 			title: `${head} --> ${base}`,
 			body: `# Merging from branch ${head} into ${base}.\n\n### Previous PR: ${payload.pull_request.html_url}\n\n${newBody}`,
@@ -67,10 +67,8 @@ function createPullRequest(head, base, payload, newBody = '', labels = []) {
 
 function handleNew(payload) {
 	// Get the issue, not the PR
-	request(Github.get(payload.pull_request.issue_url), (err, res, body) => {
+	rp(Github.get(payload.pull_request.issue_url), (err, res, body) => {
 		if (res.statusCode >= 200 && res.statusCode < 300) {
-			console.log('NEW Labels:', JSON.parse(body).labels)
-
 			const labels = JSON.parse(body).labels || []
 			const repo = payload.repository.html_url
 			const head = payload.pull_request.head.ref,
@@ -78,7 +76,7 @@ function handleNew(payload) {
 				tickets = prBody.match(jiraRegex)
 
 			if (head === 'staging') {
-				return 'New Pr -- Don\'t need to handle'
+				return 'New PR -- Don\'t need to handle'
 			}
 
 			// If there aren't any JIRA tickets in the body as well, warn them

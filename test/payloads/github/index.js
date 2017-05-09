@@ -1,9 +1,11 @@
 import * as review from './review'
 import * as pullRequest from './pullRequest'
 import * as label from './label'
+import * as issue from './issue'
 
 export {
-	review,
+	issue,
+	label,
 	pullRequest,
-	label
+	review,
 }
