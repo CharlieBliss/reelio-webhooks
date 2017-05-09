@@ -35,7 +35,7 @@ export function Status() {
 			})
 		})
 
-		it.only('Handles Status Change (success)', (done) => {
+		it('Handles Status Change (success)', (done) => {
 			const request = Object.assign({},
 				{ headers: headers.github },
 				{ body: payloads.status.success })
