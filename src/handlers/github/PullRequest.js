@@ -102,16 +102,15 @@ function handleNew(payload) {
 
 				const ticketBase = 'https://reelio.atlassian.net/rest/api/2/issue'
 				const responses = []
-				const attempts = 0
 				const uniqueTickets = tickets.filter(uniqueTicketFilter)
 
 				Promise.all(uniqueTickets.map(t => rp(Jira.get(`${ticketBase}/${t}`)) //eslint-disable-line
 					.then((data) => {
-						responses.push(data)
-					})),
-				).then(() => {
-					console.log('RESPONSES', responses)
-					Tickets.getTicketResponses(responses, tickets, attempts, repo, (formattedTickets) => {
+						responses.push(JSON.parse(data))
+					})))
+					.then(() => {
+						const formattedTickets = Tickets.formatTicketData(responses, repo)
+
 						Firebase.log('github', payload.repository.full_name, 'reelio_deploy/feature', null, {
 							tickets: formattedTickets,
 							fixed_count: tickets.filter(uniqueTicketFilter).length,
@@ -119,7 +118,6 @@ function handleNew(payload) {
 							target: 'url',
 						})
 					})
-				})
 			}
 
 			return 'New PR -- Complete'
@@ -163,20 +161,19 @@ function handleMerge(payload) {
 
 			const ticketBase = 'https://reelio.atlassian.net/rest/api/2/issue'
 			const responses = []
-			const attempts = 0
 
 			Promise.all(uniqueTickets.map(t => rp(Jira.get(`${ticketBase}/${t}`)) //eslint-disable-line
 				.then((data) => {
 					responses.push(data)
 				}),
 			)).then(() => {
-				Tickets.getTicketResponses(responses, tickets, attempts, repo, (formattedTickets) => {
-					Firebase.log('github', payload.repository.full_name, 'reelio_deploy', null, {
-						tickets: formattedTickets,
-						fixed_count: tickets.filter(uniqueTicketFilter).length,
-						environment: 'production',
-						target: 'pro.reelio.com',
-					})
+				const formattedTickets = Tickets.formatTicketData(responses, repo)
+
+				Firebase.log('github', payload.repository.full_name, 'reelio_deploy', null, {
+					tickets: formattedTickets,
+					fixed_count: tickets.filter(uniqueTicketFilter).length,
+					environment: 'production',
+					target: 'pro.reelio.com',
 				})
 			})
 		}

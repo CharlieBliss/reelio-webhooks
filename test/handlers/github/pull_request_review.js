@@ -159,9 +159,11 @@ export function PullRequestReview() {
 			const add = nock('https://api.github.com')
 				.post('/repos/Kyle-Mendes/public-repo/issues/1/labels', ["approved","$$qa"])
 				.reply(200)
+
 			const removeReview = nock('https://api.github.com')
 				.delete('/repos/Kyle-Mendes/public-repo/issues/1/labels/%24%24review')
 				.reply(200)
+
 			const removeChanges = nock('https://api.github.com')
 				.delete('/repos/Kyle-Mendes/public-repo/issues/1/labels/changes%20requested')
 				.reply(200)
@@ -174,7 +176,7 @@ export function PullRequestReview() {
 					expect(removeChanges.isDone()).to.be.true
 					expect(nock.pendingMocks()).to.be.empty
 					done()
-				}, 10)
+				}, 20)
 			})
 
 		it('Returns CI success if 2+ reviews, all approved', (done) => {
@@ -203,9 +205,11 @@ export function PullRequestReview() {
 			const add = nock('https://api.github.com')
 				.post('/repos/Kyle-Mendes/public-repo/issues/1/labels', ["approved","$$qa"])
 				.reply(200)
+
 			const removeChanges = nock('https://api.github.com')
 				.delete('/repos/Kyle-Mendes/public-repo/issues/1/labels/changes%20requested')
 				.reply(200)
+
 			const removeReview = nock('https://api.github.com')
 				.delete('/repos/Kyle-Mendes/public-repo/issues/1/labels/%24%24review')
 				.reply(200)
@@ -218,7 +222,7 @@ export function PullRequestReview() {
 					expect(removeChanges.isDone()).to.be.true
 					expect(nock.pendingMocks()).to.be.empty
 					done()
-				}, 10)
+				}, 20)
 			})
 
 			it('Handles 1 approved review', (done) => {

@@ -8,9 +8,8 @@ import Slack from '../helpers/slack'
 
 class Tickets {
 
-	getTicketResponses(responses, tickets, attempts, repo, logData) {
-		const formattedTickets = responses.map((ticket) => {
-			console.log('TICKET', ticket)
+	formatTicketData(responses = [], repo) {
+		return responses.map((ticket) => {
 			const assignee = ticket.fields.assignee || null
 
 			return {
@@ -20,14 +19,7 @@ class Tickets {
 				points: ticket.fields.customfield_10004 || 'not provided',
 				repository: repo,
 			}
-
 		})
-
-		if (formattedTickets) {
-			return logData(formattedTickets)
-		}
-
-		return 'No Tickets'
 	}
 
 	getTicketFirebaseInfo(ticket, repo, logData) {
