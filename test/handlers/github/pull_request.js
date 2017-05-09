@@ -53,14 +53,129 @@ export function PullRequest() {
 
 		})
 
-		// it.only('Should warn author if PR is "ticketless"', (done) => {
-		// 	let payload = payloads.pullRequest.pullRequestOpenedStaging
-		// 		setTimeout(() => {
-		// 			expect(CheckReviews(payload, 'pull_request')).to.equal('Invalid Action')
-		// 			done()
-		// 		}, 10)
-		// 	})
+		it('Should warn author if PR is "ticketless"', (done) => {
+			let payload = payloads.pullRequest.pullRequestTicketless
+			const sha = payload.pull_request.head.sha
 
+			const reviews = nock('https://api.github.com')
+				.get('/repos/Kyle-Mendes/public-repo/issues/1')
+				.reply(200, payloads.issue.ticketless)
+
+			const failureCI = nock('https://api.github.com')
+				.post(`/repos/Kyle-Mendes/public-repo/statuses/${sha}`,
+					{
+						state: 'failure',
+						description: `This PR requires 2 more approved reviews to be merged.`,
+						context: 'ci/reelio',
+					})
+				.reply(200)
+
+			const ticketlessComment = nock('https://api.github.com')
+				.post('/repos/Kyle-Mendes/public-repo/issues/1/comments',
+					{ body: `@Kyle-Mendes - It looks like you didn't include JIRA ticket references in this ticket.  Are you sure you have none to reference?`
+					})
+				.reply(200)
+
+			const featureBranchComment = nock('https://api.github.com')
+				.post('/repos/Kyle-Mendes/public-repo/issues/1/comments')
+				.reply(200)
+			const ticketless = nock('https://api.github.com')
+				.post('/repos/Kyle-Mendes/public-repo/issues/1/labels', ['$$ticketless'])
+				.reply(200)
+			const addReview = nock('https://api.github.com')
+				.post('/repos/Kyle-Mendes/public-repo/issues/1/labels', ['$$review'])
+				.reply(200)
+			const removeQA = nock('https://api.github.com')
+				.delete('/repos/Kyle-Mendes/public-repo/issues/1/labels/%24%24qa')
+				.reply(200)
+			const removeApproved = nock('https://api.github.com')
+				.delete('/repos/Kyle-Mendes/public-repo/issues/1/labels/approved')
+				.reply(200)
+
+			const request = Object.assign({},
+				{ headers: headers.github },
+				{ body: JSON.stringify(payload) })
+			request.headers['X-Github-Event'] = 'pull_request'
+
+			wrapped.run(request).then((response) => {
+			setTimeout(() => {
+				expect(reviews.isDone()).to.be.true
+				expect(removeQA.isDone()).to.be.true
+				expect(removeApproved.isDone()).to.be.true
+				expect(failureCI.isDone()).to.be.true
+				expect(ticketlessComment.isDone()).to.be.true
+				expect(ticketless.isDone()).to.be.true
+				expect(featureBranchComment.isDone()).to.be.true
+				expect(addReview.isDone()).to.be.true
+				done()
+			}, 50)
 		})
+	})
 
+		it.only('Should warn author if PR is "featureless"', (done) => {
+			let payload = payloads.pullRequest.pullRequestFeatureless
+			const sha = payload.pull_request.head.sha
+
+			const reviews = nock('https://api.github.com')
+				.get('/repos/Kyle-Mendes/public-repo/issues/1')
+				.reply(200, payloads.issue.ticketless)
+
+			const failureCI = nock('https://api.github.com')
+				.post(`/repos/Kyle-Mendes/public-repo/statuses/${sha}`,
+					{
+						state: 'failure',
+						description: `This PR requires 2 more approved reviews to be merged.`,
+						context: 'ci/reelio',
+					})
+				.reply(200)
+
+			const featureLessComment = nock('https://api.github.com')
+				.post('/repos/Kyle-Mendes/public-repo/issues/1/comments',
+					{ body: `@Kyle-Mendes - It looks like your branch doesn't contain \`feature-\`.  Are you sure this PR shouldn't be a feature branch?`
+					})
+				.reply(200)
+
+			const featureBranchComment = nock('https://api.github.com')
+				.post('/repos/Kyle-Mendes/public-repo/issues/1/comments')
+				.reply(200)
+			const featureless = nock('https://api.github.com')
+				.post('/repos/Kyle-Mendes/public-repo/issues/1/labels', ['$$featureless'])
+				.reply(200)
+			const addReview = nock('https://api.github.com')
+				.post('/repos/Kyle-Mendes/public-repo/issues/1/labels', ['$$review'])
+				.reply(200)
+			const removeQA = nock('https://api.github.com')
+				.delete('/repos/Kyle-Mendes/public-repo/issues/1/labels/%24%24qa')
+				.reply(200)
+			const removeApproved = nock('https://api.github.com')
+				.delete('/repos/Kyle-Mendes/public-repo/issues/1/labels/approved')
+				.reply(200)
+
+			const request = Object.assign({},
+				{ headers: headers.github },
+				{ body: JSON.stringify(payload) })
+			request.headers['X-Github-Event'] = 'pull_request'
+
+			wrapped.run(request).then((response) => {
+			setTimeout(() => {
+				expect(reviews.isDone()).to.be.true
+				expect(removeQA.isDone()).to.be.true
+				expect(removeApproved.isDone()).to.be.true
+				expect(failureCI.isDone()).to.be.true
+				expect(featureLessComment.isDone()).to.be.true
+				expect(featureless.isDone()).to.be.true
+				expect(featureBranchComment.isDone()).to.not.be.true
+				expect(addReview.isDone()).to.be.true
+				done()
+			}, 50)
+		})
+	})
+
+
+
+
+
+
+
+	})
 	}

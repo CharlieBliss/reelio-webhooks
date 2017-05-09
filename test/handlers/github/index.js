@@ -1,2 +1,2 @@
 export { PullRequestReview } from './pull_request_review'
-// export { PullRequest } from './pull_request'
+export { PullRequest } from './pull_request'

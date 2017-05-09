@@ -67,20 +67,19 @@ function createPullRequest(head, base, payload, newBody = '', labels = []) {
 
 function handleNew(payload) {
 	// Get the issue, not the PR
-	rp(Github.get(payload.pull_request.issue_url), (err, res, body) => {
+	request(Github.get(payload.pull_request.issue_url), (err, res, body) => {
 		if (res.statusCode >= 200 && res.statusCode < 300) {
 			const labels = JSON.parse(body).labels || []
 			const repo = payload.repository.html_url
 			const head = payload.pull_request.head.ref,
 				prBody = payload.pull_request.body || '',
-				tickets = prBody.match(jiraRegex)
+				tickets = prBody.match(jiraRegex) || []
 
 			if (head === 'staging') {
 				return 'New PR -- Don\'t need to handle'
 			}
-
 			// If there aren't any JIRA tickets in the body as well, warn them
-			if (!tickets && !labels.map(l => l.name).includes('$$webhook')) {
+			if (!tickets.length && !labels.map(l => l.name).includes('$$webhook')) {
 				const feedback = `@${payload.pull_request.user.login} - It looks like you didn't include JIRA ticket references in this ticket.  Are you sure you have none to reference?`
 				request(Github.post(`${payload.pull_request.issue_url}/comments`, { body: feedback }))
 				request(Github.post(`${payload.pull_request.issue_url}/labels`, ['$$ticketless']))
