@@ -1,52 +1,132 @@
 {
   "hangarunderground": {
     "reelio-front": {
-      "require_reviews": {
-        "enabled": true,
-        "count": 2
-      },
-      "status": {
-        "enabled": true
-      },
-      "pull_request": {
-        "enabled": true
-      },
-      "pull_request_review": {
-        "enabled": true
+      "github": {
+        "labels": {
+          "enabled": true
+        },
+        "require_reviews": {
+          "enabled": true,
+          "count": 2
+        },
+        "status": {
+          "enabled": true
+        },
+        "pull_request": {
+          "enabled": true
+        },
+        "pull_request_review": {
+          "enabled": true
+        }
       }
     },
 
     "reelio": {
-      "require_reviews": {
-        "enabled": false,
-        "count": 2
-      },
-      "status": {
-        "enabled": true
-      },
-      "pull_request": {
-        "enabled": false
-      },
-      "pull_request_review": {
-        "enabled": false
+      "github": {
+        "labels": {
+          "enabled": false
+        },
+        "require_reviews": {
+          "enabled": false,
+          "count": 2
+        },
+        "status": {
+          "enabled": true
+        },
+        "pull_request": {
+          "enabled": false
+        },
+        "pull_request_review": {
+          "enabled": false
+        }
+      }
+    },
+
+    "reelio-front-tests": {
+      "github": {
+        "labels": {
+          "enabled": true
+        },
+        "require_reviews": {
+          "enabled": true,
+          "count": 2
+        },
+        "status": {
+          "enabled": true
+        },
+        "pull_request": {
+          "enabled": true
+        },
+        "pull_request_review": {
+          "enabled": true
+        }
       }
     }
   },
 
   "Kyle-Mendes": {
+    "public-repo": {
+      "github": {
+        "labels": {
+          "enabled": true
+        },
+        "require_reviews": {
+          "enabled": true,
+          "count": 2
+        },
+        "status": {
+          "enabled": true
+        },
+        "pull_request": {
+          "enabled": true
+        },
+        "pull_request_review": {
+          "enabled": true
+        }
+      }
+    },
+
     "webhook-test": {
-      "require_reviews": {
-        "enabled": true,
-        "count": 10
-      },
-      "status": {
-        "enabled": true
-      },
-      "pull_request": {
-        "enabled": true
-      },
-      "pull_request_review": {
-        "enabled": true
+      "github": {
+        "labels": {
+          "enabled": true
+        },
+        "require_reviews": {
+          "enabled": true,
+          "count": 10
+        },
+        "status": {
+          "enabled": true
+        },
+        "pull_request": {
+          "enabled": true
+        },
+        "pull_request_review": {
+          "enabled": true
+        }
+      }
+    }
+  },
+
+  "dillonmcroberts": {
+    "Webhook-test": {
+      "github": {
+        "labels": {
+          "enabled": true
+        },
+        "require_reviews": {
+          "enabled": true,
+          "count": 10
+        },
+        "status": {
+          "enabled": true
+        },
+        "pull_request": {
+          "enabled": true
+        },
+        "pull_request_review": {
+          "enabled": true
+        }
       }
     }
   }
