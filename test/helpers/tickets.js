@@ -22,7 +22,7 @@ describe('helpers -- tickets', () => {
 		const sha = githubPayloads.pullRequest.pullRequestOpenedStaging.pull_request.head.sha
 
 		const PRRoute = nock('https://api.github.com')
-		.get('/repos/dillonmcroberts/Webhook-test/pulls/26')
+		.get('/repos/Kyle-Mendes/public-repo/pulls/26')
 		.reply(200, githubPayloads.pullRequest.pullRequestOpenedStaging.pull_request)
 
 		const successCI = nock('https://api.github.com')
@@ -52,7 +52,7 @@ describe('helpers -- tickets', () => {
 		const sha = githubPayloads.pullRequest.pullRequestMultiTickets.pull_request.head.sha
 
 		const PRRoute = nock('https://api.github.com')
-		.get('/repos/dillonmcroberts/Webhook-test/pulls/26')
+		.get('/repos/Kyle-Mendes/public-repo/pulls/26')
 		.reply(200, githubPayloads.pullRequest.pullRequestMultiTickets.pull_request)
 
 		const successCI = nock('https://api.github.com')
@@ -91,8 +91,8 @@ describe('helpers -- tickets', () => {
 			.reply(200)
 
 		const PRRoute = nock('https://api.github.com')
-		.get('/repos/dillonmcroberts/Webhook-test/pulls/26')
-		.reply(200, githubPayloads.pullRequest.pullRequestMultiTicketsUnapproved.pull_request)
+			.get('/repos/Kyle-Mendes/public-repo/pulls/26')
+			.reply(200, githubPayloads.pullRequest.pullRequestMultiTicketsUnapproved.pull_request)
 
 		const failureCI = nock('https://api.github.com')
 		.post(`/repos/Kyle-Mendes/public-repo/statuses/${sha}`,

@@ -78,6 +78,7 @@ function handleNew(payload) {
 			if (head === 'staging') {
 				return 'New PR -- Don\'t need to handle'
 			}
+
 			// If there aren't any JIRA tickets in the body as well, warn them
 			if (!tickets.length && !labels.map(l => l.name).includes('$$webhook')) {
 				const feedback = `@${payload.pull_request.user.login} - It looks like you didn't include JIRA ticket references in this ticket.  Are you sure you have none to reference?`
@@ -103,8 +104,6 @@ function handleNew(payload) {
 				const ticketBase = 'https://reelio.atlassian.net/rest/api/2/issue'
 				const responses = []
 				const uniqueTickets = tickets.filter(uniqueTicketFilter)
-
-				request(Github.post(`${payload.pull_request.issue_url}/labels`, ['$$review']))
 
 				Promise.all(uniqueTickets.map(t => rp(Jira.get(`${ticketBase}/${t}`)) //eslint-disable-line
 					.then((data) => {

@@ -62,10 +62,16 @@ describe('Properly handles Removing Labels', () => {
 				 [
 					 { state: 'changes_requested', user: { id: 7416637 }, submitted_at: 1489426108742 },
 				 ],
-			 )
+			)
 
-			Labels(payload)
+		const add = nock('https://api.github.com')
+			.post('/repos/Kyle-Mendes/public-repo/issues/1/labels', ['$$review'])
+			.reply(200)
+
+		Labels(payload)
+
 			setTimeout(() => {
+				expect(add.isDone()).to.be.true
 				expect(reviews.isDone()).to.be.true
 				expect(slack.isDone()).to.be.true
 				expect(nock.pendingMocks()).to.be.empty

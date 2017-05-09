@@ -32,6 +32,7 @@ class LabelHelper {
 
 	handleUnlabel(payload) {
 		if (payload.label.name === 'changes requested') {
+			request(Github.post(`${payload.pull_request.issue_url}/labels`, ['$$review']))
 			return this.triggerReviewReminder(payload)
 		}
 

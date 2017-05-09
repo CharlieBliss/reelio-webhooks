@@ -28,7 +28,7 @@
   },
   "scripts": {
     "test:handlers": "sls invoke test --compilers js:babel-register --path test/handlers",
-    "test:helpers": "mocha test/helper_tests --compilers js:babel-register",
+    "test:helpers": "mocha test/helpers --compilers js:babel-register",
     "lint": "eslint src"
   },
   "babel": {

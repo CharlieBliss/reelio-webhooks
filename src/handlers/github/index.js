@@ -1,3 +1,4 @@
+import { get } from 'lodash'
 import CheckReviews from './CheckReviews'
 import Labels from './Labels'
 import PullRequest from './PullRequest'
@@ -7,17 +8,19 @@ import Status from './Status'
 import helper from '../../helpers/github'
 import firebase from '../../helpers/firebase'
 
+import config from '../../../config.json'
+
+const handler = 'github'
 
 export function handle(event, context, callback) {
-
 	const headers = event.headers,
 		githubEvent = headers['X-GitHub-Event'] || headers['X-Github-Event'],
 		payload = JSON.parse(event.body),
 		action = payload.action
 
-	const fullRepo = payload.repository.full_name
-		// org = fullRepo.split('/')[0],
-		// repo = fullRepo.split('/')[1]
+	const fullRepo = payload.repository.full_name,
+		org = fullRepo.split('/')[0],
+		repo = fullRepo.split('/')[1]
 
 	/* eslint-disable */
 	console.log('---------------------------------');
@@ -39,28 +42,33 @@ export function handle(event, context, callback) {
 		githubEvent === 'pull_request' ||
 		githubEvent === 'pull_request_review'
 	) {
-		CheckReviews(payload, githubEvent)
+		if (get(config, [org, repo, handler, 'require_reviews', 'enabled'])) {
+			CheckReviews(payload, githubEvent, get(config, [org, repo, handler, 'require_reviews', 'count']))
+		}
 	}
 
 	if (githubEvent === 'pull_request') {
-		// if (get(config, [org, repo, 'pull_request', 'enabled'])) {
-		return callback(null, helper.respond(PullRequest(payload)))
-		// }
+		if (get(config, [org, repo, handler, 'pull_request', 'enabled'])) {
+			return callback(null, helper.respond(PullRequest(payload)))
+		}
 	}
 
 	if (githubEvent === 'label') {
-		return callback(null, helper.respond(Labels(payload)))
+		if (get(config, [org, repo, handler, 'labels', 'enabled'])) {
+			return callback(null, helper.respond(Labels(payload)))
+		}
 	}
 
 	if (githubEvent === 'pull_request_review') {
-		return callback(null, helper.respond(Review(payload)))
-
-		// if (get(config, [org, repo, 'pull_request_review', 'enabled'])) {
-		// }
+		if (get(config, [org, repo, handler, 'pull_request_review', 'enabled'])) {
+			return callback(null, helper.respond(Review(payload)))
+		}
 	}
 
 	if (githubEvent === 'status') {
-		return callback(null, helper.respond(Status(payload)))
+		if (get(config, [org, repo, handler, 'status', 'enabled'])) {
+			return callback(null, helper.respond(Status(payload)))
+		}
 	}
 
 	return callback(null, helper.respond('No actions taken.'))
