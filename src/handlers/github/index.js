@@ -14,7 +14,6 @@ export function handle(event, context, callback) {
 		githubEvent = headers['X-GitHub-Event'] || headers['X-Github-Event'],
 		payload = JSON.parse(event.body),
 		action = payload.action
-
 	// const fullRepo = payload.repository.full_name
 		// org = fullRepo.split('/')[0],
 		// repo = fullRepo.split('/')[1]
@@ -31,7 +30,7 @@ export function handle(event, context, callback) {
 		return callback(null, helper.respond('Not a valid github event.', 400))
 	}
 
-	if (!action) {
+	if (!action && githubEvent !== 'status') {
 		return callback(null, helper.respond('No action given.', 400))
 	}
 
