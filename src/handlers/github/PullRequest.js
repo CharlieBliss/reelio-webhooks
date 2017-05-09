@@ -107,7 +107,7 @@ function handleNew(payload) {
 
 				Promise.all(uniqueTickets.map(t => rp(Jira.get(`${ticketBase}/${t}`)) //eslint-disable-line
 				.then((data) => {
-					responses.push(JSON.parse(data))
+					responses.push(data)
 				}),
 			))
 
