@@ -137,7 +137,6 @@ function handleMerge(payload) {
 
 	const uniqueTickets = tickets.filter(uniqueTicketFilter)
 	const repo = payload.repository.html_url
-
 	const user = FRONTEND_MEMBERS[payload.pull_request.user.id],
 		base = payload.pull_request.base.ref // target of the original PR
 
@@ -165,7 +164,7 @@ function handleMerge(payload) {
 
 			Promise.all(uniqueTickets.map(t => rp(Jira.get(`${ticketBase}/${t}`)) //eslint-disable-line
 				.then((data) => {
-					responses.push(data)
+					responses.push(JSON.parse(data))
 				}),
 			)).then(() => {
 				const formattedTickets = Tickets.formatTicketData(responses, repo)
@@ -202,7 +201,6 @@ function handleMerge(payload) {
 }
 
 function PullRequest(payload) {
-
 	if (payload.action === 'labeled' || payload.action === 'unlabeled') {
 		Labels(payload)
 		return 'Pull Request -- Labels Handled'
