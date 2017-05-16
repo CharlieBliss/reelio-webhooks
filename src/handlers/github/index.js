@@ -50,7 +50,7 @@ export function handle(event, context, callback) {
 
 	if (githubEvent === 'pull_request') {
 		if (get(config, [org, repo, handler, 'pull_request', 'enabled'])) {
-			return callback(null, helper.respond(PullRequest(payload)))
+			return callback(null, helper.respond(PullRequest(payload, get(config, [org, repo, handler, 'pull_request']))))
 		}
 	}
 

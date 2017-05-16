@@ -65,7 +65,7 @@ function createPullRequest(head, base, payload, newBody = '', labels = []) {
 	})
 }
 
-function handleNew(payload) {
+function handleNew(payload, config) {
 	// Get the issue, not the PR
 	request(Github.get(payload.pull_request.issue_url), (err, res, body) => {
 		if (res.statusCode >= 200 && res.statusCode < 300) {
@@ -80,7 +80,12 @@ function handleNew(payload) {
 			}
 
 			// If there aren't any JIRA tickets in the body as well, warn them
-			if (!tickets.length && !labels.map(l => l.name).includes('$$webhook')) {
+			if (
+				!tickets.length &&
+				!labels.map(l => l.name).includes('$$webhook') &&
+				config.opened &&
+				(config.opened.enabled || config.open.tickets)
+			) {
 				const feedback = `@${payload.pull_request.user.login} - It looks like you didn't include JIRA ticket references in this ticket.  Are you sure you have none to reference?`
 				request(Github.post(`${payload.pull_request.issue_url}/comments`, { body: feedback }))
 				request(Github.post(`${payload.pull_request.issue_url}/labels`, ['$$ticketless']))
@@ -89,7 +94,12 @@ function handleNew(payload) {
 			}
 
 			// If the branch isn't a feature branch, ask about it
-			if (!head.includes('feature-') && !labels.map(l => l.name).includes('$$webhook')) {
+			if (
+				!head.includes('feature-') &&
+				!labels.map(l => l.name).includes('$$webhook') &&
+				config.opened &&
+				(config.opened.enabled || config.open.feature)
+			) {
 				const feedback = `@${payload.pull_request.user.login} - It looks like your branch doesn't contain \`feature-\`.  Are you sure this PR shouldn't be a feature branch?`
 				request(Github.post(`${payload.pull_request.issue_url}/comments`, { body: feedback }))
 				request(Github.post(`${payload.pull_request.issue_url}/labels`, ['$$featureless']))
@@ -105,20 +115,23 @@ function handleNew(payload) {
 				const responses = []
 				const uniqueTickets = tickets.filter(uniqueTicketFilter)
 
-				Promise.all(uniqueTickets.map(t => rp(Jira.get(`${ticketBase}/${t}`)) //eslint-disable-line
-					.then((data) => {
-						responses.push(JSON.parse(data))
-					})))
-					.then(() => {
-						const formattedTickets = Tickets.formatTicketData(responses, repo)
+				// If tickets are enabled, grab their information and save it to firebase
+				if (config.opened.enabled || config.opened.tickets) {
+					Promise.all(uniqueTickets.map(t => rp(Jira.get(`${ticketBase}/${t}`)) //eslint-disable-line
+						.then((data) => {
+							responses.push(JSON.parse(data))
+						})))
+						.then(() => {
+							const formattedTickets = Tickets.formatTicketData(responses, repo)
 
-						Firebase.log('github', payload.repository.full_name, 'reelio_deploy/feature', null, {
-							tickets: formattedTickets,
-							fixed_count: tickets.filter(uniqueTicketFilter).length,
-							environment: parsedBranch,
-							target: 'url',
+							Firebase.log('github', payload.repository.full_name, 'reelio_deploy/feature', null, {
+								tickets: formattedTickets,
+								fixed_count: tickets.filter(uniqueTicketFilter).length,
+								environment: parsedBranch,
+								target: 'url',
+							})
 						})
-					})
+				}
 			}
 
 			return 'New PR -- Complete'
@@ -128,7 +141,7 @@ function handleNew(payload) {
 	})
 }
 
-function handleMerge(payload) {
+function handleMerge(payload, config) {
 	let labels = [],
 		reviews = []
 
@@ -148,16 +161,26 @@ function handleMerge(payload) {
 
 		if (
 			labels.length &&
-			base === 'staging'
+			base === 'staging' &&
+			config.merged.create
 		) {
 			createPullRequest('staging', 'master', payload, newBody, ['$$production'])
 		}
 
 		// If the closed PRs target was the master branch, alert QA of impending release
-		if (base === 'master') {
+		if (
+			base === 'master' &&
+			config.merged.alert &&
+			config.merged.alert.channel &&
+			config.merged.alert.url &&
+			config.merged.alert.env
+		) {
+			const alertConfig = config.merged.alert
+
 			const fixed = tickets.filter(uniqueTicketFilter),
 				formattedFixed = fixed.map(t => `<https://reelio.atlassian.net/browse/${t}|${t}>`).join('\n')
-			Slack.slackDeployWarning(payload, formattedFixed)
+
+			Slack.slackDeployWarning(payload, formattedFixed, alertConfig.channel, `<${alertConfig.url}|${alertConfig.env}>`)
 
 			const ticketBase = 'https://reelio.atlassian.net/rest/api/2/issue'
 			const responses = []
@@ -172,46 +195,59 @@ function handleMerge(payload) {
 				Firebase.log('github', payload.repository.full_name, 'reelio_deploy', null, {
 					tickets: formattedTickets,
 					fixed_count: tickets.filter(uniqueTicketFilter).length,
-					environment: 'production',
-					target: 'pro.reelio.com',
+					environment: alertConfig.env,
+					target: alertConfig.url,
 				})
 			})
 		}
 	})
 
 
-	// Get the reviews
-	request(Github.get(`${payload.pull_request.url}/reviews`), (err, res, body) => {
-		if (res.statusCode >= 200 && res.statusCode < 300) {
-			reviews = JSON.parse(body) || []
-			reviews = reviews.map(r => r.state)
-		}
-		// If the PR was merged without any changes requested, :tada: to the dev!
-		if (
-			!reviews.includes('CHANGES_REQUESTED') &&
-			user.slack_id !== 'U28LB0AAH' &&
-			payload.pull_request.user.id.toString() !== '25992031'
-		) {
-			Slack.slackCongrats(payload, user)
-			Firebase.log('github', payload.repository.full_name, 'pull_request', 'party_parrot', payload)
-		}
-	})
+	if (config.merged.congrats) {
+		// Get the reviews
+		request(Github.get(`${payload.pull_request.url}/reviews`), (err, res, body) => {
+			if (res.statusCode >= 200 && res.statusCode < 300) {
+				reviews = JSON.parse(body) || []
+				reviews = reviews.map(r => r.state)
+			}
+			// If the PR was merged without any changes requested, :tada: to the dev!
+			if (
+				!reviews.includes('CHANGES_REQUESTED') &&
+				user.slack_id !== 'U28LB0AAH' &&
+				payload.pull_request.user.id.toString() !== '25992031'
+			) {
+				Slack.slackCongrats(payload, user)
+				Firebase.log('github', payload.repository.full_name, 'pull_request', 'party_parrot', payload)
+			}
+		})
+	}
 
 	return 'Merged!'
 }
 
-function PullRequest(payload) {
-	if (payload.action === 'labeled' || payload.action === 'unlabeled') {
+function PullRequest(payload, config) {
+
+	if (
+		(payload.action === 'labeled' || payload.action === 'unlabeled') &&
+		config.labels
+	) {
 		Labels(payload)
 		return 'Pull Request -- Labels Handled'
 	}
 
-	if (payload.action === 'opened') {
-		return handleNew(payload)
+	if (
+		payload.action === 'opened' &&
+		config.opened
+	) {
+		return handleNew(payload, config)
 	}
 
-	if (payload.action === 'closed' && payload.pull_request.merged_at) {
-		return handleMerge(payload)
+	if (
+		payload.action === 'closed' &&
+		payload.pull_request.merged_at &&
+		config.merged
+	) {
+		return handleMerge(payload, config)
 	}
 
 	return 'Pull Request -- No action taken'

@@ -5,16 +5,37 @@
         "labels": {
           "enabled": true
         },
+
         "require_reviews": {
           "enabled": true,
           "count": 2
         },
+
         "status": {
           "enabled": true
         },
+
         "pull_request": {
-          "enabled": true
+          "enabled": true,
+
+          "labels": true,
+
+          "opened": {
+            "feature": true,
+            "tickets": true
+          },
+
+          "merged": {
+            "alert": {
+              "channel": "#frontend-deploys",
+              "url": "http://pro.reelio.com",
+              "env": "production"
+            },
+            "create": true,
+            "congrats": true
+          }
         },
+
         "pull_request_review": {
           "enabled": true
         }
@@ -47,16 +68,33 @@
         "labels": {
           "enabled": true
         },
+
         "require_reviews": {
           "enabled": true,
           "count": 2
         },
+
         "status": {
           "enabled": true
         },
+
         "pull_request": {
-          "enabled": true
+          "enabled": true,
+
+          "labels": true,
+
+          "opened": {
+            "feature": false,
+            "tickets": true
+          },
+
+          "merged": {
+            "alert": false,
+            "create": false,
+            "congrats": true
+          }
         },
+
         "pull_request_review": {
           "enabled": true
         }
@@ -77,9 +115,27 @@
         "status": {
           "enabled": true
         },
+
         "pull_request": {
-          "enabled": true
+          "enabled": true,
+
+          "labels": true,
+
+          "opened": {
+            "enabled": true
+          },
+
+          "merged": {
+            "alert": {
+              "channel": "#frontend-deploys",
+              "url": "http://pro.reelio.com",
+              "env": "production"
+            },
+            "create": true,
+            "congrats": true
+          }
         },
+
         "pull_request_review": {
           "enabled": true
         }

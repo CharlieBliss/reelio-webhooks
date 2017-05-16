@@ -67,24 +67,25 @@ class Slack {
 		})
 	}
 
-	slackDeployWarning(payload, tickets) {
-		const versionText = '<http://pro.reelio.com|production>'
-		sendMessage({
-			channel: '#frontend-deploys',
-			username: 'Deploy Bot',
-			icon_url: 'https://octodex.github.com/images/welcometocat.png',
-			text: `*A deploy has been made to ${versionText}.*  The changes will be ready in ~15 minutes.\n\nThe deploy is based off of <${payload.pull_request.html_url}|PR ${payload.pull_request.number}>.\n\n*\`-- Fixes --\`*`,
-			attachments: [
-				{
-					text: tickets,
-					color: '#36a64f',
-				},
-				{
-					text: versionText,
-					color: '#de2656',
-				},
-			],
-		})
+	slackDeployWarning(payload, tickets, channel, url) {
+		if (channel && url) {
+			sendMessage({
+				channel,
+				username: 'Deploy Bot',
+				icon_url: 'https://octodex.github.com/images/welcometocat.png',
+				text: `*A deploy has been made to ${url}.*  The changes will be ready in ~15 minutes.\n\nThe deploy is based off of <${payload.pull_request.html_url}|PR ${payload.pull_request.number}>.\n\n*\`-- Fixes --\`*`,
+				attachments: [
+					{
+						text: tickets,
+						color: '#36a64f',
+					},
+					{
+						text: url,
+						color: '#de2656',
+					},
+				],
+			})
+		}
 	}
 
 	slackCongrats(payload, user) {
