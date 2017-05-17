@@ -83,7 +83,7 @@ export const FRONTEND_MEMBERS = {
 	},
 	10504688: {
 		name: 'chris',
-		id: 'U02H14HQG',
+		slack_id: 'U02H14HQG',
 		github_id: '10504688',
 	},
 	16420835: {
