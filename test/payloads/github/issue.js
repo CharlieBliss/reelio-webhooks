@@ -8,7 +8,7 @@ export const masterPR = JSON.stringify([
   }
 ])
 
-export const ticketless = JSON.stringify([
+export const genericIssue = JSON.stringify([
   {
     "body": "I'm having a problem with this.",
     "repository": {

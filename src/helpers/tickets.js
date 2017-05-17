@@ -1,6 +1,11 @@
 import request from 'request'
+import rp from 'request-promise'
 import moment from 'moment'
 
+import { uniqueTicketFilter } from '../helpers/utils'
+import { jiraRegex } from '../consts'
+
+import Github from '../helpers/github'
 import Firebase from '../helpers/firebase'
 import Jira from './jira'
 import Slack from '../helpers/slack'
@@ -83,6 +88,65 @@ class Tickets {
 			})
 
 			return 'Tickets marked up'
+		})
+	}
+
+	checkTicketStatus(pullRequestRoute, labels = true) {
+		request(Github.get(pullRequestRoute), (err, res, resBody) => {
+			const PR = JSON.parse(resBody),
+				body = PR.body || '',
+				tickets = body.match(jiraRegex) || [],
+				uniqueTickets = tickets.filter(uniqueTicketFilter),
+				sha = PR.head.sha
+
+			if (uniqueTickets.length === 0) {
+				return 'No Tickets'
+			}
+
+			// If there's only one ticket, it was just approved so this PR is good
+			if (uniqueTickets.length === 1) {
+				request(Github.post(`${PR.head.repo.url}/statuses/${sha}`, {
+					state: 'success',
+					description: 'All tickets marked as complete.',
+					context: 'ci/qa-team',
+				}))
+				if (labels) {
+					request(Github.post(`${PR.issue_url}/labels`, ['$$qa approved']))
+					request(Github.delete(`${PR.issue_url}/labels/%24%24qa`))
+				}
+			} else {
+				const ticketBase = 'https://reelio.atlassian.net/rest/api/2/issue'
+				const responses = []
+
+				Promise.all(tickets.map(t => rp(Jira.get(`${ticketBase}/${t}`)) //eslint-disable-line
+					.then((data) => {
+						responses.push(JSON.parse(data))
+					}),
+			))
+				.then(() => {
+					const resolved = responses.filter(ticket => ticket.fields.status.id === '10001')
+					if (resolved.length === uniqueTickets.length) {
+						request(Github.post(`${PR.head.repo.url}/statuses/${sha}`))
+						if (labels) {
+							request(Github.post(`${PR.issue_url}/labels`, ['$$qa approved']))
+							request(Github.delete(`${PR.issue_url}/labels/%24%24qa`))
+						}
+
+					} else {
+						const unresolved = uniqueTickets.length - resolved.length
+						request(Github.post(`${PR.head.repo.url}/statuses/${sha}`, {
+							state: 'failure',
+							description: `Waiting on ${unresolved} ticket${unresolved > 1 ? 's' : ''} to be marked as "done".`,
+							context: 'ci/qa-team',
+						}))
+						if (labels) {
+							request(Github.post(`${PR.issue_url}/labels`, ['$$qa']))
+							request(Github.delete(`${PR.issue_url}/labels/%24%24qa%20approved`))
+						}
+					}
+				})
+			}
+			return 'Ticket Status updated'
 		})
 	}
 }

@@ -1,6 +1,7 @@
 import { get } from 'lodash'
 
 import CheckReviews from './CheckReviews'
+import CheckTickets from './CheckTickets'
 import Labels from './Labels'
 import PullRequest from './PullRequest'
 import Review from './Review'
@@ -50,6 +51,7 @@ export function handle(event, context, callback) {
 
 	if (githubEvent === 'pull_request') {
 		if (get(config, [org, repo, handler, 'pull_request', 'enabled'])) {
+			CheckTickets(payload, githubEvent)
 			return callback(null, helper.respond(PullRequest(payload, get(config, [org, repo, handler, 'pull_request']))))
 		}
 	}

@@ -62,7 +62,7 @@ export function PullRequest() {
 
 				const reviews = nock('https://api.github.com')
 					.get('/repos/Kyle-Mendes/public-repo/issues/1')
-					.reply(200, githubPayloads.issue.ticketless)
+					.reply(200, githubPayloads.issue.genericIssue)
 
 				const failureCI = nock('https://api.github.com')
 					.post(`/repos/Kyle-Mendes/public-repo/statuses/${sha}`,
@@ -72,6 +72,10 @@ export function PullRequest() {
 							context: 'ci/reelio',
 						})
 					.reply(200)
+
+				const PRRoute = nock('https://api.github.com')
+					.get('/repos/Kyle-Mendes/public-repo/pulls/1')
+					.reply(200, githubPayloads.pullRequest.pullRequestTicketless.pull_request)
 
 				const ticketlessComment = nock('https://api.github.com')
 					.post('/repos/Kyle-Mendes/public-repo/issues/1/comments',
@@ -115,6 +119,7 @@ export function PullRequest() {
 						expect(ticketless.isDone()).to.be.true
 						expect(featureBranchComment.isDone()).to.be.true
 						expect(addReview.isDone()).to.be.true
+						expect(PRRoute.isDone()).to.be.true
 						done()
 					}, 50)
 				})
@@ -126,7 +131,11 @@ export function PullRequest() {
 
 				const reviews = nock('https://api.github.com')
 					.get('/repos/Kyle-Mendes/public-repo/issues/1')
-					.reply(200, githubPayloads.issue.ticketless)
+					.reply(200, githubPayloads.issue.genericIssue)
+
+				const PRRoute = nock('https://api.github.com')
+					.get('/repos/Kyle-Mendes/public-repo/pulls/1')
+					.reply(200, githubPayloads.pullRequest.pullRequestTicketless.pull_request)
 
 				const failureCI = nock('https://api.github.com')
 					.post(`/repos/Kyle-Mendes/public-repo/statuses/${sha}`,
@@ -183,6 +192,7 @@ export function PullRequest() {
 						expect(featureless.isDone()).to.be.true
 						expect(featureBranchComment.isDone()).to.not.be.true
 						expect(addReview.isDone()).to.be.true
+						expect(PRRoute.isDone()).to.be.true
 						done()
 					}, 50)
 				})
@@ -194,7 +204,11 @@ export function PullRequest() {
 
 				const reviews = nock('https://api.github.com')
 					.get('/repos/Kyle-Mendes/public-repo/issues/1')
-					.reply(200, githubPayloads.issue.ticketless)
+					.reply(200, githubPayloads.issue.genericIssue)
+
+				const PRRoute = nock('https://api.github.com')
+					.get('/repos/Kyle-Mendes/public-repo/pulls/1')
+					.reply(200, githubPayloads.pullRequest.ticketAndFeatureless.pull_request)
 
 				const failureCI = nock('https://api.github.com')
 					.post(`/repos/Kyle-Mendes/public-repo/statuses/${sha}`,
@@ -220,6 +234,10 @@ export function PullRequest() {
 				const featureBranchComment = nock('https://api.github.com')
 					.post('/repos/Kyle-Mendes/public-repo/issues/1/comments')
 					.reply(200)
+
+				const ticketStatus = nock('https://api.github.com')
+				.post(`/repos/Kyle-Mendes/public-repo/statuses/${sha}`)
+				.reply(200, githubPayloads.status.qaCircleSuccess)
 				const featureless = nock('https://api.github.com')
 					.post('/repos/Kyle-Mendes/public-repo/issues/1/labels', ['$$featureless'])
 					.reply(200)
@@ -253,6 +271,7 @@ export function PullRequest() {
 						expect(ticketless.isDone()).to.be.true
 						expect(featureBranchComment.isDone()).to.not.be.true
 						expect(addReview.isDone()).to.be.true
+						expect(PRRoute.isDone()).to.be.true
 						done()
 					}, 50)
 				})
@@ -264,20 +283,19 @@ export function PullRequest() {
 
 				const reviews = nock('https://api.github.com')
 					.get('/repos/Kyle-Mendes/public-repo/issues/1')
-					.reply(200, githubPayloads.issue.ticketless)
+					.reply(200, githubPayloads.issue.genericIssue)
+
+				const PRRoute = nock('https://api.github.com')
+					.get('/repos/Kyle-Mendes/public-repo/pulls/1')
+					.reply(200, githubPayloads.pullRequest.pullRequestTicketless.pull_request)
+
+				const ticketStatus = nock('https://api.github.com')
+				 .post(`/repos/Kyle-Mendes/public-repo/statuses/${sha}`)
+				 .reply(200, githubPayloads.status.qaCircleSuccess)
 
 				const getTicket = nock('https://reelio.atlassian.net')
 					.get('/rest/api/2/issue/XYZ-2')
 					.reply(200, jiraPayloads.ticket.genericTicketData)
-
-				const failureCI = nock('https://api.github.com')
-					.post(`/repos/Kyle-Mendes/public-repo/statuses/${sha}`,
-						{
-							state: 'failure',
-							description: `This PR requires 2 more approved reviews to be merged.`,
-							context: 'ci/reelio',
-						})
-					.reply(200)
 
 				const firebaseLog = nock('https://webhooks-front.firebaseio.com')
 					.filteringPath(function(path) {
@@ -314,10 +332,11 @@ export function PullRequest() {
 						expect(removeQA.isDone()).to.be.true
 						expect(getTicket.isDone()).to.be.true
 						expect(removeApproved.isDone()).to.be.true
-						expect(failureCI.isDone()).to.be.true
 						expect(featureBranchComment.isDone()).to.be.true
 						expect(addReview.isDone()).to.be.true
 						expect(firebaseLog.isDone()).to.be.true
+						expect(PRRoute.isDone()).to.be.true
+						expect(ticketStatus.isDone()).to.be.true
 						done()
 					}, 50)
 				})
@@ -329,7 +348,11 @@ export function PullRequest() {
 
 				const reviews = nock('https://api.github.com')
 					.get('/repos/Kyle-Mendes/public-repo/issues/1')
-					.reply(200, githubPayloads.issue.ticketless)
+					.reply(200, githubPayloads.issue.genericIssue)
+
+				const PRRoute = nock('https://api.github.com')
+					.get('/repos/Kyle-Mendes/public-repo/pulls/1')
+					.reply(200, githubPayloads.pullRequest.stagingMultiTicketsPR.pull_request)
 
 				const firebaseLog = nock('https://webhooks-front.firebaseio.com')
 					.filteringPath(function(path) {
@@ -338,14 +361,9 @@ export function PullRequest() {
 					.put('').times(2)
 					.reply(200)
 
-				const failureCI = nock('https://api.github.com')
-					.post(`/repos/Kyle-Mendes/public-repo/statuses/${sha}`,
-						{
-							state: 'failure',
-							description: `This PR requires 2 more approved reviews to be merged.`,
-							context: 'ci/reelio',
-						})
-					.reply(200)
+				const ticketStatus = nock('https://api.github.com')
+					.post(`/repos/Kyle-Mendes/public-repo/statuses/${sha}`).times(2)
+					.reply(200, githubPayloads.status.qaWaitingOn2)
 
 				const featureBranchComment = nock('https://api.github.com')
 					.post('/repos/Kyle-Mendes/public-repo/issues/1/comments')
@@ -364,11 +382,11 @@ export function PullRequest() {
 					.reply(200)
 
 				const ticketResponse = nock('https://reelio.atlassian.net')
-					.get('/rest/api/2/issue/XYZ-2')
+					.get('/rest/api/2/issue/XYZ-2').times(2)
 					.reply(200, jiraPayloads.ticket.genericTicketData)
 
 				const ticketResponse2 = nock('https://reelio.atlassian.net')
-					.get('/rest/api/2/issue/XYZ-3')
+					.get('/rest/api/2/issue/XYZ-3').times(2)
 					.reply(200, jiraPayloads.ticket.genericTicketData)
 
 				const request = Object.assign({},
@@ -382,12 +400,13 @@ export function PullRequest() {
 						expect(reviews.isDone()).to.be.true
 						expect(removeQA.isDone()).to.be.true
 						expect(removeApproved.isDone()).to.be.true
-						expect(failureCI.isDone()).to.be.true
 						expect(featureBranchComment.isDone()).to.be.true
 						expect(addReview.isDone()).to.be.true
 						expect(ticketResponse.isDone()).to.be.true
 						expect(ticketResponse2.isDone()).to.be.true
+						expect(ticketStatus.isDone()).to.be.true
 						expect(firebaseLog.isDone()).to.be.true
+						expect(PRRoute.isDone()).to.be.true
 						done()
 					}, 50)
 				})
@@ -547,17 +566,7 @@ export function PullRequest() {
 					}, 50)
 				})
 			})
-			//gets the GH issue
-			//gets the GH reviews
 
 		})
-
-
-
-		//todo
-
-		// ALL MERGE STUFF
-		// BE MORE SPECIFIC WITH FIREBASE ENDPOINTS
-
 	})
 }
