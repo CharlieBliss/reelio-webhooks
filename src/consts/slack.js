@@ -88,17 +88,17 @@ export const FRONTEND_MEMBERS = {
 	},
 	16420835: {
 		name: 'daniellap',
-		id: 'U3D0PQ4R5',
+		slack_id: 'U3D0PQ4R5',
 		github_id: '16420835',
 	},
 	1058579: {
 		name: 'gabriel',
-		id: 'U0U5BKF0T',
+		slack_id: 'U0U5BKF0T',
 		github_id: '1058579',
 	},
 	13035177: {
 		name: 'sabina',
-		id: 'U02H4GFGX',
+		slack_id: 'U02H4GFGX',
 		github_id: '13035177',
 	},
 }
