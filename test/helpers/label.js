@@ -60,7 +60,7 @@ describe('Properly handles Removing Labels', () => {
 			.get('/repos/Kyle-Mendes/public-repo/pulls/2/reviews')
 			.reply(200,
 				 [
-					 { state: 'changes_requested', user: { id: 7416637 }, submitted_at: 1489426108742 },
+					 { state: 'CHANGES_REQUESTED', user: { id: 7416637 }, submitted_at: 1489426108742 },
 				 ],
 			)
 
