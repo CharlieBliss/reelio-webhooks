@@ -7,3 +7,9 @@ test:
     - npm run test:helpers
     - npm run test:handlers
     - npm run lint
+
+deployment:
+  production:
+    branch: master
+    commands:
+      sls deploy --stage production
