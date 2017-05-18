@@ -17,7 +17,9 @@ class LabelHelper {
 			// get reviewers and send a reminder message for each of them to re-review
 			const reviewers = parseReviews(reviews)
 			reviewers.forEach((reviewer) => {
-				Slack.reviewReminder(payload, user, reviewer)
+				if (reviewer.state === 'CHANGES_REQUESTED') {
+					Slack.reviewReminder(payload, user, reviewer)
+				}
 			})
 
 			return 'Labels -- Reviewers Reminded'
