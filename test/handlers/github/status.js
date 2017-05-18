@@ -31,7 +31,7 @@ export function Status() {
 					expect(slack.isDone()).to.be.true
 					expect(nock.pendingMocks()).to.be.empty
 					done()
-				}, 10)
+				}, 30)
 			})
 		})
 
@@ -51,7 +51,7 @@ export function Status() {
 					expect(slack.isDone()).to.not.be.true
 					expect(nock.pendingMocks()[0]).to.equal(pendingMock)
 					done()
-				}, 10)
+				}, 30)
 			})
 		})
 

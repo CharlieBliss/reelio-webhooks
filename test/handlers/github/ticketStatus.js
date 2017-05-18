@@ -356,7 +356,7 @@ export function TicketStatus() {
 					expect(successCI.isDone()).to.be.true
 					expect(nock.pendingMocks().length).to.equal(1)
 					done()
-				}, 10)
+				}, 30)
 			})
 		})
 
@@ -397,7 +397,7 @@ export function TicketStatus() {
 					expect(response.statusCode).to.equal(200)
 					expect(nock.pendingMocks().length).to.equal(1)
 					done()
-				}, 10)
+				}, 30)
 			})
 		})
 

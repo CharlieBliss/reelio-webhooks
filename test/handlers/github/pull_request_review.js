@@ -24,7 +24,7 @@ export function PullRequestReview() {
 				setTimeout(() => {
 					expect(CheckReviews(payload, 'pull_request')).to.equal('Invalid Action')
 					done()
-				}, 10)
+				}, 20)
 			})
 
 		it('Skips Review Process and returns CI success if PR is into master', (done) => {
@@ -45,7 +45,7 @@ export function PullRequestReview() {
 					expect(successCI.isDone()).to.be.true
 					expect(nock.pendingMocks()).to.be.empty
 					done()
-				}, 10)
+				}, 20)
 			})
 
 		it('Returns CI failure if fewer than 2 reviews', (done) => {
@@ -87,7 +87,7 @@ export function PullRequestReview() {
 					expect(removeApproved.isDone()).to.be.true
 					expect(nock.pendingMocks()).to.be.empty
 					done()
-				}, 10)
+				}, 20)
 			})
 
 		it('Returns CI failure if not all reviews are approved', (done) => {
@@ -176,7 +176,7 @@ export function PullRequestReview() {
 					expect(removeChanges.isDone()).to.be.true
 					expect(nock.pendingMocks()).to.be.empty
 					done()
-				}, 20)
+				}, 30)
 			})
 
 		it('Returns CI success if 2+ reviews, all approved', (done) => {
@@ -222,7 +222,7 @@ export function PullRequestReview() {
 					expect(removeChanges.isDone()).to.be.true
 					expect(nock.pendingMocks()).to.be.empty
 					done()
-				}, 20)
+				}, 30)
 			})
 
 			it('Handles 1 approved review', (done) => {
