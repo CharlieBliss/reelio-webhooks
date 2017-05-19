@@ -42,6 +42,33 @@
       }
     },
 
+    "Reelio-Webhooks" : {
+      "github": {
+        "labels": {
+          "enabled": true
+        },
+
+        "require_reviews": {
+          "enabled": true,
+          "count": 1
+        },
+
+        "status": {
+          "enabled": true
+        },
+
+        "pull_request": {
+          "enabled": true,
+
+          "labels": true
+        },
+
+        "pull_request_review": {
+          "enabled": true
+        }
+      }
+    },
+
     "reelio": {
       "github": {
         "labels": {
