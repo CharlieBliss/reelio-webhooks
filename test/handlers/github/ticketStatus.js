@@ -13,7 +13,7 @@ const slackUrl = require('../../../src/consts').SLACK_URL
 const CheckReviews = require('../../../src/handlers/github/CheckReviews').default
 
 export function TicketStatus() {
-	describe('Check PR Review Status', () => {
+	describe('Check PR Ticket Status', () => {
 		beforeEach(() => {
 			nock.cleanAll()
 		})
@@ -51,7 +51,7 @@ export function TicketStatus() {
 				.reply(200, githubPayloads.status.qaCircleSuccess)
 
 		  const getTicket = nock('https://reelio.atlassian.net')
-				.get('/rest/api/2/issue/XYZ-2')
+				.get('/rest/api/2/issue/XYZ-2').times(2)
 				.reply(200, jiraPayloads.ticket.genericTicketData)
 
 			const request = Object.assign({},

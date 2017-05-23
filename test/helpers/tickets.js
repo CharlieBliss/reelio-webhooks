@@ -44,7 +44,7 @@ describe('helpers -- tickets', () => {
 			expect(addQAApproved.isDone()).to.be.true
 			expect(Transition(jiraPayloads.transition.qaToDone)).to.equal('PR status updated')
 			done()
-		}, 10)
+		}, 1500)
 	})
 
 	it('Should handle JIRA ticket transitions from QA => Done (multiple tickets, all approved)', (done) => {
