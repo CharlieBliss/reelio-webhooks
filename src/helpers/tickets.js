@@ -103,20 +103,8 @@ class Tickets {
 				return 'No Tickets'
 			}
 
-			// If there's only one ticket, it was just approved so this PR is good
-			if (uniqueTickets.length === 1) {
-				request(Github.post(`${PR.head.repo.url}/statuses/${sha}`, {
-					state: 'success',
-					description: 'All tickets marked as complete.',
-					context: 'ci/qa-team',
-				}))
-				if (labels) {
-					request(Github.post(`${PR.issue_url}/labels`, ['$$qa approved']))
-					request(Github.delete(`${PR.issue_url}/labels/%24%24qa`))
-				}
-			} else {
-				const ticketBase = 'https://reelio.atlassian.net/rest/api/2/issue'
-				const responses = []
+			const ticketBase = 'https://reelio.atlassian.net/rest/api/2/issue'
+			const responses = []
 
 				Promise.all(tickets.map(t => rp(Jira.get(`${ticketBase}/${t}`)) //eslint-disable-line
 					.then((data) => {
@@ -126,12 +114,15 @@ class Tickets {
 				.then(() => {
 					const resolved = responses.filter(ticket => ticket.fields.status.id === '10001')
 					if (resolved.length === uniqueTickets.length) {
-						request(Github.post(`${PR.head.repo.url}/statuses/${sha}`))
+						request(Github.post(`${PR.head.repo.url}/statuses/${sha}`, {
+							state: 'success',
+							description: 'All tickets marked as complete.',
+							context: 'ci/qa-team',
+						}))
 						if (labels) {
 							request(Github.post(`${PR.issue_url}/labels`, ['$$qa approved']))
 							request(Github.delete(`${PR.issue_url}/labels/%24%24qa`))
 						}
-
 					} else {
 						const unresolved = uniqueTickets.length - resolved.length
 						request(Github.post(`${PR.head.repo.url}/statuses/${sha}`, {
@@ -145,7 +136,6 @@ class Tickets {
 						}
 					}
 				})
-			}
 			return 'Ticket Status updated'
 		})
 	}
