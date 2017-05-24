@@ -792,3 +792,50 @@ export const pullRequestMergedMaster = {
 		"url": "https://api.github.com/repos/Kyle-Mendes/public-repo",
 	},
 }
+
+export const singlePull = [{
+		"repository": {
+			"url": "https://api.github.com/users/Kyle-Mendes/public-repo",
+		},
+		"url": "https://api.github.com/repos/Kyle-Mendes/public-repo/pulls/1",
+}]
+
+export const multiplePulls =
+[
+	{
+		"repository": {
+			"url": "https://api.github.com/users/Kyle-Mendes/public-repo",
+		},
+		"url": "https://api.github.com/repos/Kyle-Mendes/public-repo/pulls/1",
+	},
+	{
+		"repository": {
+			"url": "https://api.github.com/users/Kyle-Mendes/public-repo",
+		},
+		"url": "https://api.github.com/repos/Kyle-Mendes/public-repo/pulls/2",
+	},
+]
+
+export const pullRequestWithConflicts = {
+	"mergeable_state": "dirty",
+	"number": 123,
+	"html_url": "https://api.github.com/repos/Kyle-Mendes/public-repo/pulls/1",
+	"issue_url": "https://api.github.com/repos/Kyle-Mendes/public-repo/issues/1",
+	"user": {
+		"id": 7416637,
+	},
+}
+
+export const pullRequestWithConflicts2 = {
+	"mergeable_state": "dirty",
+	"number": 123,
+	"html_url": "https://api.github.com/repos/Kyle-Mendes/public-repo/pulls/2",
+	"issue_url": "https://api.github.com/repos/Kyle-Mendes/public-repo/issues/2",
+	"user": {
+		"id": 7416637,
+	},
+}
+
+export const pullRequestMergeable = {
+	"mergeable_state": "clean",
+}

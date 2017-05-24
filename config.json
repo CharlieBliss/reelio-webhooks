@@ -32,7 +32,8 @@
               "env": "production"
             },
             "create": true,
-            "congrats": true
+            "congrats": true,
+            "conflicts": true
           }
         },
 
@@ -118,7 +119,8 @@
           "merged": {
             "alert": false,
             "create": false,
-            "congrats": true
+            "congrats": true,
+            "conflicts": true
           }
         },
 
@@ -159,7 +161,8 @@
               "env": "production"
             },
             "create": true,
-            "congrats": true
+            "congrats": true,
+            "conflicts": true
           }
         },
 
@@ -199,13 +202,18 @@
         },
         "require_reviews": {
           "enabled": true,
-          "count": 10
+          "count": 0
         },
         "status": {
           "enabled": true
         },
         "pull_request": {
-          "enabled": true
+          "enabled": true,
+          "merged": {
+          "create": true,
+          "congrats": true,
+          "conflicts": true
+          }
         },
         "pull_request_review": {
           "enabled": true

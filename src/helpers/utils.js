@@ -1,3 +1,7 @@
+import rp from 'request-promise'
+import Github from '../helpers/github'
+import Slack from '../helpers/slack'
+
 export function uniqueTicketFilter(value, index, self) {
 	return self.indexOf(value) === index
 }
@@ -34,4 +38,32 @@ export function parseReviews(reviews = []) {
 	})
 
 	return Object.keys(data).map(k => data[k])
+}
+
+export function checkSingleMergeStatus(pullRequest) {
+	if (pullRequest.mergeable_state === 'conflicting' || pullRequest.mergeable_state === 'dirty') {
+		rp(Github.post(`${pullRequest.issue_url}/labels`, ['$$rebase']))
+		Slack.conflictWarning(pullRequest)
+
+	}	else if (pullRequest.mergeable_state === 'unknown') {
+		// timeout gives github time to compute mergeability when it's 'unknown'
+		setTimeout(() => {
+			checkSingleMergeStatus(pullRequest)
+		}, 100)
+	}
+}
+
+export function checkMergeStatus(payload) {
+	// get all pulls for repository
+	rp(Github.get(`${payload.repository.url}/pulls`)).then((data) => {
+		const pullRequests = JSON.parse(data) || []
+
+		// loop over each pull request and checks merge_status
+		pullRequests.forEach((pull) => {
+			rp(Github.get(pull.url)).then((response) => {
+				const pullRequest = JSON.parse(response)
+				checkSingleMergeStatus(pullRequest)
+			})
+		})
+	})
 }

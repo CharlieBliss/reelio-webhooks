@@ -31,6 +31,16 @@ class Slack {
 		})
 	}
 
+	conflictWarning(payload) {
+		const user = FRONTEND_MEMBERS[payload.user.id]
+		sendMessage({
+			channel: user.slack_id,
+			username: 'Conflict Resolution Bot',
+			icon_url: 'https://octodex.github.com/images/yaktocat.png',
+			text: `Hey there, ${user.name}. PR ${payload.number} has been flagged as having merge conflicts. Please review on <${payload.html_url}|GitHub>.`,
+		})
+	}
+
 	tableFailed(ticket, resp) {
 		sendMessage({
 			channel: 'U28LB0AAH',

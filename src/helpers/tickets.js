@@ -31,8 +31,9 @@ class Tickets {
 		const ticketBase = 'https://reelio.atlassian.net/rest/api/2/issue'
 		let firebaseInfo
 
-		request(Jira.get(`${ticketBase}/${ticket}`, 'jira'), (_, __, data) => {
-			const ticketInfo = (JSON.parse(data))
+		rp(Jira.get(`${ticketBase}/${ticket}`))
+		.then((response) => {
+			const ticketInfo = (JSON.parse(response))
 			const board = ticketInfo.fields.project.key
 			const assignee = ticketInfo.fields.assignee || null
 

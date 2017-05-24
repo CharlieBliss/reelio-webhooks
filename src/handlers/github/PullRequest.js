@@ -2,7 +2,7 @@ import request from 'request'
 import rp from 'request-promise'
 
 import { jiraRegex, FRONTEND_MEMBERS } from '../../consts'
-import { uniqueTicketFilter, wrapJiraTicketsFromArray } from '../../helpers/utils'
+import { uniqueTicketFilter, wrapJiraTicketsFromArray, checkMergeStatus } from '../../helpers/utils'
 
 import Github from '../../helpers/github'
 import Jira from '../../helpers/jira'
@@ -221,7 +221,9 @@ function handleMerge(payload, config) {
 			}
 		})
 	}
-
+	if (config.merged.conflicts) {
+		checkMergeStatus(payload)
+	}
 	return 'Merged!'
 }
 
