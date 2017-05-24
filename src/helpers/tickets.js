@@ -106,7 +106,7 @@ class Tickets {
 			const ticketBase = 'https://reelio.atlassian.net/rest/api/2/issue'
 			const responses = []
 
-				Promise.all(tickets.map(t => rp(Jira.get(`${ticketBase}/${t}`)) //eslint-disable-line
+				Promise.all(uniqueTickets.map(t => rp(Jira.get(`${ticketBase}/${t}`)) //eslint-disable-line
 					.then((data) => {
 						responses.push(JSON.parse(data))
 					}),
