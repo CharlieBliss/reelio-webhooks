@@ -91,6 +91,45 @@
       }
     },
 
+    "live-tests": {
+      "github": {
+        "labels": {
+          "enabled": true
+        },
+
+        "require_reviews": {
+          "enabled": true,
+          "count": 2
+        },
+
+        "status": {
+          "enabled": true
+        },
+
+        "pull_request": {
+          "enabled": true,
+
+          "labels": true,
+
+          "opened": {
+            "feature": false,
+            "tickets": true
+          },
+
+          "merged": {
+            "alert": false,
+            "create": false,
+            "congrats": true,
+            "conflicts": true
+          }
+        },
+
+        "pull_request_review": {
+          "enabled": true
+        }
+      }
+    },
+
     "reelio-front-tests": {
       "github": {
         "labels": {
