@@ -45,7 +45,7 @@ export const approved = JSON.stringify({
 		"head": {
 			"label": "Kyle-Mendes:patch-2",
 			"ref": "patch-2",
-			"sha": "b7a1f9c27caa4e03c14a88feb56e2d4f7500aa63",
+			"sha": "0d1a26e67d8f5eaf1f6ba5c57fc3c7d91ac0fd1c",
 			"user": {
 				"login": "Kyle-Mendes",
 				"id": 2546,
@@ -207,7 +207,7 @@ export const denied = JSON.stringify({
 		"head": {
 			"label": "Kyle-Mendes:patch-2",
 			"ref": "patch-2",
-			"sha": "b7a1f9c27caa4e03c14a88feb56e2d4f7500aa63",
+			"sha": "0d1a26e67d8f5eaf1f6ba5c57fc3c7d91ac0fd1c",
 			"user": {
 				"login": "Kyle-Mendes",
 				"id": 2546,

@@ -8,6 +8,7 @@ import Transition from '../../src/handlers/jira/Transition'
 
 const jiraPayloads = require('../payloads/jira')
 const githubPayloads = require('../payloads/github')
+const nocks = require('../nocks')
 
 const consts = require('../../src/consts/slack')
 
@@ -20,22 +21,10 @@ describe('helpers -- tickets', () => {
 		Transition(jiraPayloads.transition.qaToDone)
 
 		const sha = githubPayloads.pullRequest.pullRequestOpenedStaging.pull_request.head.sha
-
-		const PRRoute = nock('https://api.github.com')
-		.get('/repos/Kyle-Mendes/public-repo/pulls/26')
-		.reply(200, githubPayloads.pullRequest.pullRequestOpenedStaging.pull_request)
-
-		const successCI = nock('https://api.github.com')
-		.post(`/repos/Kyle-Mendes/public-repo/statuses/${sha}`)
-		.reply(200)
-
-		const removeQA = nock('https://api.github.com')
-			.delete('/repos/Kyle-Mendes/public-repo/issues/1/labels/%24%24qa')
-			.reply(200)
-
-		const addQAApproved = nock('https://api.github.com')
-			.post('/repos/Kyle-Mendes/public-repo/issues/1/labels', ['$$qa approved'])
-			.reply(200)
+		const PRRoute = nocks.pull_request.genericStagingPR()
+		const successCI = nocks.status.genericStatus(sha)
+		const removeQA = nocks.labels.removeQA()
+		const addQAApproved = nocks.labels.addQAApproved()
 
 		setTimeout(() => {
 			expect(PRRoute.isDone()).to.be.true
@@ -50,22 +39,10 @@ describe('helpers -- tickets', () => {
 	it('Should handle JIRA ticket transitions from QA => Done (multiple tickets, all approved)', (done) => {
 
 		const sha = githubPayloads.pullRequest.pullRequestMultiTickets.pull_request.head.sha
-
-		const PRRoute = nock('https://api.github.com')
-		.get('/repos/Kyle-Mendes/public-repo/pulls/26')
-		.reply(200, githubPayloads.pullRequest.pullRequestMultiTickets.pull_request)
-
-		const successCI = nock('https://api.github.com')
-		.post(`/repos/Kyle-Mendes/public-repo/statuses/${sha}`)
-		.reply(200)
-
-		const removeQA = nock('https://api.github.com')
-			.delete('/repos/Kyle-Mendes/public-repo/issues/1/labels/%24%24qa')
-			.reply(200)
-
-		const addQAApproved = nock('https://api.github.com')
-			.post('/repos/Kyle-Mendes/public-repo/issues/1/labels', ['$$qa approved'])
-			.reply(200)
+		const PRRoute = nocks.pull_request.stagingMultiTicketsPR()
+		const successCI = nocks.status.genericStatus(sha)
+		const removeQA = nocks.labels.removeQA()
+		const addQAApproved = nocks.labels.addQAApproved()
 
 		Transition(jiraPayloads.transition.qaToDone)
 		setTimeout(() => {
@@ -79,29 +56,11 @@ describe('helpers -- tickets', () => {
 
 	it('Should handle JIRA ticket transitions from QA => Done (multiple tickets, not approved)', (done) => {
 
-
 		const sha = githubPayloads.pullRequest.pullRequestMultiTicketsUnapproved.pull_request.head.sha
-
-		const addQA = nock('https://api.github.com')
-			.post('/repos/Kyle-Mendes/public-repo/issues/1/labels', ["$$qa"])
-			.reply(200)
-
-		const removeQAApproved = nock('https://api.github.com')
-			.delete('/repos/Kyle-Mendes/public-repo/issues/1/labels/%24%24qa%20approved')
-			.reply(200)
-
-		const PRRoute = nock('https://api.github.com')
-			.get('/repos/Kyle-Mendes/public-repo/pulls/26')
-			.reply(200, githubPayloads.pullRequest.pullRequestMultiTicketsUnapproved.pull_request)
-
-		const failureCI = nock('https://api.github.com')
-		.post(`/repos/Kyle-Mendes/public-repo/statuses/${sha}`,
-			{
-				state: 'failure',
-				description: `Waiting on 1 ticket to be marked as "done".`,
-				context: 'ci/qa-team',
-			})
-		.reply(200)
+		const addQA = nocks.labels.addQA()
+		const removeQAApproved = nocks.labels.removeQAApproved()
+		const PRRoute = nocks.pull_request.stagingPRMultiTicketsUnapproved()
+		const failureCI = nocks.status.QAWaitingOn1(sha)
 
 		Transition(jiraPayloads.transition.qaToDone)
 		setTimeout(() => {

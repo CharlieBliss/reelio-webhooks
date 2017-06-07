@@ -3,29 +3,24 @@ const nock = require('nock')
 
 const Slack = require('../../src/helpers/slack').default
 const consts = require('../../src/consts/slack')
+const nocks = require('../nocks')
+
 
 describe('helpers -- slack', () => {
 	beforeEach(() => {
 		nock.cleanAll()
 	})
+
 	it('Should be able to alert when changes are requested', (done) => {
+		const slack = nocks.slack.changesRequestedSlack()
+
+		const user = consts.FRONTEND_MEMBERS[7416637]
 		const payload = {
 			review: {
 				html_url: 'http://reelio.com',
 			},
 		}
-
-		const user = consts.FRONTEND_MEMBERS[6400039]
-
-		const textRegexp = new RegExp(`^(?=.*\\b${user.name}\\b)(?=.*\\bhttp:\\/\\/reelio\\.com\\b).*$`)
-
-		const slack = nock(consts.SLACK_URL)
-			.post('', { channel: user.slack_id, text: textRegexp })
-			.reply(200)
-
-
 		Slack.changesRequested(payload, user)
-
 		setTimeout(() => {
 			expect(slack.isDone()).to.be.true
 			expect(nock.pendingMocks()).to.be.empty
@@ -34,13 +29,10 @@ describe('helpers -- slack', () => {
 	})
 
 	it('Should be able to alert when a table failed', (done) => {
-		const slack = nock(consts.SLACK_URL)
-			.post('', { channel: 'U28LB0AAH', username: 'PR Bot'})
-			.reply(200)
+		const slack = nocks.slack.slackTableFailed()
 
 		Slack.tableFailed('FRONT-1234', { errorMessages: ['That', 'wasn\'t',
 		'right.'] })
-
 		setTimeout(() => {
 			expect(slack.isDone()).to.be.true
 			expect(nock.pendingMocks()).to.be.empty
@@ -49,9 +41,7 @@ describe('helpers -- slack', () => {
 	})
 
 	it('Should be able to alert when firebase failed trimming', (done) => {
-		const slack = nock(consts.SLACK_URL)
-			.post('', { channel: 'U28LB0AAH', username: 'Firebase Bot'})
-			.reply(200)
+		const slack = nocks.slack.slackFirebaseFailed()
 
 		Slack.firebaseFailed('Something went wrong!')
 

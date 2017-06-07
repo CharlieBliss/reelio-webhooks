@@ -5,6 +5,7 @@ const mochaPlugin = require('serverless-mocha-plugin')
 const headers = require('../../payloads/headers')
 const githubPayloads = require('../../payloads/github')
 const jiraPayloads = require('../../payloads/jira')
+const nocks = require('../../nocks')
 
 const lambdaWrapper = mochaPlugin.lambdaWrapper;
 const expect = mochaPlugin.chai.expect;
@@ -14,106 +15,77 @@ export function Transition() {
 	describe('Transition', () => {
 		beforeEach(() => {
 			nock.cleanAll()
+			nock.disableNetConnect()
 		})
 
 		it('Handles Jira transition Event (2+ approved reviews)', (done) => {
-			const request = Object.assign({}, { headers: headers.jira }, { body: JSON.stringify(jiraPayloads.transition.qaToDone) })
-
 			const sha = githubPayloads.pullRequest.pullRequestMultiTickets.pull_request.head.sha
 
-			const PRRoute = nock('https://api.github.com')
-				.get('/repos/Kyle-Mendes/public-repo/pulls/26')
-				.reply(200, githubPayloads.pullRequest.pullRequestMultiTickets.pull_request)
+			const PRRoute = nocks.pull_request.stagingPRMultiTickets()
+			const successCI = nocks.status.genericStatus(sha)
+			const removeQA = nocks.labels.removeQA()
+			const addQAApproved = nocks.labels.addQAApproved()
+			const ticketResponse = nocks.jira.resolvedTicket1()
+			const ticketResponse2 = nocks.jira.resolvedTicket2()
 
-			const successCI = nock('https://api.github.com')
-				.post(`/repos/Kyle-Mendes/public-repo/statuses/${sha}`)
-				.reply(200)
-
-			const removeQA = nock('https://api.github.com')
-				.delete('/repos/Kyle-Mendes/public-repo/issues/1/labels/%24%24qa')
-				.reply(200)
-
-			const addQAApproved = nock('https://api.github.com')
-				.post('/repos/Kyle-Mendes/public-repo/issues/1/labels', ['$$qa approved'])
-				.reply(200)
-
+			const request = Object.assign({}, { headers: headers.jira }, { body: JSON.stringify(jiraPayloads.transition.qaToDone) })
 			wrapped.run(request).then((response) => {
 				setTimeout(() => {
 					expect(PRRoute.isDone()).to.be.true
 					expect(successCI.isDone()).to.be.true
 					expect(removeQA.isDone()).to.be.true
 					expect(addQAApproved.isDone()).to.be.true
+					expect(addQAApproved.isDone()).to.be.true
+					expect(ticketResponse.isDone()).to.be.true
+					expect(ticketResponse2.isDone()).to.be.true
 					done()
-				}, 1500)
+				}, 50)
 			})
 		})
 
 		it('Handles Jira transition Event (1 approved review)', (done) => {
-			const request = Object.assign({}, { headers: headers.jira }, { body: JSON.stringify(jiraPayloads.transition.qaToDone) })
-
 			const sha = githubPayloads.pullRequest.pullRequestMultiTicketsUnapproved.pull_request.head.sha
 
-			const addQA = nock('https://api.github.com')
-				.post('/repos/Kyle-Mendes/public-repo/issues/1/labels', ["$$qa"])
-				.reply(200)
+			const PRRoute = nocks.pull_request.stagingPRMultiTicketsUnapproved()
+			const addQA = nocks.labels.addQA()
+			const removeQAApproved = nocks.labels.removeQAApproved()
+			const failureCI = nocks.status.QAWaitingOn1(sha)
+			const ticketResponse = nocks.jira.resolvedTicket1()
+			const ticketResponse2 = nocks.jira.unresolvedTicket()
 
-			const removeQAApproved = nock('https://api.github.com')
-				.delete('/repos/Kyle-Mendes/public-repo/issues/1/labels/%24%24qa%20approved')
-				.reply(200)
-
-			const PRRoute = nock('https://api.github.com')
-				.get('/repos/Kyle-Mendes/public-repo/pulls/26')
-			.reply(200, githubPayloads.pullRequest.pullRequestMultiTicketsUnapproved.pull_request)
-
-			const failureCI = nock('https://api.github.com')
-			.post(`/repos/Kyle-Mendes/public-repo/statuses/${sha}`,
-				{
-					state: 'failure',
-					description: `Waiting on 1 ticket to be marked as "done".`,
-					context: 'ci/qa-team',
-				})
-			.reply(200)
-
+			const request = Object.assign({}, { headers: headers.jira }, { body: JSON.stringify(jiraPayloads.transition.qaToDone) })
 			wrapped.run(request).then((response) => {
 				setTimeout(() => {
 					expect(PRRoute.isDone()).to.be.true
 					expect(addQA.isDone()).to.be.true
 					expect(removeQAApproved.isDone()).to.be.true
 					expect(failureCI.isDone()).to.be.true
+					expect(ticketResponse.isDone()).to.be.true
+					expect(ticketResponse2.isDone()).to.be.true
 					done()
-				}, 1500)
+				}, 50)
 			})
 		})
 
 		it('Handles Jira transition Event (Single Ticket)', (done) => {
-			const request = Object.assign({}, { headers: headers.jira }, { body: JSON.stringify(jiraPayloads.transition.qaToDone) })
-
 			const sha = githubPayloads.pullRequest.pullRequestOpenedStaging.pull_request.head.sha
 
-			const PRRoute = nock('https://api.github.com')
-				.get('/repos/Kyle-Mendes/public-repo/pulls/26')
-				.reply(200, githubPayloads.pullRequest.pullRequestOpenedStaging.pull_request)
+			const PRRoute = nocks.pull_request.genericStagingPR()
+			const successCI = nocks.status.genericStatus(sha)
+			const removeQA = nocks.labels.removeQA()
+			const addQAApproved = nocks.labels.addQAApproved()
+			const ticketResponse = nocks.jira.resolvedTicket1()
 
-			const successCI = nock('https://api.github.com')
-				.post(`/repos/Kyle-Mendes/public-repo/statuses/${sha}`)
-				.reply(200)
-
-			const removeQA = nock('https://api.github.com')
-				.delete('/repos/Kyle-Mendes/public-repo/issues/1/labels/%24%24qa')
-				.reply(200)
-
-			const add = nock('https://api.github.com')
-				.post('/repos/Kyle-Mendes/public-repo/issues/1/labels', ['$$qa approved'])
-				.reply(200)
-
+			const request = Object.assign({}, { headers: headers.jira }, { body: JSON.stringify(jiraPayloads.transition.qaToDone) })
 			wrapped.run(request).then((response) => {
 				setTimeout(() => {
 					expect(PRRoute.isDone()).to.be.true
 					expect(successCI.isDone()).to.be.true
 					expect(removeQA.isDone()).to.be.true
-					expect(add.isDone()).to.be.true
+					expect(addQAApproved.isDone()).to.be.true
+					expect(ticketResponse.isDone()).to.be.true
 					done()
-				}, 1500)
+				}, 30)
 			})
 		})
 

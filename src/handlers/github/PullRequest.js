@@ -73,10 +73,11 @@ function handleNew(payload, config) {
 			const repo = payload.repository.html_url
 			const head = payload.pull_request.head.ref,
 				prBody = payload.pull_request.body || '',
-				tickets = prBody.match(jiraRegex) || []
+				tickets = prBody.match(jiraRegex) || [],
+				author = payload.pull_request.user
 
-			if (head === 'staging') {
-				return 'New PR -- Don\'t need to handle'
+			if (author.id.toString() === '25992031') {
+				return 'Devops PR -- Don\'t need to handle'
 			}
 
 			// If there aren't any JIRA tickets in the body as well, warn them
@@ -121,16 +122,16 @@ function handleNew(payload, config) {
 						.then((data) => {
 							responses.push(JSON.parse(data))
 						})))
-						.then(() => {
-							const formattedTickets = Tickets.formatTicketData(responses, repo)
+							.then(() => {
+								const formattedTickets = Tickets.formatTicketData(responses, repo)
 
-							Firebase.log('github', payload.repository.full_name, 'reelio_deploy/feature', null, {
-								tickets: formattedTickets,
-								fixed_count: tickets.filter(uniqueTicketFilter).length,
-								environment: parsedBranch,
-								target: 'url',
+								Firebase.log('github', payload.repository.full_name, 'reelio_deploy/feature', null, {
+									tickets: formattedTickets,
+									fixed_count: tickets.filter(uniqueTicketFilter).length,
+									environment: parsedBranch,
+									target: 'url',
+								})
 							})
-						})
 				}
 			}
 

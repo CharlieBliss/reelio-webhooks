@@ -28,7 +28,7 @@ class LabelHelper {
 
 	handleAddLabel(payload) {
 		if (payload.label.name === 'WIP') {
-			request(Github.delete(`${payload.pull_request.issue_url}/labels/$$review`))
+			request(Github.delete(`${payload.pull_request.issue_url}/labels/%24%24review`))
 		}
 	}
 

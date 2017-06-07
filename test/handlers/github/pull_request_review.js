@@ -10,13 +10,14 @@ const wrapped = lambdaWrapper.wrap(mod, { handler: 'handle' })
 
 const headers = require('../../payloads/headers')
 const payloads = require('../../payloads/github')
-const slackUrl = require('../../../src/consts').SLACK_URL
+const nocks = require('../../nocks')
 const CheckReviews = require('../../../src/handlers/github/CheckReviews').default
 
 export function PullRequestReview() {
 	describe('Check PR Review Status', () => {
 		beforeEach(() => {
 			nock.cleanAll()
+			nock.disableNetConnect()
 		})
 
 		it('Only triggers review process for specific actions (i.e. not "Closed")', (done) => {
@@ -27,21 +28,15 @@ export function PullRequestReview() {
 				}, 20)
 			})
 
-		it('Skips Review Process and returns CI success if PR is into master', (done) => {
-			const payload = payloads.pullRequest.pullRequestOpenedMaster
+		it('Skips Review Process and returns CI success if PR is into master by devops', (done) => {
+			const payload = payloads.pullRequest.pullRequestOpenedMasterDevops
 			const sha = payload.pull_request.head.sha
-			const successCI = nock('https://api.github.com')
-				.post(`/repos/Kyle-Mendes/public-repo/statuses/${sha}`,
-					{
-						state: 'success',
-						description: 'No reviews required',
-						context: 'ci/reelio',
-					})
-				.reply(200)
+
+			const successCI = nocks.status.masterSuccessCI(sha)
 
 			CheckReviews(payload, 'pull_request')
 				setTimeout(() => {
-					expect(CheckReviews(payload, 'pull_request', 1)).to.equal('Master Branch')
+					expect(CheckReviews(payload, 'pull_request')).to.equal('Webhook PR')
 					expect(successCI.isDone()).to.be.true
 					expect(nock.pendingMocks()).to.be.empty
 					done()
@@ -52,37 +47,16 @@ export function PullRequestReview() {
 			const payload = payloads.pullRequest.pullRequestOpenedStaging
 			const sha = payload.pull_request.head.sha
 
-			const failureCI = nock('https://api.github.com')
-				.post(`/repos/Kyle-Mendes/public-repo/statuses/${sha}`,
-					{
-						state: 'failure',
-						description: `This PR requires 1 more approved review to be merged.`,
-						context: 'ci/reelio',
-					})
-				.reply(200)
-
-			const reviews = nock('https://api.github.com')
-				.get('/repos/Kyle-Mendes/public-repo/pulls/1/reviews')
-				.reply(200,
-					 [
-						 { state: 'approved', user: { id: 7416637 }, submitted_at: 1489426108738 },
-					 ],
-				 )
-
-			const add = nock('https://api.github.com')
-				.post('/repos/Kyle-Mendes/public-repo/issues/1/labels', ['$$review'])
-				.reply(200)
-			const removeQA = nock('https://api.github.com')
-				.delete('/repos/Kyle-Mendes/public-repo/issues/1/labels/%24%24qa')
-				.reply(200)
-			const removeApproved = nock('https://api.github.com')
-				.delete('/repos/Kyle-Mendes/public-repo/issues/1/labels/approved')
-				.reply(200)
+			const failureCI = nocks.status.failureWaitingOnReview(sha)
+			const reviews = nocks.reviews.singleApproved()
+			const addReview = nocks.labels.addReview()
+			const removeQA = nocks.labels.removeQA()
+			const removeApproved = nocks.labels.removeApproved()
 
 			CheckReviews(payload, 'pull_request')
 				setTimeout(() => {
 					expect(failureCI.isDone()).to.be.true
-					expect(add.isDone()).to.be.true
+					expect(addReview.isDone()).to.be.true
 					expect(removeQA.isDone()).to.be.true
 					expect(removeApproved.isDone()).to.be.true
 					expect(nock.pendingMocks()).to.be.empty
@@ -94,39 +68,16 @@ export function PullRequestReview() {
 			const payload = payloads.pullRequest.pullRequestOpenedStaging
 			const sha = payload.pull_request.head.sha
 
-			const failureCI = nock('https://api.github.com')
-				.post(`/repos/Kyle-Mendes/public-repo/statuses/${sha}`,
-					{
-						state: 'failure',
-						description: 'This PR is blocked from merging due to a pending request for changes.',
-						context: 'ci/reelio',
-					})
-				.reply(200)
-
-			const reviews = nock('https://api.github.com')
-				.get('/repos/Kyle-Mendes/public-repo/pulls/1/reviews')
-				.reply(200,
-					 [
-						 { state: 'changes_requested', user: { id: 15472986 }, submitted_at: 1489426108756 },
-						 { state: 'approved', user: { id: 7416637 }, submitted_at: 1489426108742 },
-						 { state: 'approved', user: { id: 25992031 }, submitted_at: 1489426108738 },
-					 ],
-				 )
-
-			const add = nock('https://api.github.com')
-				.post('/repos/Kyle-Mendes/public-repo/issues/1/labels', ['$$review'])
-				.reply(200)
-			const removeQA = nock('https://api.github.com')
-				.delete('/repos/Kyle-Mendes/public-repo/issues/1/labels/%24%24qa')
-				.reply(200)
-			const removeApproved = nock('https://api.github.com')
-				.delete('/repos/Kyle-Mendes/public-repo/issues/1/labels/approved')
-				.reply(200)
+			const failureCI = nocks.status.failureChangedRequested(sha)
+			const reviews = nocks.reviews.outstandingChanges()
+			const addReview = nocks.labels.addReview()
+			const removeQA = nocks.labels.removeQA()
+			const removeApproved = nocks.labels.removeApproved()
 
 			CheckReviews(payload, 'pull_request')
 				setTimeout(() => {
 					expect(failureCI.isDone()).to.be.true
-					expect(add.isDone()).to.be.true
+					expect(addReview.isDone()).to.be.true
 					expect(removeQA.isDone()).to.be.true
 					expect(removeApproved.isDone()).to.be.true
 					expect(nock.pendingMocks()).to.be.empty
@@ -138,42 +89,23 @@ export function PullRequestReview() {
 			const payload = payloads.pullRequest.pullRequestOpenedStaging
 			const sha = payload.pull_request.head.sha
 
-			const successCI = nock('https://api.github.com')
-				.post(`/repos/Kyle-Mendes/public-repo/statuses/${sha}`,
-					{
-						state: 'success',
-						description: `At least 2 reviews, all reviews approved.`,
-						context: 'ci/reelio',
-					})
-				.reply(200)
-
-			const reviews = nock('https://api.github.com')
-				.get('/repos/Kyle-Mendes/public-repo/pulls/1/reviews')
-				.reply(200,
-					 [
-						 { state: 'approved', user: { id: 7416637 }, submitted_at: 1489426108742 },
-						 { state: 'approved', user: { id: 25992031 }, submitted_at: 1489426108738 },
-					 ],
-				 )
-
-			const add = nock('https://api.github.com')
-				.post('/repos/Kyle-Mendes/public-repo/issues/1/labels', ["approved","$$qa"])
-				.reply(200)
-
-			const removeReview = nock('https://api.github.com')
-				.delete('/repos/Kyle-Mendes/public-repo/issues/1/labels/%24%24review')
-				.reply(200)
-
-			const removeChanges = nock('https://api.github.com')
-				.delete('/repos/Kyle-Mendes/public-repo/issues/1/labels/changes%20requested')
-				.reply(200)
+			const successCI = nocks.status.successCI(sha)
+			const reviews = nocks.reviews.doubleApproved()
+			const transition = nocks.jira.autoTransition()
+			const ticketTable = nocks.jira.createTable()
+			const addQAandApproved = nocks.labels.addQAandApproved()
+			const removeReview = nocks.labels.removeReview()
+			const removeChangesRequested = nocks.labels.removeChangesRequested()
 
 			CheckReviews(payload, 'pull_request')
 				setTimeout(() => {
 					expect(successCI.isDone()).to.be.true
-					expect(add.isDone()).to.be.true
+					expect(reviews.isDone()).to.be.true
+					expect(transition.isDone()).to.be.true
+					expect(ticketTable.isDone()).to.be.true
+					expect(addQAandApproved.isDone()).to.be.true
 					expect(removeReview.isDone()).to.be.true
-					expect(removeChanges.isDone()).to.be.true
+					expect(removeChangesRequested.isDone()).to.be.true
 					expect(nock.pendingMocks()).to.be.empty
 					done()
 				}, 30)
@@ -183,41 +115,21 @@ export function PullRequestReview() {
 			const payload = payloads.pullRequest.pullRequestOpenedStaging
 			const sha = payload.pull_request.head.sha
 
-			const successCI = nock('https://api.github.com')
-				.post(`/repos/Kyle-Mendes/public-repo/statuses/${sha}`,
-					{
-						state: 'success',
-						description: `At least 2 reviews, all reviews approved.`,
-						context: 'ci/reelio',
-					})
-				.reply(200)
-
-			const reviews = nock('https://api.github.com')
-				.get('/repos/Kyle-Mendes/public-repo/pulls/1/reviews')
-				.reply(200,
-					 [
-						 { state: 'approved', user: { id: 7416637 }, submitted_at: 1489426108742 },
-						 { state: 'approved', user: { id: 25992031 }, submitted_at: 1489426108738 },
-						 { state: 'approved', user: { id: 6400039 }, submitted_at: 1489426108755 },
-					 ],
-				 )
-
-			const add = nock('https://api.github.com')
-				.post('/repos/Kyle-Mendes/public-repo/issues/1/labels', ["approved","$$qa"])
-				.reply(200)
-
-			const removeChanges = nock('https://api.github.com')
-				.delete('/repos/Kyle-Mendes/public-repo/issues/1/labels/changes%20requested')
-				.reply(200)
-
-			const removeReview = nock('https://api.github.com')
-				.delete('/repos/Kyle-Mendes/public-repo/issues/1/labels/%24%24review')
-				.reply(200)
+			const successCI = nocks.status.successCI(sha)
+			const reviews = nocks.reviews.tripleApproved()
+			const transition = nocks.jira.autoTransition()
+			const ticketTable = nocks.jira.createTable()
+			const addQAandApproved = nocks.labels.addQAandApproved()
+			const removeChanges = nocks.labels.removeChangesRequested()
+			const removeReview = nocks.labels.removeReview()
 
 			CheckReviews(payload, 'pull_request')
 				setTimeout(() => {
 					expect(successCI.isDone()).to.be.true
-					expect(add.isDone()).to.be.true
+					expect(reviews.isDone()).to.be.true
+					expect(transition.isDone()).to.be.true
+					expect(ticketTable.isDone()).to.be.true
+					expect(addQAandApproved.isDone()).to.be.true
 					expect(removeReview.isDone()).to.be.true
 					expect(removeChanges.isDone()).to.be.true
 					expect(nock.pendingMocks()).to.be.empty
@@ -225,135 +137,95 @@ export function PullRequestReview() {
 				}, 30)
 			})
 
-			it('Handles 1 approved review', (done) => {
-				const request = Object.assign({}, { headers: headers.github }, { body: payloads.review.approved })
-				request.headers['X-Github-Event'] = payloads.review.event
+		it('Handles 1 approved review', (done) => {
+			const payload = JSON.parse(payloads.review.approved)
+			const sha = payload.pull_request.head.sha
 
-				const sha = 'b7a1f9c27caa4e03c14a88feb56e2d4f7500aa63'
+			const addReview = nocks.labels.addReview()
+			const removeQA = nocks.labels.removeQA()
+			const removeApproved = nocks.labels.removeApproved()
+			const failureCI = nocks.status.failureWaitingOnReview(sha)
+			const reviews = nocks.reviews.singleApproved()
+			const firebaseLog = nocks.firebase.genericFirebaseLog()
 
-				const addReview = nock('https://api.github.com')
-					.post('/repos/Kyle-Mendes/public-repo/issues/1/labels', ['$$review'])
-					.reply(200)
-
-				const removeQA = nock('https://api.github.com')
-					.delete('/repos/Kyle-Mendes/public-repo/issues/1/labels/%24%24qa')
-					.reply(200)
-
-				const removeApproved = nock('https://api.github.com')
-					.delete('/repos/Kyle-Mendes/public-repo/issues/1/labels/approved')
-					.reply(200)
-
-				const successCI = nock('https://api.github.com')
-					.post(`/repos/Kyle-Mendes/public-repo/statuses/${sha}`)
-					.reply(200)
-
-				wrapped.run(request).then((response) => {
-					setTimeout(() => {
-						expect(response).to.not.be.empty
-						expect(response.body).to.equal('Github -- Review Changes Success')
-						expect(addReview.isDone()).to.be.true
-						expect(successCI.isDone()).to.be.true
-						expect(nock.pendingMocks()).to.be.empty
-						done()
-					}, 50)
-				})
+			const request = Object.assign({}, { headers: headers.github }, { body: payloads.review.approved })
+			request.headers['X-Github-Event'] = payloads.review.event
+			wrapped.run(request).then((response) => {
+				setTimeout(() => {
+					expect(response).to.not.be.empty
+					expect(response.body).to.equal('Github -- Review Changes Success')
+					expect(addReview.isDone()).to.be.true
+					expect(removeQA.isDone()).to.be.true
+					expect(removeApproved.isDone()).to.be.true
+					expect(firebaseLog.isDone()).to.be.true
+					expect(failureCI.isDone()).to.be.true
+					expect(reviews.isDone()).to.be.true
+					expect(nock.pendingMocks()).to.be.empty
+					done()
+				}, 30)
 			})
+		})
 
-			it('Handles 2nd approved review', (done) => {
-				const request = Object.assign({}, { headers: headers.github }, { body: payloads.review.approved })
-				request.headers['X-Github-Event'] = payloads.review.event
+		it('Handles 2nd approved review', (done) => {
+			const payload = JSON.parse(payloads.review.approved)
+			const sha = payload.pull_request.head.sha
 
-				const sha = 'b7a1f9c27caa4e03c14a88feb56e2d4f7500aa63'
+			const reviews = nocks.reviews.doubleApproved()
+			const addQAandApproved = nocks.labels.addQAandApproved()
+			const removeChangesRequested = nocks.labels.removeChangesRequested()
+			const firebaseLog = nocks.firebase.genericFirebaseLog()
+			const removeReview = nocks.labels.removeReview()
+			const successCI = nocks.status.successCI(sha)
 
-				const reviews = nock('https://api.github.com')
-					.get('/repos/Kyle-Mendes/public-repo/pulls/1/reviews')
-					.reply(200,
-						 [
-							 { state: 'approved', user: { id: 7416637 }, submitted_at: 1489426108742 },
-							 { state: 'approved', user: { id: 25992031 }, submitted_at: 1489426108738 },
-						 ],
-					 )
-
-				const add = nock('https://api.github.com')
-					.post('/repos/Kyle-Mendes/public-repo/issues/1/labels', ['approved', '$$qa'])
-					.reply(200)
-
-				const remove = nock('https://api.github.com')
-					.delete('/repos/Kyle-Mendes/public-repo/issues/1/labels/changes%20requested')
-					.reply(200)
-
-				const removeReview = nock('https://api.github.com')
-					.delete('/repos/Kyle-Mendes/public-repo/issues/1/labels/%24%24review')
-					.reply(200)
-
-				const successCI = nock('https://api.github.com')
-					.post(`/repos/Kyle-Mendes/public-repo/statuses/${sha}`)
-					.reply(200)
-
-				wrapped.run(request).then((response) => {
-					setTimeout(() => {
-						expect(response).to.not.be.empty
-						expect(response.body).to.equal('Github -- Review Changes Success')
-						expect(add.isDone()).to.be.true
-						expect(removeReview.isDone()).to.be.true
-						expect(remove.isDone()).to.be.true
-						expect(successCI.isDone()).to.be.true
-						expect(nock.pendingMocks()).to.be.empty
-						done()
-					}, 50)
-				})
+			const request = Object.assign({}, { headers: headers.github }, { body: payloads.review.approved })
+			request.headers['X-Github-Event'] = payloads.review.event
+			wrapped.run(request).then((response) => {
+				setTimeout(() => {
+					expect(response).to.not.be.empty
+					expect(response.body).to.equal('Github -- Review Changes Success')
+					expect(addQAandApproved.isDone()).to.be.true
+					expect(removeChangesRequested.isDone()).to.be.true
+					expect(firebaseLog.isDone()).to.be.true
+					expect(removeReview.isDone()).to.be.true
+					expect(successCI.isDone()).to.be.true
+					expect(nock.pendingMocks()).to.be.empty
+					done()
+				}, 30)
 			})
+		})
 
-			it('handles declined reviews', (done) => {
-				const request = Object.assign({}, { headers: headers.github }, { body: payloads.review.denied })
-				request.headers['X-Github-Event'] = payloads.review.event
+		it('handles declined reviews', (done) => {
+			const payload = JSON.parse(payloads.review.denied)
+			const sha = payload.pull_request.head.sha
 
-				const sha = 'b7a1f9c27caa4e03c14a88feb56e2d4f7500aa63'
+			const reviews = nocks.reviews.singleChangesRequested()
+			const firebaseLog = nocks.firebase.genericFirebaseLog()
+			const addChangesRequested = nocks.labels.addChangesRequested()
+			const addReview = nocks.labels.addReview()
+			const removeQA = nocks.labels.removeQA()
+			const removeApproved = nocks.labels.removeApproved()
+			const failureCI = nocks.status.failureWaitingOnTwoReviews(sha)
+			const slack = nocks.slack.genericSlack()
 
-				const add = nock('https://api.github.com')
-					.post('/repos/Kyle-Mendes/public-repo/issues/1/labels', ['changes requested'])
-					.reply(200)
-
-				const addReview = nock('https://api.github.com')
-					.post('/repos/Kyle-Mendes/public-repo/issues/1/labels', ['$$review'])
-					.reply(200)
-
-				const removeQA = nock('https://api.github.com')
-					.delete('/repos/Kyle-Mendes/public-repo/issues/1/labels/%24%24qa')
-					.reply(200)
-
-				const removeApproved = nock('https://api.github.com')
-					.delete('/repos/Kyle-Mendes/public-repo/issues/1/labels/approved')
-					.reply(200)
-
-				const failureCI = nock('https://api.github.com')
-					.post(`/repos/Kyle-Mendes/public-repo/statuses/${sha}`,
-						{
-							state: 'failure',
-							description: `This PR requires 2 more approved reviews to be merged.`,
-							context: 'ci/reelio',
-						})
-					.reply(200)
-
-				const slack = nock(slackUrl)
-					.post('')
-					.reply(200)
-
-				wrapped.run(request).then((response) => {
-					setTimeout(() => {
-						expect(response).to.not.be.empty
-						expect(response.body).to.equal('Github -- Review Changes Request')
-						expect(add.isDone()).to.be.true
-						expect(addReview.isDone()).to.be.true
-						expect(removeQA.isDone()).to.be.true
-						expect(removeApproved.isDone()).to.be.true
-						expect(slack.isDone()).to.be.true
-						expect(failureCI.isDone()).to.be.true
-						expect(nock.pendingMocks()).to.be.empty
-						done()
-					}, 50)
-				})
+			const request = Object.assign({}, { headers: headers.github }, { body: payloads.review.denied })
+			request.headers['X-Github-Event'] = payloads.review.event
+			wrapped.run(request).then((response) => {
+				setTimeout(() => {
+					expect(response).to.not.be.empty
+					expect(response.body).to.equal('Github -- Review Changes Request')
+					expect(reviews.isDone()).to.be.true
+					expect(firebaseLog.isDone()).to.be.true
+					expect(addChangesRequested.isDone()).to.be.true
+					expect(addReview.isDone()).to.be.true
+					expect(removeQA.isDone()).to.be.true
+					expect(removeApproved.isDone()).to.be.true
+					expect(slack.isDone()).to.be.true
+					expect(failureCI.isDone()).to.be.true
+					expect(nock.pendingMocks()).to.be.empty
+					done()
+				}, 50)
 			})
+		})
 
 	})
 }

@@ -2,7 +2,6 @@ import Tickets from '../../helpers/tickets'
 
 function CheckTickets(payload, event) {
 	const action = payload.action
-	const base = payload.pull_request.base.ref
 
 	const actions = ['opened', 'edited', 'reopened', 'synchronize']
 
@@ -14,8 +13,8 @@ function CheckTickets(payload, event) {
 	const prUrl = payload.pull_request.url
 
 	// Skip PRs that don't need reviews.
-	if (base.includes('master')) {
-		return 'Master Branch'
+	if (payload.pull_request.user.id.toString() === '25992031') {
+		return 'Devops Branch'
 	}
 
 	Tickets.checkTicketStatus(prUrl, false)

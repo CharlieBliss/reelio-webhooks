@@ -18,7 +18,7 @@ export const genericIssue = JSON.stringify([
   }
 ])
 
-export const issue = JSON.stringify([
+export const approvedIssue = JSON.stringify([
 	{
 		"body": "I'm having a problem with this.",
 		"repository": {

@@ -41,6 +41,10 @@ export function parseReviews(reviews = []) {
 }
 
 export function checkSingleMergeStatus(pullRequest) {
+	if (pullRequest.mergeable_state === 'clean') {
+		rp(Github.delete(`${pullRequest.issue_url}/labels/%24%24rebase`))
+	}
+
 	if (pullRequest.mergeable_state === 'conflicting' || pullRequest.mergeable_state === 'dirty') {
 		rp(Github.post(`${pullRequest.issue_url}/labels`, ['$$rebase']))
 		Slack.conflictWarning(pullRequest)
@@ -57,7 +61,6 @@ export function checkMergeStatus(payload) {
 	// get all pulls for repository
 	rp(Github.get(`${payload.repository.url}/pulls`)).then((data) => {
 		const pullRequests = JSON.parse(data) || []
-
 		// loop over each pull request and checks merge_status
 		pullRequests.forEach((pull) => {
 			rp(Github.get(pull.url)).then((response) => {

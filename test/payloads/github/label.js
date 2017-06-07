@@ -41,7 +41,7 @@ export const removeChanges = {
 	"repository": {
 		"full_name": "Kyle-Mendes/public-repo",
 	},
-	"url": 'https://api.github.com/repos/Kyle-Mendes/public-repo/pulls/2',
+	"url": 'https://api.github.com/repos/Kyle-Mendes/public-repo/pulls/1',
 	"issue_url": "https://api.github.com/repos/Kyle-Mendes/public-repo/issues/1",
 	},
 }

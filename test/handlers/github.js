@@ -12,6 +12,7 @@ const wrapped = lambdaWrapper.wrap(mod, { handler: 'handle' })
 
 const headers = require('../payloads/headers')
 const payloads = require('../payloads/github')
+const nocks = require('../nocks')
 const slackUrl = require('../../src/consts/slack').SLACK_URL
 
 Object.keys(tests).forEach(test => tests[test]())
@@ -20,9 +21,11 @@ describe('github', () => {
 	describe('Github Events', () => {
 		beforeEach(() => {
 			nock.cleanAll()
+			nock.disableNetConnect()
 		})
 
 		it('Returns 400 for no github event', (done) => {
+			const firebaseLog = nocks.firebase.genericFirebaseLog()
 			const request = Object.assign({}, { headers: headers.github }, { body: payloads.review.approved })
 			request.headers['X-Github-Event'] = null
 
@@ -31,12 +34,14 @@ describe('github', () => {
 					expect(response).to.not.be.empty
 					expect(response.body).to.equal('Github -- No event provided.')
 					expect(response.statusCode).to.equal(400)
+					expect(firebaseLog.isDone()).to.be.true
 					done()
 				}, 10)
 			})
 		})
 
 		it('Returns 200 for no github action', (done) => {
+			const firebaseLog = nocks.firebase.genericFirebaseLog()
 			const request = Object.assign({}, { headers: headers.github }, { body: payloads.review.noAction })
 			request.headers['X-Github-Event'] = 'pull_request_review_comment'
 
@@ -44,12 +49,14 @@ describe('github', () => {
 				setTimeout(() => {
 					expect(response).to.not.be.empty
 					expect(response.statusCode).to.equal(200)
+					expect(firebaseLog.isDone()).to.be.true
 					done()
 				}, 10)
 			})
 		})
 
 		it('Takes no action with unhandled events', (done) => {
+			const firebaseLog = nocks.firebase.genericFirebaseLog()
 			const request = Object.assign({}, { headers: headers.github }, { body: payloads.review.approved })
 			request.headers['X-Github-Event'] = "Labeled"
 
@@ -57,6 +64,7 @@ describe('github', () => {
 				setTimeout(() => {
 					expect(response).to.not.be.empty
 					expect(response.body).to.equal('Github -- No actions taken.')
+					expect(firebaseLog.isDone()).to.be.true
 					expect(response.statusCode).to.equal(200)
 					done()
 				}, 10)
