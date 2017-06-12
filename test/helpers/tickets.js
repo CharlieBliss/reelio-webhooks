@@ -15,6 +15,7 @@ const consts = require('../../src/consts/slack')
 describe('helpers -- tickets', () => {
 	beforeEach(() => {
 		nock.cleanAll()
+		nock.disableNetConnect()
 	})
 
 	it('Should handle JIRA ticket transitions from QA => Done (single ticket)', (done) => {
@@ -25,12 +26,14 @@ describe('helpers -- tickets', () => {
 		const successCI = nocks.status.genericStatus(sha)
 		const removeQA = nocks.labels.removeQA()
 		const addQAApproved = nocks.labels.addQAApproved()
+		const ticketResponse = nocks.jira.resolvedTicket1()
 
 		setTimeout(() => {
 			expect(PRRoute.isDone()).to.be.true
 			expect(successCI.isDone()).to.be.true
 			expect(removeQA.isDone()).to.be.true
 			expect(addQAApproved.isDone()).to.be.true
+			expect(ticketResponse.isDone()).to.be.true
 			expect(Transition(jiraPayloads.transition.qaToDone)).to.equal('PR status updated')
 			done()
 		}, 1500)
@@ -43,6 +46,8 @@ describe('helpers -- tickets', () => {
 		const successCI = nocks.status.genericStatus(sha)
 		const removeQA = nocks.labels.removeQA()
 		const addQAApproved = nocks.labels.addQAApproved()
+		const ticketResponse = nocks.jira.resolvedTicket1()
+		const ticketResponse2 = nocks.jira.resolvedTicket2()
 
 		Transition(jiraPayloads.transition.qaToDone)
 		setTimeout(() => {
@@ -50,6 +55,8 @@ describe('helpers -- tickets', () => {
 			expect(successCI.isDone()).to.be.true
 			expect(removeQA.isDone()).to.be.true
 			expect(addQAApproved.isDone()).to.be.true
+			expect(ticketResponse.isDone()).to.be.true
+			expect(ticketResponse2.isDone()).to.be.true
 			done()
 		}, 1500)
 	})
@@ -61,6 +68,8 @@ describe('helpers -- tickets', () => {
 		const removeQAApproved = nocks.labels.removeQAApproved()
 		const PRRoute = nocks.pull_request.stagingPRMultiTicketsUnapproved()
 		const failureCI = nocks.status.QAWaitingOn1(sha)
+		const ticketResponse = nocks.jira.resolvedTicket1()
+		const unresolvedTicket = nocks.jira.unresolvedTicket()
 
 		Transition(jiraPayloads.transition.qaToDone)
 		setTimeout(() => {
@@ -68,6 +77,8 @@ describe('helpers -- tickets', () => {
 			expect(addQA.isDone()).to.be.true
 			expect(removeQAApproved.isDone()).to.be.true
 			expect(failureCI.isDone()).to.be.true
+			expect(ticketResponse.isDone()).to.be.true
+			expect(unresolvedTicket.isDone()).to.be.true
 			done()
 		}, 1500)
 	})

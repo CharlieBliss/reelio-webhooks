@@ -10,6 +10,7 @@ import Firebase from '../../src/helpers/firebase'
 describe('Properly Logs events to Firebase', () => {
 	beforeEach(() => {
 		nock.cleanAll()
+		nock.disableNetConnect()
 	})
 
 	it('Logs Event with Action', (done) => {

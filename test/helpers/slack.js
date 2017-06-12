@@ -9,6 +9,7 @@ const nocks = require('../nocks')
 describe('helpers -- slack', () => {
 	beforeEach(() => {
 		nock.cleanAll()
+		nock.disableNetConnect()
 	})
 
 	it('Should be able to alert when changes are requested', (done) => {

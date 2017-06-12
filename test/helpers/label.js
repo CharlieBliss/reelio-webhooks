@@ -10,6 +10,7 @@ const Labels = require('../../src/handlers/github/Labels').default
 describe('Properly handles Adding Label', () => {
 	beforeEach(() => {
 		nock.cleanAll()
+		nock.disableNetConnect()
 	})
 
 	it('Handles "WIP Added" event', (done) => {
