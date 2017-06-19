@@ -101,10 +101,40 @@ export const FRONTEND_MEMBERS = {
 		slack_id: 'U02H4GFGX',
 		github_id: '13035177',
 	},
+	8799208: {
+		name: 'jaxball',
+		slack_id: 'U5SCM1CSZ',
+		github_id: '8799208',
+	},
+	23634676: {
+		name: 'pollyk',
+		slack_id: 'U5GDMSUTX',
+		github_id: '23634676',
+	},
+	491128: {
+		name: 'danp',
+		slack_id: 'U54D421RV',
+		github_id: '491128',
+	},
 }
 
 /* eslint-disable */
 export const slack_members = [
+	{
+		"id": "U54D421RV",
+		"name": "danp",
+	},
+	{
+		"id": "U5SCM1CSZ",
+		"name": "jaxball",
+	},
+	{
+		"id": "U5GDMSUTX",
+		"name": "pollyk",
+	},
+
+
+
 	{
 		"id": "U02DRJ30Q",
 		"name": "aakhi",
