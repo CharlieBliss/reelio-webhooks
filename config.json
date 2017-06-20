@@ -73,7 +73,7 @@
     "reelio": {
       "github": {
         "labels": {
-          "enabled": false
+          "enabled": true
         },
         "require_reviews": {
           "enabled": false,
@@ -83,10 +83,14 @@
           "enabled": true
         },
         "pull_request": {
-          "enabled": false
+          "enabled": true,
+          "merged": {
+            "conflicts": true,
+            "congrats": true
+          }
         },
         "pull_request_review": {
-          "enabled": false
+          "enabled": true
         }
       }
     },
