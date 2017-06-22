@@ -51,7 +51,7 @@ export function handle(event, context, callback) {
 
 	if (githubEvent === 'pull_request') {
 		if (get(config, [org, repo, handler, 'pull_request', 'enabled'])) {
-			CheckTickets(payload, githubEvent)
+			CheckTickets(payload, githubEvent, get(config, [org, repo, handler, 'pull_request', 'done_status']))
 			return callback(null, helper.respond(PullRequest(payload, get(config, [org, repo, handler, 'pull_request']))))
 		}
 	}

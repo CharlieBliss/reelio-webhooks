@@ -1,6 +1,6 @@
 import Tickets from '../../helpers/tickets'
 
-function CheckTickets(payload, event) {
+function CheckTickets(payload, event, status) {
 	const action = payload.action
 
 	const actions = ['opened', 'edited', 'reopened', 'synchronize']
@@ -17,7 +17,9 @@ function CheckTickets(payload, event) {
 		return 'Devops Branch'
 	}
 
-	Tickets.checkTicketStatus(prUrl, false)
+	if (status) {
+		Tickets.checkTicketStatus(prUrl, false, status)
+	}
 
 }
 

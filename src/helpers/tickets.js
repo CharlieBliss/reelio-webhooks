@@ -95,7 +95,7 @@ class Tickets {
 		})
 	}
 
-	checkTicketStatus(pullRequestRoute, labels = true) {
+	checkTicketStatus(pullRequestRoute, labels = true, status = '10001') {
 		rp(Github.get(pullRequestRoute))
 			.then((response) => {
 				const PR = JSON.parse(response),
@@ -118,7 +118,7 @@ class Tickets {
 					.catch((err) => { console.log(err) }),
 				))
 					.then(() => {
-						const resolved = responses.filter(ticket => ticket.fields.status.id === '10001')
+						const resolved = responses.filter(ticket => ticket.fields.status.id === status)
 						if (resolved.length === uniqueTickets.length) {
 							request(Github.post(`${PR.head.repo.url}/statuses/${sha}`, {
 								state: 'success',

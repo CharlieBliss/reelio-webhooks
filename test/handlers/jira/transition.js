@@ -54,6 +54,7 @@ export function Transition() {
 			const ticketResponse2 = nocks.jira.unresolvedTicket()
 
 			const request = Object.assign({}, { headers: headers.jira }, { body: JSON.stringify(jiraPayloads.transition.qaToDone) })
+
 			wrapped.run(request).then((response) => {
 				setTimeout(() => {
 					expect(PRRoute.isDone()).to.be.true
@@ -63,7 +64,7 @@ export function Transition() {
 					expect(ticketResponse.isDone()).to.be.true
 					expect(ticketResponse2.isDone()).to.be.true
 					done()
-				}, 50)
+				}, 500)
 			})
 		})
 
