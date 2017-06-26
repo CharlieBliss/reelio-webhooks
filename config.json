@@ -86,7 +86,7 @@
         },
         "pull_request": {
           "enabled": true,
-          "done_status": 10801,
+          "done_status": 10001,
           "merged": {
             "conflicts": true,
             "congrats": true
