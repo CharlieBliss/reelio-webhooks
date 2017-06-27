@@ -62,7 +62,7 @@ function CheckReviews(payload, event, count = 2) {
 
 							// Move the tickets to "Ready for QA"
 							const tickets = payload.pull_request.body.match(jiraRegex) || []
-							Tickets.transitionTickets(tickets, payload)
+							Tickets.updateTickets(tickets, payload)
 						})
 				}
 
@@ -87,7 +87,6 @@ function CheckReviews(payload, event, count = 2) {
 					description: `This PR requires ${additional} more approved review${additional > 1 ? 's' : ''} to be merged.`,
 					context: 'ci/reelio',
 				}))
-
 				request(Github.post(`${payload.pull_request.issue_url}/labels`, ['$$review']))
 				request(Github.delete(`${payload.pull_request.issue_url}/labels/%24%24qa`))
 				request(Github.delete(`${payload.pull_request.issue_url}/labels/approved`))

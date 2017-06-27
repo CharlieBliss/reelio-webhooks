@@ -33,6 +33,7 @@ export function TicketStatus() {
 			const removeQA = nocks.labels.removeQA()
 			const removeApproved = nocks.labels.removeApproved()
 			const featureBranchComment = nocks.github.featureBranchComment()
+			const transition = nocks.jira.autoTransition()
 			const firebaseLog = nocks.firebase.genericFirebaseLog(2)
 
 			const request = Object.assign({},
@@ -52,6 +53,7 @@ export function TicketStatus() {
 					expect(removeQA.isDone()).to.be.true
 					expect(removeApproved.isDone()).to.be.true
 					expect(featureBranchComment.isDone()).to.be.true
+					expect(transition.isDone()).to.be.true
 					expect(firebaseLog.isDone()).to.be.true
 					expect(nock.pendingMocks()).to.be.empty
 					done()
@@ -75,6 +77,8 @@ export function TicketStatus() {
 			const addReview = nocks.labels.addReview()
 			const removeQA = nocks.labels.removeQA()
 			const removeApproved = nocks.labels.removeApproved()
+			const transition = nocks.jira.autoTransition()
+			const transition2 = nocks.jira.autoTransition2()
 
 			const request = Object.assign({},
 				{ headers: headers.github },
@@ -95,6 +99,8 @@ export function TicketStatus() {
 					expect(addReview.isDone()).to.be.true
 					expect(removeQA.isDone()).to.be.true
 					expect(removeApproved.isDone()).to.be.true
+					expect(transition.isDone()).to.be.true
+					expect(transition2.isDone()).to.be.true
 					expect(nock.pendingMocks()).to.be.empty
 					done()
 				}, 1500)
@@ -117,6 +123,8 @@ export function TicketStatus() {
 			const addReview = nocks.labels.addReview()
 			const removeQA = nocks.labels.removeQA()
 			const removeApproved = nocks.labels.removeApproved()
+			const transition = nocks.jira.autoTransition()
+			const transition2 = nocks.jira.autoTransition2()
 
 			const request = Object.assign({},
 				{ headers: headers.github },
@@ -138,6 +146,8 @@ export function TicketStatus() {
 					expect(addReview.isDone()).to.be.true
 					expect(removeQA.isDone()).to.be.true
 					expect(removeApproved.isDone()).to.be.true
+					expect(transition.isDone()).to.be.true
+					expect(transition2.isDone()).to.be.true
 					expect(nock.pendingMocks()).to.be.empty
 					done()
 				}, 1500)
@@ -160,6 +170,8 @@ export function TicketStatus() {
 			const addReview = nocks.labels.addReview()
 			const removeQA = nocks.labels.removeQA()
 			const removeApproved = nocks.labels.removeApproved()
+			const transition = nocks.jira.autoTransition()
+			const transition2 = nocks.jira.autoTransition2()
 
 			const request = Object.assign({},
 				{ headers: headers.github },
@@ -180,6 +192,8 @@ export function TicketStatus() {
 					expect(addReview.isDone()).to.be.true
 					expect(removeQA.isDone()).to.be.true
 					expect(removeApproved.isDone()).to.be.true
+					expect(transition.isDone()).to.be.true
+					expect(transition2.isDone()).to.be.true
 					expect(nock.pendingMocks()).to.be.empty
 					done()
 				}, 1500)

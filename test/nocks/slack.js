@@ -25,7 +25,7 @@ export const conflictWarningSlack = (pullNumber = 1) => (
 				channel: user.slack_id,
 				username: 'Conflict Resolution Bot',
 				icon_url: 'https://octodex.github.com/images/yaktocat.png',
-				text: `Hey there, Dillon. PR 123 has been flagged as having merge conflicts. Please review on <https://api.github.com/repos/Kyle-Mendes/public-repo/pulls/${pullNumber}|GitHub>.`,
+				text: `Hey there, Dillon. PR 123 has been flagged as having merge conflicts. Please review on <https://api.github.com/repos/test/test/pulls/${pullNumber}|GitHub>.`,
 			}
 		)
 		.reply(200)

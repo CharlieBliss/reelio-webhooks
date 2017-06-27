@@ -76,6 +76,10 @@ function handleNew(payload, config) {
 				tickets = prBody.match(jiraRegex) || [],
 				author = payload.pull_request.user
 
+			const ticketBase = 'https://reelio.atlassian.net/rest/api/2/issue'
+			const responses = []
+			const uniqueTickets = tickets.filter(uniqueTicketFilter)
+
 			if (author.id.toString() === '25992031') {
 				return 'Devops PR -- Don\'t need to handle'
 			}
@@ -85,7 +89,7 @@ function handleNew(payload, config) {
 				!tickets.length &&
 				!labels.map(l => l.name).includes('$$webhook') &&
 				config.opened &&
-				(config.opened.enabled || config.open.tickets)
+				(config.opened.enabled || config.opened.tickets)
 			) {
 				const feedback = `@${payload.pull_request.user.login} - It looks like you didn't include JIRA ticket references in this ticket.  Are you sure you have none to reference?`
 				request(Github.post(`${payload.pull_request.issue_url}/comments`, { body: feedback }))
@@ -99,7 +103,7 @@ function handleNew(payload, config) {
 				!head.includes('feature-') &&
 				!labels.map(l => l.name).includes('$$webhook') &&
 				config.opened &&
-				(config.opened.enabled || config.open.feature)
+				(config.opened.enabled || config.opened.feature)
 			) {
 				const feedback = `@${payload.pull_request.user.login} - It looks like your branch doesn't contain \`feature-\`.  Are you sure this PR shouldn't be a feature branch?`
 				request(Github.post(`${payload.pull_request.issue_url}/comments`, { body: feedback }))
@@ -111,10 +115,6 @@ function handleNew(payload, config) {
 					url = `http://zzz-${parsedBranch}.s3-website-us-east-1.amazonaws.com/`
 
 				request(Github.post(`${payload.pull_request.issue_url}/comments`, { body: `@${payload.pull_request.user.login} - Thanks for the PR! Your feature branch is now [live](${url})` }))
-
-				const ticketBase = 'https://reelio.atlassian.net/rest/api/2/issue'
-				const responses = []
-				const uniqueTickets = tickets.filter(uniqueTicketFilter)
 
 				// If tickets are enabled, grab their information and save it to firebase
 				if (config.opened.enabled || config.opened.tickets) {
@@ -132,6 +132,11 @@ function handleNew(payload, config) {
 									target: 'url',
 								})
 							})
+				}
+				if (config.opened.transition) {
+					uniqueTickets.forEach((ticket) => {
+						Tickets.transitionTicket(`${ticketBase}/${ticket}`, 21)
+					})
 				}
 			}
 

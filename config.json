@@ -23,7 +23,8 @@
 
           "opened": {
             "feature": true,
-            "tickets": true
+            "tickets": true,
+            "transition": true
           },
 
           "merged": {
@@ -200,7 +201,8 @@
           "labels": true,
 
           "opened": {
-            "enabled": true
+            "enabled": true,
+            "transition": true
           },
 
           "merged": {
@@ -271,5 +273,56 @@
         }
       }
     }
-  }
+  },
+
+    "test": {
+      "test": {
+
+        "github": {
+          "labels": {
+            "enabled": true
+          },
+
+          "require_reviews": {
+            "enabled": true,
+            "count": 2
+          },
+
+          "status": {
+            "enabled": true
+          },
+
+          "pull_request": {
+            "enabled": true,
+
+            "labels": true,
+
+            "done_status": 10001,
+
+            "opened": {
+              "feature": true,
+              "tickets": true,
+              "transition": true
+            },
+
+            "merged": {
+              "alert": {
+                "channel": "#frontend-deploys",
+                "url": "http://pro.reelio.com",
+                "env": "production"
+              },
+              "create": true,
+              "congrats": true,
+              "conflicts": true
+            }
+          },
+
+          "pull_request_review": {
+            "enabled": true
+          }
+
+        }
+      }
+    }
+
 }

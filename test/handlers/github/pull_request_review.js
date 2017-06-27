@@ -153,7 +153,6 @@ export function PullRequestReview() {
 			wrapped.run(request).then((response) => {
 				setTimeout(() => {
 					expect(response).to.not.be.empty
-					expect(response.body).to.equal('Github -- Review Changes Success')
 					expect(addReview.isDone()).to.be.true
 					expect(removeQA.isDone()).to.be.true
 					expect(removeApproved.isDone()).to.be.true
@@ -182,7 +181,6 @@ export function PullRequestReview() {
 			wrapped.run(request).then((response) => {
 				setTimeout(() => {
 					expect(response).to.not.be.empty
-					expect(response.body).to.equal('Github -- Review Changes Success')
 					expect(addQAandApproved.isDone()).to.be.true
 					expect(removeChangesRequested.isDone()).to.be.true
 					expect(firebaseLog.isDone()).to.be.true
@@ -212,7 +210,6 @@ export function PullRequestReview() {
 			wrapped.run(request).then((response) => {
 				setTimeout(() => {
 					expect(response).to.not.be.empty
-					expect(response.body).to.equal('Github -- Review Changes Request')
 					expect(reviews.isDone()).to.be.true
 					expect(firebaseLog.isDone()).to.be.true
 					expect(addChangesRequested.isDone()).to.be.true

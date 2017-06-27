@@ -1,32 +1,32 @@
 export const failure = JSON.stringify(
 	{
 		"repository": {
-			"html_url": "https://github.com/Kyle-Mendes/public-repo",
-			"full_name": "Kyle-Mendes/public-repo",
+			"html_url": "https://github.com/test/test",
+			"full_name": "test/test",
 		},
-	  "name": "Kyle-Mendes/public-repo",
+	  "name": "test/test",
 	  "context": "ci/circleci",
 	  "state": "failure",
 		"commit":
 		{
 			"author": { "id": '6400039' },
-			"html_url": "https://github.com/Kyle-Mendes/public-repo/commit/9049f1265b7d61be4a8904a9a27120d2064dab3b",
+			"html_url": "https://github.com/test/test/commit/9049f1265b7d61be4a8904a9a27120d2064dab3b",
 		},
 	})
 
 export const success = JSON.stringify(
 	{
-	  "name": "Kyle-Mendes/public-repo",
+	  "name": "test/test",
 		"repository": {
-			"html_url": "https://github.com/Kyle-Mendes/public-repo",
-			"full_name": "Kyle-Mendes/public-repo",
+			"html_url": "https://github.com/test/test",
+			"full_name": "test/test",
 		},
 	  "context": "ci/circleci",
 	  "state": "success",
 		"commit":
 		{
 			"author": { "id": '6400039' },
-			"html_url": "https://github.com/Kyle-Mendes/public-repo/commit/9049f1265b7d61be4a8904a9a27120d2064dab3b",
+			"html_url": "https://github.com/test/test/commit/9049f1265b7d61be4a8904a9a27120d2064dab3b",
 		},
 	})
 

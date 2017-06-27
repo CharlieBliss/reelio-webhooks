@@ -42,6 +42,12 @@ export const autoTransition = () => (
 		.reply(200)
 )
 
+export const autoTransition2 = () => (
+	nock('https://reelio.atlassian.net')
+		.post('/rest/api/2/issue/XYZ-3/transitions')
+		.reply(200)
+)
+
 // jira table
 
 export const createTable = () => (

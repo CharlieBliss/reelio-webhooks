@@ -31,14 +31,9 @@ export function PullRequest() {
 				const sha = payload.pull_request.head.sha
 
 				const issue = nocks.issues.genericIssue()
-				const reviews = nocks.reviews.noReviews()
 				const ticketStatus = nocks.status.QAgenericSuccess(sha)
-				const getTicket = nocks.jira.genericTicketData()
-				const featureBranchComment = nocks.github.featureBranchComment()
-				const addReview = nocks.labels.addReview()
-				const removeQA = nocks.labels.removeQA()
-				const removeApproved = nocks.labels.removeApproved()
-				const firebaseLog = nocks.firebase.genericFirebaseLog(2)
+				const firebaseLog = nocks.firebase.genericFirebaseLog()
+
 
 				const request = Object.assign({},
 					{ headers: headers.github },
@@ -48,12 +43,7 @@ export function PullRequest() {
 				wrapped.run(request).then((response) => {
 					setTimeout(() => {
 						expect(issue.isDone()).to.be.true
-						expect(reviews.isDone()).to.be.true
 						expect(ticketStatus.isDone()).to.be.true
-						expect(featureBranchComment.isDone()).to.be.true
-						expect(addReview.isDone()).to.be.true
-						expect(removeQA.isDone()).to.be.true
-						expect(removeApproved.isDone()).to.be.true
 						expect(firebaseLog.isDone()).to.be.true
 						done()
 					}, 50)
@@ -219,6 +209,7 @@ export function PullRequest() {
 				const removeQA = nocks.labels.removeQA()
 				const removeApproved = nocks.labels.removeApproved()
 				const firebaseLog = nocks.firebase.genericFirebaseLog(2)
+				const transition = nocks.jira.autoTransition()
 
 				const request = Object.assign({},
 					{ headers: headers.github },
@@ -237,6 +228,7 @@ export function PullRequest() {
 						expect(removeQA.isDone()).to.be.true
 						expect(removeApproved.isDone()).to.be.true
 						expect(firebaseLog.isDone()).to.be.true
+						expect(transition.isDone()).to.be.true
 						done()
 					}, 50)
 				})
@@ -258,6 +250,8 @@ export function PullRequest() {
 				const removeApproved = nocks.labels.removeApproved()
 				const ticketResponse = nocks.jira.genericTicketData(2)
 				const ticketResponse2 = nocks.jira.xyz3TicketData(2)
+				const transition = nocks.jira.autoTransition()
+				const transition2 = nocks.jira.autoTransition2()
 
 				const request = Object.assign({},
 					{ headers: headers.github },
@@ -278,6 +272,8 @@ export function PullRequest() {
 						expect(removeApproved.isDone()).to.be.true
 						expect(ticketResponse.isDone()).to.be.true
 						expect(ticketResponse2.isDone()).to.be.true
+						expect(transition.isDone()).to.be.true
+						expect(transition2.isDone()).to.be.true
 						done()
 					}, 50)
 				})

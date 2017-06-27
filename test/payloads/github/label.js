@@ -7,10 +7,10 @@ export const addWIP = {
     "color":"ff0000"
   },
 	"pull_request": {
-		"issue_url": "https://api.github.com/repos/Kyle-Mendes/public-repo/issues/1",
+		"issue_url": "https://api.github.com/repos/test/test/issues/1",
 	},
 	"repository": {
-		"full_name": "Kyle-Mendes/public-repo",
+		"full_name": "test/test",
 	},
 }
 
@@ -21,10 +21,10 @@ export const removeWIP = {
     "color":"ff0000"
   },
 	"pull_request": {
-	"issue_url": "https://api.github.com/repos/Kyle-Mendes/public-repo/issues/1",
+	"issue_url": "https://api.github.com/repos/test/test/issues/1",
 	},
 	"repository": {
-		"full_name": "Kyle-Mendes/public-repo",
+		"full_name": "test/test",
 	},
 }
 
@@ -39,9 +39,9 @@ export const removeChanges = {
 		"id": "7416637",
 	},
 	"repository": {
-		"full_name": "Kyle-Mendes/public-repo",
+		"full_name": "test/test",
 	},
-	"url": 'https://api.github.com/repos/Kyle-Mendes/public-repo/pulls/1',
-	"issue_url": "https://api.github.com/repos/Kyle-Mendes/public-repo/issues/1",
+	"url": 'https://api.github.com/repos/test/test/pulls/1',
+	"issue_url": "https://api.github.com/repos/test/test/issues/1",
 	},
 }

@@ -27,6 +27,14 @@ class Tickets {
 		})
 	}
 
+	transitionTicket(ticketUrl, transitionID) {
+		rp(Jira.post(`${ticketUrl}/transitions`, {
+			transition: {
+				id: transitionID,
+			},
+		}))
+	}
+
 	getTicketFirebaseInfo(ticket, repo, logData) {
 		const ticketBase = 'https://reelio.atlassian.net/rest/api/2/issue'
 		let firebaseInfo
@@ -49,7 +57,7 @@ class Tickets {
 			.catch(err => err)
 	}
 
-	transitionTickets(tickets, payload) {
+	updateTickets(tickets, payload) {
 		const head = payload.pull_request.head.ref
 		const parsedBranch = head.substr(head.indexOf('-') + 1, head.length)
 		const repo = payload.repository.html_url
@@ -59,16 +67,11 @@ class Tickets {
 				table = `|| Deployed On || PR API || PR Human || Deployed || QA Approved || \n || ${moment().format('l')} || [(internal use)|${payload.pull_request.url}] || [${payload.pull_request.number}|${payload.pull_request.html_url}] || [Yes|http://zzz-${parsedBranch}.s3-website-us-east-1.amazonaws.com/] || ||`
 
 			// Make sure the ticket is marked as `Ready for QA`
-			rp(Jira.post(`${ticketUrl}/transitions`, {
-				transition: {
-					id: 221,
-				},
-			}))
-				.then(() => {
-					this.getTicketFirebaseInfo(ticket, repo, (board, data) => {
-						Firebase.log('JIRA', board, 'transition', 'QA', { ticket: data })
-					})
-				})
+			this.transitionTicket(ticketUrl, 221)
+
+			this.getTicketFirebaseInfo(ticket, repo, (board, data) => {
+				Firebase.log('JIRA', board, 'transition', 'QA', { ticket: data })
+			})
 
 			// Update the ticket with our new table
 			rp(Jira.put(`${ticketUrl}`, {

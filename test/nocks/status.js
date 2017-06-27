@@ -2,7 +2,7 @@ import nock from 'nock'
 
 export const genericStatus = (sha) => (
 	nock('https://api.github.com')
-	.post(`/repos/Kyle-Mendes/public-repo/statuses/${sha}`)
+	.post(`/repos/test/test/statuses/${sha}`)
 	.reply(200)
 )
 // ---------------
@@ -12,7 +12,7 @@ export const genericStatus = (sha) => (
 // ci/reelio failures
 export const failureChangedRequested = (sha) => (
 	nock('https://api.github.com')
-		.post(`/repos/Kyle-Mendes/public-repo/statuses/${sha}`,
+		.post(`/repos/test/test/statuses/${sha}`,
 			{
 				state: 'failure',
 				description: 'This PR is blocked from merging due to a pending request for changes.',
@@ -23,7 +23,7 @@ export const failureChangedRequested = (sha) => (
 
 export const failureWaitingOnReview = (sha) => (
 	nock('https://api.github.com')
-		.post(`/repos/Kyle-Mendes/public-repo/statuses/${sha}`,
+		.post(`/repos/test/test/statuses/${sha}`,
 			{
 				state: 'failure',
 				description: `This PR requires 1 more approved review to be merged.`,
@@ -34,7 +34,7 @@ export const failureWaitingOnReview = (sha) => (
 
 export const failureWaitingOnTwoReviews = (sha) => (
 	nock('https://api.github.com')
-		.post(`/repos/Kyle-Mendes/public-repo/statuses/${sha}`,
+		.post(`/repos/test/test/statuses/${sha}`,
 			{
 				state: 'failure',
 				description: `This PR requires 2 more approved reviews to be merged.`,
@@ -46,7 +46,7 @@ export const failureWaitingOnTwoReviews = (sha) => (
 // ci/reelio successes
 export const masterSuccessCI = (sha) => (
 	nock('https://api.github.com')
-		.post(`/repos/Kyle-Mendes/public-repo/statuses/${sha}`,
+		.post(`/repos/test/test/statuses/${sha}`,
 			{
 				state: 'success',
 				description: 'No reviews required',
@@ -57,7 +57,7 @@ export const masterSuccessCI = (sha) => (
 
 export const successCI = (sha) => (
 	nock('https://api.github.com')
-		.post(`/repos/Kyle-Mendes/public-repo/statuses/${sha}`,
+		.post(`/repos/test/test/statuses/${sha}`,
 			{
 				state: 'success',
 				description: `At least 2 reviews, all reviews approved.`,
@@ -73,7 +73,7 @@ export const successCI = (sha) => (
 //ci/qa failures
 export const QAWaitingOn1 = (sha) => (
 	nock('https://api.github.com')
-		.post(`/repos/Kyle-Mendes/public-repo/statuses/${sha}`)
+		.post(`/repos/test/test/statuses/${sha}`)
 		.reply(200,
 			{
 				state: 'failure',
@@ -84,7 +84,7 @@ export const QAWaitingOn1 = (sha) => (
 
 export const QAWaitingOn2 = (sha) => (
 	nock('https://api.github.com')
-		.post(`/repos/Kyle-Mendes/public-repo/statuses/${sha}`)
+		.post(`/repos/test/test/statuses/${sha}`)
 		.reply(200,
 			{
 				state: 'failure',
@@ -97,7 +97,7 @@ export const QAWaitingOn2 = (sha) => (
 
 export const QAgenericSuccess = (sha) => (
 	nock('https://api.github.com')
-		.post(`/repos/Kyle-Mendes/public-repo/statuses/${sha}`)
+		.post(`/repos/test/test/statuses/${sha}`)
 		.reply(200,
 			{
 				state: 'success',
