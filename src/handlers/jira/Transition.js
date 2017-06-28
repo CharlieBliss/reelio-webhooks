@@ -7,11 +7,6 @@ export function Transition(payload) {
 	if (payload.transition.transitionId === 51) {
 		const TicketTable = payload.issue.fields.customfield_10900
 
-		if (!TicketTable) {
-			// This should be impossible
-			return 'No table ticket!!!'
-		}
-
 		const PRRoute = TicketTable.match(/\[\(internal use\)\|([^\]]*)\]/)[1]
 
 		Tickets.checkTicketStatus(PRRoute)
