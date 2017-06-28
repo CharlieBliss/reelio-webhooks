@@ -1,4 +1,3 @@
-import Slack from '../../helpers/slack'
 import Tickets from '../../helpers/tickets'
 
 export function Transition(payload) {
@@ -9,8 +8,7 @@ export function Transition(payload) {
 		const TicketTable = payload.issue.fields.customfield_10900
 
 		if (!TicketTable) {
-			// Warn Kyle.  This should be impossible
-			Slack.noTable(payload)
+			// This should be impossible
 			return 'No table ticket!!!'
 		}
 
