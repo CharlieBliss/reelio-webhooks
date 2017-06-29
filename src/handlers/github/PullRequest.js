@@ -191,20 +191,30 @@ function handleMerge(payload, config) {
 			const ticketBase = 'https://reelio.atlassian.net/rest/api/2/issue'
 			const responses = []
 
-			Promise.all(uniqueTickets.map(t => rp(Jira.get(`${ticketBase}/${t}`)) //eslint-disable-line
-				.then((data) => {
-					responses.push(JSON.parse(data))
-				}),
-			)).then(() => {
-				const formattedTickets = Tickets.formatTicketData(responses, repo)
+			if (uniqueTickets.length < 10) {
+				Promise.all(uniqueTickets.map(t => rp(Jira.get(`${ticketBase}/${t}`)) //eslint-disable-line
+					.then((data) => {
+						responses.push(JSON.parse(data))
+					}),
+				)).then(() => {
+					const formattedTickets = Tickets.formatTicketData(responses, repo)
 
+					Firebase.log('github', payload.repository.full_name, 'reelio_deploy', null, {
+						tickets: formattedTickets,
+						fixed_count: uniqueTickets.length,
+						environment: alertConfig.env,
+						target: alertConfig.url,
+					})
+				})
+			} else {
 				Firebase.log('github', payload.repository.full_name, 'reelio_deploy', null, {
-					tickets: formattedTickets,
-					fixed_count: tickets.filter(uniqueTicketFilter).length,
+					tickets: uniqueTickets,
+					fixed_count: uniqueTickets.length,
 					environment: alertConfig.env,
 					target: alertConfig.url,
 				})
-			})
+			}
+
 		}
 	})
 

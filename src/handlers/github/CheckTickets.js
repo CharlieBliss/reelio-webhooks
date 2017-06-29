@@ -20,8 +20,6 @@ function CheckTickets(payload, event, status) {
 	if (status) {
 		Tickets.checkTicketStatus(prUrl, false, status)
 	}
-
 }
-
 
 export default CheckTickets
