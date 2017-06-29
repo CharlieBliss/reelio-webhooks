@@ -4,8 +4,8 @@
 1. [Review](#review)
 1. [Check Reviewers](#check-reviewers)
 1. [Pull Request](#pull-request)
-  * [Github](#Github)
-  * [Jira](#jira)
+   - [Github](#Github)
+   - [Jira](#jira)
 
 ## Getting Started:
 1. Install [ngrok](https://ngrok.com/) via `brew`
