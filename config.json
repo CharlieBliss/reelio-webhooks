@@ -181,15 +181,17 @@
   },
 
   "Kyle-Mendes": {
-    "public-repo": {
+    "webhook-test": {
       "github": {
         "labels": {
           "enabled": true
         },
+
         "require_reviews": {
           "enabled": true,
           "count": 2
         },
+
         "status": {
           "enabled": true
         },
@@ -201,44 +203,18 @@
           "labels": true,
 
           "opened": {
-            "enabled": true,
+            "feature": true,
+            "tickets": true,
             "transition": true
           },
 
           "merged": {
-            "alert": {
-              "channel": "#frontend-deploys",
-              "url": "http://pro.reelio.com",
-              "env": "production"
-            },
             "create": true,
             "congrats": true,
             "conflicts": true
           }
         },
 
-        "pull_request_review": {
-          "enabled": true
-        }
-      }
-    },
-
-    "webhook-test": {
-      "github": {
-        "labels": {
-          "enabled": true
-        },
-        "require_reviews": {
-          "enabled": true,
-          "count": 10
-        },
-        "status": {
-          "enabled": true
-        },
-        "pull_request": {
-          "enabled": true,
-          "done_status": 10001
-        },
         "pull_request_review": {
           "enabled": true
         }
