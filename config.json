@@ -251,6 +251,48 @@
     }
   },
 
+  "tchryssos": {
+    "Webhooks-Test": {
+        "github": {
+          "labels": {
+            "enabled": true
+          },
+
+          "require_reviews": {
+            "enabled": true,
+            "count": 2
+          },
+
+          "status": {
+            "enabled": true
+          },
+
+          "pull_request": {
+            "enabled": true,
+            "done_status": 10001,
+
+            "labels": true,
+
+            "opened": {
+              "feature": true,
+              "tickets": true,
+              "transition": true
+            },
+
+            "merged": {
+              "create": true,
+              "congrats": true,
+              "conflicts": true
+            }
+          },
+
+          "pull_request_review": {
+            "enabled": true
+          }
+        }
+      }
+    },
+
     "test": {
       "test": {
 
