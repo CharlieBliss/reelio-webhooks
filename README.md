@@ -11,30 +11,30 @@
 1. Install [ngrok](https://ngrok.com/) via `brew`
 1. Clone down the repository.
 1. Install Dependencies
-  - `npm install` or `yarn`
-  - `npm install -g serverless`
+   - `npm install` or `yarn`
+   - `npm install -g serverless`
 1. Generate a Github API Token
-  - Go to https://github.com/settings/tokens
-  - Click Generate New Token
-  - Check `repo` and `admin:repo_hook`
-  - Copy the output
+   - Go to https://github.com/settings/tokens
+   - Click Generate New Token
+   - Check `repo` and `admin:repo_hook`
+   - Copy the output
 1. Start the offline serverless runtime
-  - `github_token=<your_github_token> sls offline start`
-  - `ngrok http 3000`
+   - `github_token=<your_github_token> sls offline start`
+   - `ngrok http 3000`
 1. Set up a test repository on your personal Github.
-  - Create repo.
-  - Go to Settings > Webhooks
-  - Add a webhook.
-  - Put the ngrok Forwarding URL, followed by `/github `in Payload URL (`http://123.ngrok.io/github`)
-  - Set Content Type to `application/json`
-  - Select "Send me *everything*."
-  - Select "Active"
-  - Click "Add Webhook"
+   - Create repo.
+   - Go to Settings > Webhooks
+   - Add a webhook.
+   - Put the ngrok Forwarding URL, followed by `/github `in Payload URL (`http://123.ngrok.io/github`)
+   - Set Content Type to `application/json`
+   - Select "Send me *everything*."
+   - Select "Active"
+   - Click "Add Webhook"
 1. Setup config
-  - In `./config.json` add an object with:
-    - Your github username
-    - Your test repository
-    - Config options for the functionality you're going to test
+   - In `./config.json` add an object with:
+     - Your github username
+     - Your test repository
+     - Config options for the functionality you're going to test
 
 ## Status:
   **Monitors CircleCI status of Pull Requests**
