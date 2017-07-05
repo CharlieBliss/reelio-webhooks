@@ -233,8 +233,28 @@ function handleMerge(payload, config) {
 	return 'Merged!'
 }
 
-function PullRequest(payload, config) {
+function handleDeploy(payload, config) {
+	const PRRoute = payload.pull_request.url
+	rp(Github.get(PRRoute))
+		.then((response) => {
+			const PR = JSON.parse(response)
+			const sha = PR.head.sha
+			const branch = PR.head.ref
 
+			if (config.continuous_deployment.branches.size === 0 || config.continuous_deployment.branches.includes(branch)) {
+				rp(Github.get(`${PR.head.repo.url}/commits/${sha}/status`))
+					.then((statusResp) => {
+						if (statusResp.state === 'success' && payload.state === 'success' && payload.context === 'ci/circleci') {
+							rp(Github.put(`${PRRoute}/merge`))
+							return 'PR Auto-Merged'
+						}
+						return 'No Auto Deploy'
+					})
+			}
+		})
+}
+
+function PullRequest(payload, config) {
 	if (
 		(payload.action === 'labeled' || payload.action === 'unlabeled') &&
 		config.labels
@@ -256,6 +276,13 @@ function PullRequest(payload, config) {
 		config.merged
 	) {
 		return handleMerge(payload, config)
+	}
+
+	if (
+		payload.action === 'synchronize' &&
+		config.continuous_deployment.enabled
+	) {
+		return handleDeploy(payload, config)
 	}
 
 	return 'Pull Request -- No action taken'
