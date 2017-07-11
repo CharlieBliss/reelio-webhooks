@@ -242,13 +242,8 @@
           "create": true,
           "congrats": true,
           "conflicts": true
-				},
-					"continuous_deployment": {
-						"enabled": true,
-						"branches": []
-					}
+          }
         },
-
         "pull_request_review": {
           "enabled": true
         }
@@ -337,13 +332,7 @@
               "create": true,
               "congrats": true,
               "conflicts": true
-            },
-
-						"continuous_deployment": {
-							"enabled": true,
-							"branches": null
-						}
-
+            }
           },
 
           "pull_request_review": {
