@@ -59,12 +59,12 @@ class Tickets {
 
 	updateTickets(tickets, payload) {
 		const head = payload.pull_request.head.ref
-		const parsedBranch = head.substr(head.indexOf('-') + 1, head.length)
+		const parsedBranch = head.substr(head.indexOf('-') + 1, head.length).toLowerCase()
 		const repo = payload.repository.html_url
 
 		tickets.forEach((ticket) => {
 			const ticketUrl = `https://reelio.atlassian.net/rest/api/2/issue/${ticket}`,
-				table = `|| Deployed On || PR API || PR Human || Deployed || QA Approved || \n || ${moment().format('l')} || [(internal use)|${payload.pull_request.url}] || [${payload.pull_request.number}|${payload.pull_request.html_url}] || [Yes|http://zzz-${parsedBranch}.s3-website-us-east-1.amazonaws.com/] || ||`
+				table = `|| Deployed On || PR API || PR Human || Deployed || QA Approved || \n || ${moment().format('l')} || [(internal use)|${payload.pull_request.url}] || [${payload.pull_request.number}|${payload.pull_request.html_url}] || [Yes|http://features.pro.reelio.com/${parsedBranch}] || ||`
 
 			// Make sure the ticket is marked as `Ready for QA`
 			this.transitionTicket(ticketUrl, 221)
@@ -130,7 +130,11 @@ class Tickets {
 							}))
 							if (labels) {
 								request(Github.post(`${PR.issue_url}/labels`, ['$$qa approved']))
-								request(Github.delete(`${PR.issue_url}/labels/%24%24qa`))
+								try {
+									request(Github.delete(`${PR.issue_url}/labels/%24%24qa`))
+								} catch (e) {
+									console.error(`Couldn't remove label $$qa from PR #${PR.id}`)
+								}
 							}
 						} else {
 							const unresolved = uniqueTickets.length - resolved.length
@@ -141,7 +145,11 @@ class Tickets {
 							}))
 							if (labels) {
 								request(Github.post(`${PR.issue_url}/labels`, ['$$qa']))
-								request(Github.delete(`${PR.issue_url}/labels/%24%24qa%20approved`))
+								try {
+									request(Github.delete(`${PR.issue_url}/labels/%24%24qa%20approved`))
+								} catch (e) {
+									console.error(`Couldn't remove label '$$qa approved' from PR #${PR.id}`)
+								}
 							}
 						}
 					})
