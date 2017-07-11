@@ -114,15 +114,14 @@ class Tickets {
 				const ticketBase = 'https://reelio.atlassian.net/rest/api/2/issue'
 				const responses = []
 
-				Promise.all(uniqueTickets.map((t) => { //eslint-disable-line
+				Promise.all(uniqueTickets.map((t) => {
 					console.log(Jira.get(`${ticketBase}/${t}`))
 					return rp(Jira.get(`${ticketBase}/${t}`))
-				}) //eslint-disable-line
-					.then((data) => {
-						responses.push(JSON.parse(data))
-					})
-					.catch((err) => { console.log(err) }),
-				)
+						.then((data) => {
+							responses.push(JSON.parse(data))
+						})
+						.catch((err) => { console.log(err) })
+				}))
 					.then(() => {
 						const resolved = responses.filter(ticket => ticket.fields.status.id === status)
 						if (resolved.length === uniqueTickets.length) {
