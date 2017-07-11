@@ -64,7 +64,7 @@ class Tickets {
 
 		tickets.forEach((ticket) => {
 			const ticketUrl = `https://reelio.atlassian.net/rest/api/2/issue/${ticket}`,
-				table = `|| Deployed On || PR API || PR Human || Deployed || QA Approved || \n || ${moment().format('l')} || [(internal use)|${payload.pull_request.url}] || [${payload.pull_request.number}|${payload.pull_request.html_url}] || [Yes|http://zzz-${parsedBranch}.s3-website-us-east-1.amazonaws.com/] || ||`
+				table = `|| Deployed On || PR API || PR Human || Deployed || QA Approved || \n || ${moment().format('l')} || [(internal use)|${payload.pull_request.url}] || [${payload.pull_request.number}|${payload.pull_request.html_url}] || [Yes|http://features.pro.reelio.com/${parsedBranch}] || ||`
 
 			// Make sure the ticket is marked as `Ready for QA`
 			this.transitionTicket(ticketUrl, 221)

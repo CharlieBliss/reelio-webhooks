@@ -16,7 +16,7 @@ export const qaToDone = {
 		"self": "https://reelio.atlassian.net/rest/api/2/issue/27609",
 		"key": "XYZ-2",
 		"fields": {
-			"customfield_10900": "|| Deployed On || PR API || PR Human || Deployed || QA Approved || \n || 3/31/2017 || [(internal use)|https://api.github.com/repos/test/test/pulls/1] || [26|https://github.com/test/test/pull/26] || [Yes|http://zzz-xyz1.s3-website-us-east-1.amazonaws.com/] || ||",
+			"customfield_10900": "|| Deployed On || PR API || PR Human || Deployed || QA Approved || \n || 3/31/2017 || [(internal use)|https://api.github.com/repos/test/test/pulls/1] || [26|https://github.com/test/test/pull/26] || [Yes|http://features.pro.reelio.com/xyz1] || ||",
 			"assignee": {
 				"displayName": "Dillon McRoberts",
 			},
