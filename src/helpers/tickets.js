@@ -130,7 +130,11 @@ class Tickets {
 							}))
 							if (labels) {
 								request(Github.post(`${PR.issue_url}/labels`, ['$$qa approved']))
-								request(Github.delete(`${PR.issue_url}/labels/%24%24qa`))
+								try {
+									request(Github.delete(`${PR.issue_url}/labels/%24%24qa`))
+								} catch (e) {
+									console.error(`Couldn't remove label $$qa from PR #${PR.id}`)
+								}
 							}
 						} else {
 							const unresolved = uniqueTickets.length - resolved.length
@@ -141,7 +145,11 @@ class Tickets {
 							}))
 							if (labels) {
 								request(Github.post(`${PR.issue_url}/labels`, ['$$qa']))
-								request(Github.delete(`${PR.issue_url}/labels/%24%24qa%20approved`))
+								try {
+									request(Github.delete(`${PR.issue_url}/labels/%24%24qa%20approved`))
+								} catch (e) {
+									console.error(`Couldn't remove label '$$qa approved' from PR #${PR.id}`)
+								}
 							}
 						}
 					})
