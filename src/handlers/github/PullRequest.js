@@ -112,7 +112,7 @@ function handleNew(payload, config) {
 				Firebase.log('github', payload.repository.full_name, 'pull_request', 'featureless', payload)
 			} else {
 				const parsedBranch = head.substr(head.indexOf('-') + 1, head.length),
-					url = `http://features.pro.reelio.com/${parsedBranch}`
+					url = `http://features.pro.reelio.com/${parsedBranch}`.toLowerCase()
 
 				request(Github.post(`${payload.pull_request.issue_url}/comments`, { body: `@${payload.pull_request.user.login} - Thanks for the PR! Your feature branch is now [live](${url})` }))
 

@@ -59,7 +59,7 @@ class Tickets {
 
 	updateTickets(tickets, payload) {
 		const head = payload.pull_request.head.ref
-		const parsedBranch = head.substr(head.indexOf('-') + 1, head.length)
+		const parsedBranch = head.substr(head.indexOf('-') + 1, head.length).toLowerCase()
 		const repo = payload.repository.html_url
 
 		tickets.forEach((ticket) => {
