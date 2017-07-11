@@ -17,7 +17,7 @@
 
         "pull_request": {
           "enabled": true,
-          "done_status": 10001,
+          "done_status": "10001",
 
           "labels": true,
 
@@ -62,7 +62,7 @@
 
         "pull_request": {
           "enabled": true,
-          "done_status": 10001,
+          "done_status": "10001",
 
           "labels": true
         },
@@ -87,7 +87,7 @@
         },
         "pull_request": {
           "enabled": true,
-          "done_status": 10001,
+          "done_status": "10001",
           "merged": {
             "conflicts": true,
             "congrats": true
@@ -115,7 +115,7 @@
         },
 
         "pull_request": {
-          "done_status": 10001,
+          "done_status": "10001",
           "enabled": true,
 
           "labels": true,
@@ -156,7 +156,7 @@
 
         "pull_request": {
           "enabled": true,
-          "done_status": 10001,
+          "done_status": "10001",
 
           "labels": true,
 
@@ -198,7 +198,7 @@
 
         "pull_request": {
           "enabled": true,
-          "done_status": 10001,
+          "done_status": "10001",
 
           "labels": true,
 
@@ -237,7 +237,7 @@
         },
         "pull_request": {
           "enabled": true,
-          "done_status": 10001,
+          "done_status": "10001",
           "merged": {
           "create": true,
           "congrats": true,
@@ -274,7 +274,7 @@
 
           "pull_request": {
             "enabled": true,
-            "done_status": 10001,
+            "done_status": "10001",
 
             "labels": true,
 
@@ -320,7 +320,7 @@
 
             "labels": true,
 
-            "done_status": 10001,
+            "done_status": "10001",
 
             "opened": {
               "feature": true,
