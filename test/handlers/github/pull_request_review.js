@@ -93,6 +93,7 @@ export function PullRequestReview() {
 			const reviews = nocks.reviews.doubleApproved()
 			const transition = nocks.jira.autoTransition()
 			const ticketTable = nocks.jira.createTable()
+			const getJiraStatus = nocks.jira.genericTicketData()
 			const addQAandApproved = nocks.labels.addQAandApproved()
 			const removeReview = nocks.labels.removeReview()
 			const removeChangesRequested = nocks.labels.removeChangesRequested()
@@ -101,12 +102,14 @@ export function PullRequestReview() {
 				setTimeout(() => {
 					expect(successCI.isDone()).to.be.true
 					expect(reviews.isDone()).to.be.true
-					expect(transition.isDone()).to.be.true
+					expect(transition.isDone()).to.not.be.true
 					expect(ticketTable.isDone()).to.be.true
+					expect(getJiraStatus.isDone()).to.be.true
 					expect(addQAandApproved.isDone()).to.be.true
 					expect(removeReview.isDone()).to.be.true
 					expect(removeChangesRequested.isDone()).to.be.true
-					expect(nock.pendingMocks()).to.be.empty
+					// 1 pending mock since transition NOT made
+					expect(nock.pendingMocks().length).to.equal(1)
 					done()
 				}, 30)
 			})
@@ -122,17 +125,20 @@ export function PullRequestReview() {
 			const addQAandApproved = nocks.labels.addQAandApproved()
 			const removeChanges = nocks.labels.removeChangesRequested()
 			const removeReview = nocks.labels.removeReview()
+			const getJiraStatus = nocks.jira.genericTicketData()
 
 			CheckReviews(payload, 'pull_request')
 				setTimeout(() => {
 					expect(successCI.isDone()).to.be.true
 					expect(reviews.isDone()).to.be.true
-					expect(transition.isDone()).to.be.true
+					expect(transition.isDone()).to.not.be.true
 					expect(ticketTable.isDone()).to.be.true
 					expect(addQAandApproved.isDone()).to.be.true
 					expect(removeReview.isDone()).to.be.true
 					expect(removeChanges.isDone()).to.be.true
-					expect(nock.pendingMocks()).to.be.empty
+					expect(getJiraStatus.isDone()).to.be.true
+					// 1 pending mock since transition NOT made
+					expect(nock.pendingMocks().length).to.equal(1)
 					done()
 				}, 30)
 			})

@@ -1,9 +1,9 @@
 import request from 'request'
 import rp from 'request-promise'
 import moment from 'moment'
+import { TICKET_BASE, jiraRegex } from '../consts'
 
 import { uniqueTicketFilter } from '../helpers/utils'
-import { jiraRegex } from '../consts'
 
 import Github from '../helpers/github'
 import Firebase from '../helpers/firebase'
@@ -35,11 +35,19 @@ class Tickets {
 		}))
 	}
 
+	getJiraStatus(ticket) {
+		return rp(Jira.get(`${TICKET_BASE}/${ticket}`))
+			.then((response) => {
+				const ticketInfo = JSON.parse(response)
+				const ticketStatus = ticketInfo.fields.status.id
+				return ticketStatus.toString()
+			})
+	}
+
 	getTicketFirebaseInfo(ticket, repo, logData) {
-		const ticketBase = 'https://reelio.atlassian.net/rest/api/2/issue'
 		let firebaseInfo
 
-		rp(Jira.get(`${ticketBase}/${ticket}`))
+		rp(Jira.get(`${TICKET_BASE}/${ticket}`))
 			.then((response) => {
 				const ticketInfo = (JSON.parse(response))
 				const board = ticketInfo.fields.project.key
@@ -67,7 +75,12 @@ class Tickets {
 				table = `|| Deployed On || PR API || PR Human || Deployed || QA Approved || \n || ${moment().format('l')} || [(internal use)|${payload.pull_request.url}] || [${payload.pull_request.number}|${payload.pull_request.html_url}] || [Yes|http://features.pro.reelio.com/${parsedBranch}] || ||`
 
 			// Make sure the ticket is marked as `Ready for QA`
-			this.transitionTicket(ticketUrl, 221)
+			this.getJiraStatus(ticket)
+				.then((status) => {
+					if (status === '10400') {
+						this.transitionTicket(ticketUrl, 221)
+					}
+				})
 
 			this.getTicketFirebaseInfo(ticket, repo, (board, data) => {
 				Firebase.log('JIRA', board, 'transition', 'QA', { ticket: data })
@@ -111,17 +124,13 @@ class Tickets {
 					return 'No Tickets'
 				}
 
-				const ticketBase = 'https://reelio.atlassian.net/rest/api/2/issue'
 				const responses = []
 
-				Promise.all(uniqueTickets.map((t) => {
-					console.log(Jira.get(`${ticketBase}/${t}`))
-					return rp(Jira.get(`${ticketBase}/${t}`))
+				Promise.all(uniqueTickets.map(t => rp(Jira.get(`${TICKET_BASE}/${t}`))
 						.then((data) => {
 							responses.push(JSON.parse(data))
 						})
-						.catch((err) => { console.log(err) })
-				}))
+						.catch((err) => { console.log(err) })))
 					.then(() => {
 						const resolved = responses.filter(ticket => ticket.fields.status.id === status)
 						if (resolved.length === uniqueTickets.length) {
