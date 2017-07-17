@@ -21,6 +21,8 @@
 
           "labels": true,
 
+          "high_priority_label": true,
+
           "opened": {
             "feature": true,
             "tickets": true,
@@ -63,7 +65,7 @@
         "pull_request": {
           "enabled": true,
           "done_status": "10001",
-
+          "high_priority_label": true,
           "labels": true
         },
 
@@ -87,6 +89,7 @@
         },
         "pull_request": {
           "enabled": true,
+          "high_priority_label": true,
           "done_status": "10001",
           "merged": {
             "conflicts": true,
@@ -117,7 +120,7 @@
         "pull_request": {
           "done_status": "10001",
           "enabled": true,
-
+          "high_priority_label": true,
           "labels": true,
 
           "opened": {
@@ -157,7 +160,7 @@
         "pull_request": {
           "enabled": true,
           "done_status": "10001",
-
+          "high_priority_label": true,
           "labels": true,
 
           "opened": {
@@ -316,6 +319,8 @@
             "labels": true,
 
             "done_status": "10001",
+
+            "high_priority_label": true,
 
             "opened": {
               "feature": true,

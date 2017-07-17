@@ -203,7 +203,7 @@ export function PullRequest() {
 				const reviews = nocks.reviews.noReviews()
 				const PRRoute = nocks.pull_request.ticketlessPR()
 				const ticketStatus = nocks.status.QAgenericSuccess(sha)
-				const getTicket = nocks.jira.genericTicketData()
+				const getTicket = nocks.jira.genericTicketData(2)
 				const featureBranchComment = nocks.github.featureBranchComment()
 				const addReview = nocks.labels.addReview()
 				const removeQA = nocks.labels.removeQA()
@@ -230,7 +230,48 @@ export function PullRequest() {
 						expect(firebaseLog.isDone()).to.be.true
 						expect(transition.isDone()).to.be.true
 						done()
-					}, 50)
+					}, 1000)
+				})
+			})
+
+			it('Should properly handle a new High Priority Pull Request (single ticket)', (done) => {
+				let payload = githubPayloads.pullRequest.pullRequestOpenedStaging
+				const sha = payload.pull_request.head.sha
+
+				const issue = nocks.issues.genericIssue()
+				const reviews = nocks.reviews.noReviews()
+				const PRRoute = nocks.pull_request.ticketlessPR()
+				const ticketStatus = nocks.status.QAgenericSuccess(sha)
+				const getTicket = nocks.jira.highPriorityTicket(2)
+				const featureBranchComment = nocks.github.featureBranchComment()
+				const addReview = nocks.labels.addReview()
+				const removeQA = nocks.labels.removeQA()
+				const removeApproved = nocks.labels.removeApproved()
+				const firebaseLog = nocks.firebase.genericFirebaseLog(2)
+				const transition = nocks.jira.autoTransition()
+				const addHighPriority = nocks.labels.addHighPriority()
+
+				const request = Object.assign({},
+					{ headers: headers.github },
+					{ body: JSON.stringify(payload) })
+				request.headers['X-Github-Event'] = 'pull_request'
+
+				wrapped.run(request).then((response) => {
+					setTimeout(() => {
+						expect(issue.isDone()).to.be.true
+						expect(reviews.isDone()).to.be.true
+						expect(PRRoute.isDone()).to.be.true
+						expect(ticketStatus.isDone()).to.be.true
+						expect(getTicket.isDone()).to.be.true
+						expect(featureBranchComment.isDone()).to.be.true
+						expect(addReview.isDone()).to.be.true
+						expect(addHighPriority.isDone()).to.be.true
+						expect(removeQA.isDone()).to.be.true
+						expect(removeApproved.isDone()).to.be.true
+						expect(firebaseLog.isDone()).to.be.true
+						expect(transition.isDone()).to.be.true
+						done()
+					}, 1000)
 				})
 			})
 
@@ -248,8 +289,8 @@ export function PullRequest() {
 				const addReview = nocks.labels.addReview()
 				const removeQA = nocks.labels.removeQA()
 				const removeApproved = nocks.labels.removeApproved()
-				const ticketResponse = nocks.jira.genericTicketData(2)
-				const ticketResponse2 = nocks.jira.xyz3TicketData(2)
+				const ticketResponse = nocks.jira.genericTicketData(3)
+				const ticketResponse2 = nocks.jira.xyz3TicketData(3)
 				const transition = nocks.jira.autoTransition()
 				const transition2 = nocks.jira.autoTransition2()
 
@@ -275,9 +316,57 @@ export function PullRequest() {
 						expect(transition.isDone()).to.be.true
 						expect(transition2.isDone()).to.be.true
 						done()
-					}, 50)
+					}, 1000)
 				})
 			})
+
+			it('Should properly handle a new High Priority Pull Request (multi tickets)', (done) => {
+				let payload = githubPayloads.pullRequest.stagingMultiTicketsPR
+				const sha = payload.pull_request.head.sha
+
+				const issue = nocks.issues.genericIssue()
+				const reviews = nocks.reviews.noReviews()
+				const PRRoute = nocks.pull_request.stagingMultiTicketsPR()
+				const failureCI = nocks.status.failureWaitingOnTwoReviews(sha)
+				const firebaseLog = nocks.firebase.genericFirebaseLog(2)
+				const ticketStatus = nocks.status.QAWaitingOn2(sha)
+				const featureBranchComment = nocks.github.featureBranchComment()
+				const addReview = nocks.labels.addReview()
+				const addHighPriority = nocks.labels.addHighPriority()
+				const removeQA = nocks.labels.removeQA()
+				const removeApproved = nocks.labels.removeApproved()
+				const ticketResponse = nocks.jira.highPriorityTicket(3)
+				const ticketResponse2 = nocks.jira.xyz3TicketData(3)
+				const transition = nocks.jira.autoTransition()
+				const transition2 = nocks.jira.autoTransition2()
+
+				const request = Object.assign({},
+					{ headers: headers.github },
+					{ body: JSON.stringify(payload) })
+				request.headers['X-Github-Event'] = 'pull_request'
+
+				wrapped.run(request).then((response) => {
+					setTimeout(() => {
+						expect(issue.isDone()).to.be.true
+						expect(reviews.isDone()).to.be.true
+						expect(PRRoute.isDone()).to.be.true
+						expect(failureCI.isDone()).to.be.true
+						expect(firebaseLog.isDone()).to.be.true
+						expect(ticketStatus.isDone()).to.be.true
+						expect(featureBranchComment.isDone()).to.be.true
+						expect(addReview.isDone()).to.be.true
+						expect(addHighPriority.isDone()).to.be.true
+						expect(removeQA.isDone()).to.be.true
+						expect(removeApproved.isDone()).to.be.true
+						expect(ticketResponse.isDone()).to.be.true
+						expect(ticketResponse2.isDone()).to.be.true
+						expect(transition.isDone()).to.be.true
+						expect(transition2.isDone()).to.be.true
+						done()
+					}, 1000)
+				})
+			})
+
 		})
 
 		describe('Handles Merge Pull Request', () => {
@@ -313,7 +402,7 @@ export function PullRequest() {
 						expect(removeRebase.isDone()).to.be.true
 						expect(nock.pendingMocks()).to.be.empty
 						done()
-					}, 50)
+					}, 1000)
 				})
 			})
 

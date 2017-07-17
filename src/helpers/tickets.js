@@ -71,7 +71,7 @@ class Tickets {
 		const repo = payload.repository.html_url
 
 		tickets.forEach((ticket) => {
-			const ticketUrl = `https://reelio.atlassian.net/rest/api/2/issue/${ticket}`,
+			const ticketUrl = `${TICKET_BASE}/${ticket}`,
 				table = `|| Deployed On || PR API || PR Human || Deployed || QA Approved || \n || ${moment().format('l')} || [(internal use)|${payload.pull_request.url}] || [${payload.pull_request.number}|${payload.pull_request.html_url}] || [Yes|http://features.pro.reelio.com/${parsedBranch}] || ||`
 
 			// Make sure the ticket is marked as `Ready for QA`
@@ -168,6 +168,24 @@ class Tickets {
 				return 'Ticket Status updated'
 			})
 			.catch(err => (err))
+	}
+
+	setPriority(tickets, pr) {
+		let highPriority
+
+		Promise.all(tickets.map(ticket =>
+			rp(Jira.get(`${TICKET_BASE}/${ticket}`)),
+		))
+			.then((response) => {
+				highPriority = response.some(ticket => (
+					JSON.parse(ticket).fields.priority.id === '1'
+				))
+			})
+			.then(() => {
+				if (highPriority) {
+					request(Github.post(`${pr}/labels`, ['High Priority']))
+				}
+			})
 	}
 }
 

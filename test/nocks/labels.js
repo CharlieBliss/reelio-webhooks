@@ -50,6 +50,12 @@ export const addTicketless = () => (
 		.reply(200)
 )
 
+export const addHighPriority = () => (
+	nock('https://api.github.com')
+	.post('/repos/test/test/issues/1/labels', ['High Priority'])
+	.reply(200)
+)
+
 // remove labels
 
 export const removeApproved = () => (

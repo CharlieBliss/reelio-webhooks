@@ -116,9 +116,9 @@ function handleNew(payload, config) {
 
 				request(Github.post(`${payload.pull_request.issue_url}/comments`, { body: `@${payload.pull_request.user.login} - Thanks for the PR! Your feature branch is now [live](${url})` }))
 
-				// If tickets are enabled, grab their information and save it to firebase
 				if (config.opened.enabled || config.opened.tickets) {
-					Promise.all(uniqueTickets.map(t => rp(Jira.get(`${ticketBase}/${t}`)) //eslint-disable-line
+					// If tickets are enabled, grab their information and save it to firebase
+					Promise.all(uniqueTickets.map(t => rp(Jira.get(`${ticketBase}/${t}`))
 						.then((data) => {
 							responses.push(JSON.parse(data))
 						})))
@@ -132,6 +132,9 @@ function handleNew(payload, config) {
 									target: 'url',
 								})
 							})
+					if (config.high_priority_label) {
+						Tickets.setPriority(uniqueTickets, payload.pull_request.issue_url)
+					}
 				}
 				if (config.opened.transition) {
 					uniqueTickets.forEach((ticket) => {

@@ -11,6 +11,12 @@ export const genericTicketData = (times = 1) => (
 		.reply(200, payloads.ticket.genericTicketData)
 )
 
+export const highPriorityTicket = ( times = 1 ) => (
+	nock('https://reelio.atlassian.net')
+		.get('/rest/api/2/issue/XYZ-2').times(times)
+		.reply(200, payloads.ticket.highPriorityTicketData)
+)
+
 export const resolvedTicket1 = (times = 1) => (
 	nock('https://reelio.atlassian.net')
 		.get('/rest/api/2/issue/XYZ-2').times(times)
