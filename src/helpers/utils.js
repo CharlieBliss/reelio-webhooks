@@ -41,15 +41,15 @@ export function parseReviews(reviews = []) {
 }
 
 export function checkSingleMergeStatus(pullRequest) {
-	if (pullRequest.mergeable_state === 'clean') {
+	// unstable indicates no merge conflicts but PR status checks are failing
+	if (pullRequest.mergeable_state === 'clean' || pullRequest.mergeable_state === 'unstable') {
 		rp(Github.delete(`${pullRequest.issue_url}/labels/%24%24rebase`))
-	}
 
-	if (pullRequest.mergeable_state === 'conflicting' || pullRequest.mergeable_state === 'dirty') {
+	} else if (pullRequest.mergeable_state === 'conflicting' || pullRequest.mergeable_state === 'dirty') {
 		rp(Github.post(`${pullRequest.issue_url}/labels`, ['$$rebase']))
 		Slack.conflictWarning(pullRequest)
 
-	}	else if (pullRequest.mergeable_state === 'unknown') {
+	} else if (pullRequest.mergeable_state === 'unknown') {
 		// timeout gives github time to compute mergeability when it's 'unknown'
 		setTimeout(() => {
 			checkSingleMergeStatus(pullRequest)
