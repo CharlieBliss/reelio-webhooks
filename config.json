@@ -84,8 +84,8 @@
           "enabled": true
         },
         "require_reviews": {
-          "enabled": false,
-          "count": 2
+          "enabled": true,
+          "count": 1
         },
         "status": {
           "enabled": true
@@ -96,7 +96,8 @@
           "done_status": "10001",
           "merged": {
             "conflicts": true,
-            "congrats": true
+            "congrats": true,
+            "create": true
           },
           "opened": {
             "feature": {
