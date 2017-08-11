@@ -18,6 +18,7 @@
         "pull_request": {
           "enabled": true,
           "done_status": "10001",
+          "check_tickets": true,
 
           "labels": true,
 
@@ -67,6 +68,7 @@
 
         "pull_request": {
           "enabled": true,
+          "check_tickets": true,
           "done_status": "10001",
           "high_priority_label": true,
           "labels": true
@@ -92,6 +94,7 @@
         },
         "pull_request": {
           "enabled": true,
+          "check_tickets": false,
           "high_priority_label": true,
           "done_status": "10001",
           "merged": {
@@ -130,6 +133,7 @@
 
         "pull_request": {
           "done_status": "10001",
+          "check_tickets": true,
           "enabled": true,
           "high_priority_label": true,
           "labels": true,
@@ -173,6 +177,7 @@
 
         "pull_request": {
           "enabled": true,
+          "check_tickets": true,
           "done_status": "10001",
           "high_priority_label": true,
           "labels": true,
@@ -218,6 +223,7 @@
 
         "pull_request": {
           "enabled": true,
+          "check_tickets": true,
           "done_status": "10001",
 
           "labels": true,
@@ -260,6 +266,7 @@
         },
         "pull_request": {
           "enabled": true,
+          "check_tickets": true,
           "done_status": "10001",
           "merged": {
           "create": true,
@@ -292,6 +299,7 @@
 
           "pull_request": {
             "enabled": true,
+            "check_tickets": true,
             "done_status": "10001",
 
             "labels": true,
@@ -338,6 +346,7 @@
 
           "pull_request": {
             "enabled": true,
+            "check_tickets": true,
 
             "labels": true,
 
