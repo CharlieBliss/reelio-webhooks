@@ -94,6 +94,10 @@
           "merged": {
             "conflicts": true,
             "congrats": true
+          },
+          "opened": {
+            "feature": true,
+            "tickets": true
           }
         },
         "pull_request_review": {

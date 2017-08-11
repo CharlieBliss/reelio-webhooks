@@ -7,3 +7,6 @@ jspm_packages
 
 # OS
 .DS_Store
+tags
+tags.lock
+tags.temp
