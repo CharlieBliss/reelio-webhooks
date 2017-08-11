@@ -114,7 +114,7 @@ function handleNew(payload, config) {
 				const parsedBranch = head.substr(head.indexOf('-') + 1, head.length)
 
 				if (config.opened.feature && head.includes('feature-')) {
-					const url = `http://features.pro.reelio.com/${parsedBranch}`.toLowerCase()
+					const url = config.opened.feature.ticket_url.replace('{{branch}}', parsedBranch).toLowerCase()
 					request(Github.post(`${payload.pull_request.issue_url}/comments`, { body: `@${payload.pull_request.user.login} - Thanks for the PR! Your feature branch is now [live](${url})` }))
 				}
 
