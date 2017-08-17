@@ -1,7 +1,7 @@
 import request from 'request'
 import rp from 'request-promise'
 
-import { jiraRegex, FRONTEND_MEMBERS } from '../../consts'
+import { jiraRegex, jiraRegexWithDescription, deployRegex, FRONTEND_MEMBERS, TICKET_BASE } from '../../consts'
 import { uniqueTicketFilter, wrapJiraTicketsFromArray, checkMergeStatus } from '../../helpers/utils'
 
 import Github from '../../helpers/github'
@@ -76,7 +76,6 @@ function handleNew(payload, config) {
 				tickets = prBody.match(jiraRegex) || [],
 				author = payload.pull_request.user
 
-			const ticketBase = 'https://reelio.atlassian.net/rest/api/2/issue'
 			const responses = []
 			const uniqueTickets = tickets.filter(uniqueTicketFilter)
 
@@ -120,7 +119,7 @@ function handleNew(payload, config) {
 
 				if (config.opened.enabled || config.opened.tickets) {
 					// If tickets are enabled, grab their information and save it to firebase
-					Promise.all(uniqueTickets.map(t => rp(Jira.get(`${ticketBase}/${t}`))
+					Promise.all(uniqueTickets.map(t => rp(Jira.get(`${TICKET_BASE}/${t}`))
 						.then((data) => {
 							responses.push(JSON.parse(data))
 						})))
@@ -140,7 +139,7 @@ function handleNew(payload, config) {
 				}
 				if (config.opened.transition) {
 					uniqueTickets.forEach((ticket) => {
-						Tickets.transitionTicket(`${ticketBase}/${ticket}`, 21)
+						Tickets.transitionTicket(`${TICKET_BASE}/${ticket}`, 21)
 					})
 				}
 			}
@@ -153,51 +152,63 @@ function handleNew(payload, config) {
 }
 
 function handleMerge(payload, config) {
+	const repo = payload.repository.html_url,
+		base = payload.pull_request.base.ref, // target of the original PR
+		user = FRONTEND_MEMBERS[payload.pull_request.user.id]
+
 	let labels = [],
 		reviews = []
-
-	const tickets = payload.pull_request.body.match(jiraRegex) || [],
-		newBody = `### Resolves:\n${tickets.filter(uniqueTicketFilter).map(wrapJiraTicketsFromArray).join('\n\t')}`
-
-	const uniqueTickets = tickets.filter(uniqueTicketFilter)
-	const repo = payload.repository.html_url
-	const user = FRONTEND_MEMBERS[payload.pull_request.user.id],
-		base = payload.pull_request.base.ref // target of the original PR
 
 	// Get the issue, not the PR
 	request(Github.get(payload.pull_request.issue_url), (err, res, body) => {
 		if (res.statusCode >= 200 && res.statusCode < 300) {
 			labels = JSON.parse(body).labels || []
 		}
-
 		if (
 			labels.length &&
 			base === 'staging' &&
 			config.merged.create
 		) {
-			createPullRequest('staging', 'master', payload, newBody, ['$$production'])
+
+			const tickets = payload.pull_request.body.match(jiraRegex) || []
+			const uniqueTickets = tickets.filter(uniqueTicketFilter)
+
+			Promise.all(uniqueTickets.map(ticket => (wrapJiraTicketsFromArray(ticket)))).then((response) => {
+				const namedTickets = response.map(ticket => (
+					`[${ticket.ticketNumber.toUpperCase()} :: ${ticket.summary}](https://reelio.atlassian.net/browse/${ticket.ticketNumber.toUpperCase()})`
+				))
+
+				const newBody = `### Resolves:\n${namedTickets.join('\n\t')}`
+				createPullRequest('staging', 'master', payload, newBody, ['$$production'])
+			})
 		}
+	})
 
 		// If the closed PRs target was the master branch, alert QA of impending release
-		if (
+	if (
 			base === 'master' &&
 			config.merged.alert &&
 			config.merged.alert.channel &&
 			config.merged.alert.url &&
 			config.merged.alert.env
 		) {
-			const alertConfig = config.merged.alert
+		const alertConfig = config.merged.alert
+		const tickets = payload.pull_request.body.match(jiraRegexWithDescription) || []
+		const uniqueTickets = tickets.filter(uniqueTicketFilter)
+		const uniqueTicketNumbers = uniqueTickets.map(ticket => (ticket.match(deployRegex)[1]))
 
-			const fixed = tickets.filter(uniqueTicketFilter),
-				formattedFixed = fixed.map(t => `<https://reelio.atlassian.net/browse/${t}|${t}>`).join('\n')
+		const formattedFixed = uniqueTickets.map((ticket) => {
+			const ticketNumber = ticket.match(deployRegex)[1]
+			const ticketSummary = ticket.match(deployRegex)[3]
+			return `<https://reelio.atlassian.net/browse/${ticketNumber}|${ticketNumber} :: ${ticketSummary}>`
+		}).join('\n')
 
-			Slack.slackDeployWarning(payload, formattedFixed, alertConfig.channel, `<${alertConfig.url}|${alertConfig.env}>`)
+		Slack.slackDeployWarning(payload, formattedFixed, alertConfig.channel, `<${alertConfig.url}|${alertConfig.env}>`)
 
-			const ticketBase = 'https://reelio.atlassian.net/rest/api/2/issue'
-			const responses = []
+		const responses = []
 
-			if (uniqueTickets.length < 10) {
-				Promise.all(uniqueTickets.map(t => rp(Jira.get(`${ticketBase}/${t}`)) //eslint-disable-line
+		if (uniqueTickets.length < 10) {
+				Promise.all(uniqueTicketNumbers.map(t => rp(Jira.get(`${TICKET_BASE}/${t}`)) //eslint-disable-line
 					.then((data) => {
 						responses.push(JSON.parse(data))
 					}),
@@ -211,17 +222,16 @@ function handleMerge(payload, config) {
 						target: alertConfig.url,
 					})
 				})
-			} else {
-				Firebase.log('github', payload.repository.full_name, 'reelio_deploy', null, {
-					tickets: uniqueTickets,
-					fixed_count: uniqueTickets.length,
-					environment: alertConfig.env,
-					target: alertConfig.url,
-				})
-			}
-
+		} else {
+			Firebase.log('github', payload.repository.full_name, 'reelio_deploy', null, {
+				tickets: uniqueTickets,
+				fixed_count: uniqueTickets.length,
+				environment: alertConfig.env,
+				target: alertConfig.url,
+			})
 		}
-	})
+
+	}
 
 
 	if (config.merged.congrats) {
@@ -247,6 +257,7 @@ function handleMerge(payload, config) {
 	}
 	return 'Merged!'
 }
+
 
 function PullRequest(payload, config) {
 

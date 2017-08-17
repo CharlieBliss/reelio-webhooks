@@ -257,23 +257,32 @@
         "labels": {
           "enabled": true
         },
+
         "require_reviews": {
           "enabled": true,
           "count": 0
         },
+
         "status": {
           "enabled": true
         },
+
         "pull_request": {
           "enabled": true,
           "check_tickets": true,
           "done_status": "10001",
+
           "merged": {
-          "create": true,
-          "congrats": true,
-          "conflicts": true
-          }
-        },
+            "create": true,
+            "congrats": true,
+            "conflicts": true,
+            "alert": {
+              "channel": "U33BK6EQJ",
+              "url": "http://test.deploy.reelio.com",
+              "env": "DILLON"
+              }
+            }
+          },
         "pull_request_review": {
           "enabled": true
         }

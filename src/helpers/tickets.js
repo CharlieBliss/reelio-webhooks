@@ -44,6 +44,15 @@ class Tickets {
 			})
 	}
 
+	getJiraSummary(ticket) {
+		return rp(Jira.get(`${TICKET_BASE}/${ticket}`))
+			.then((response) => {
+				const ticketInfo = JSON.parse(response)
+				const summary = ticketInfo.fields.summary
+				return summary.toString()
+			})
+	}
+
 	getTicketFirebaseInfo(ticket, repo, logData) {
 		let firebaseInfo
 

@@ -1,13 +1,16 @@
 import rp from 'request-promise'
 import Github from '../helpers/github'
 import Slack from '../helpers/slack'
+import Jira from '../helpers/tickets'
 
 export function uniqueTicketFilter(value, index, self) {
 	return self.indexOf(value) === index
 }
 
 export function wrapJiraTicketsFromArray(ticket) {
-	return `[${ticket.toUpperCase()}](https://reelio.atlassian.net/browse/${ticket.toUpperCase()})`
+	return Jira.getJiraSummary(ticket).then(summary => (
+		{ ticketNumber: ticket, summary }
+	))
 }
 
 export function parseReviews(reviews = []) {

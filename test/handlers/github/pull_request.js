@@ -427,8 +427,8 @@ export function PullRequest() {
 					setTimeout(() => {
 						expect(issue.isDone()).to.be.true
 						expect(slack.isDone()).to.not.be.true
-						expect(reviews.isDone()).to.be.true
 						expect(firebaseLog.isDone()).to.be.true
+						expect(reviews.isDone()).to.be.true
 						expect(allPulls.isDone()).to.be.true
 						expect(pull.isDone()).to.be.true
 						expect(removeRebase.isDone()).to.be.true

@@ -4,6 +4,7 @@ export const genericTicketData = {
 		reporter: { displayName: 'Kyle Mendes' },
 		status: { id: '5' },
 		priority: { id: '3' },
+		summary: 'This ticket looks pretty easy',
 	}
 }
 
