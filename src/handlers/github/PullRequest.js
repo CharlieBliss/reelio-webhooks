@@ -114,7 +114,7 @@ function handleNew(payload, config) {
 
 				if (config.opened.feature && head.includes('feature-')) {
 					const url = config.opened.feature.ticket_url.replace('{{branch}}', parsedBranch).toLowerCase()
-					request(Github.post(`${payload.pull_request.issue_url}/comments`, { body: `@${payload.pull_request.user.login} - Thanks for the PR! Your feature branch is now [live](${url})` }))
+					request(Github.post(`${payload.pull_request.issue_url}/comments`, { body: `@${payload.pull_request.user.login} - Thanks for the PR! Your feature branch is now being built, and will be live at [live](${url})` }))
 				}
 
 				if (config.opened.enabled || config.opened.tickets) {
