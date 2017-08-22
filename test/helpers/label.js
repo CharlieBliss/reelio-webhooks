@@ -22,25 +22,44 @@ describe('Properly handles Adding Label', () => {
 			expect(removeReview.isDone()).to.be.true
 			expect(nock.pendingMocks()).to.be.empty
 			done()
-		}, 10)
+		}, 50)
 	})
 })
 
 describe('Properly handles Removing Labels', () => {
 	beforeEach(() => {
 		nock.cleanAll()
+		nock.disableNetConnect()
 	})
 
 	it('Handles "WIP removed" label removed', (done) => {
-		const addReview = nocks.labels.addReview()
-
 		let payload = payloads.label.removeWIP
+		let sha = payload.pull_request.head.sha
+
+		const addReview = nocks.labels.addReview()
+		const addQAandApproved = nocks.labels.addQAandApproved()
+		const removeChangesRequested = nocks.labels.removeChangesRequested()
+		const removeReview = nocks.labels.removeReview()
+		const doubleApproved = nocks.reviews.doubleApproved()
+		const status = nocks.status.genericStatus(sha)
+		const labels = nocks.labels.genericLabelsGet()
+		const getJiraStatus = nocks.jira.genericTicketData(3)
+		const createTable = nocks.jira.createTable()
+
 		Labels(payload)
 		setTimeout(() => {
 			expect(addReview.isDone()).to.be.true
+			expect(addQAandApproved.isDone()).to.be.true
+			expect(removeReview.isDone()).to.be.true
+			expect(removeChangesRequested.isDone()).to.be.true
+			expect(doubleApproved.isDone()).to.be.true
+			expect(status.isDone()).to.be.true
+			expect(labels.isDone()).to.be.true
+			expect(getJiraStatus.isDone()).to.be.true
+			expect(createTable.isDone()).to.be.true
 			expect(nock.pendingMocks()).to.be.empty
 			done()
-		}, 10)
+		}, 100)
 	})
 
 	it('Handles "Changes Requested" label removed', (done) => {
@@ -56,7 +75,7 @@ describe('Properly handles Removing Labels', () => {
 			expect(reviews.isDone()).to.be.true
 			expect(nock.pendingMocks()).to.be.empty
 			done()
-		}, 10)
+		}, 100)
 	})
 
 })

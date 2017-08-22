@@ -50,18 +50,18 @@ export function handle(event, context, callback) {
 	}
 
 	if (githubEvent === 'pull_request') {
+		if (action === 'labeled' || action === 'unlabeled') {
+			if (get(config, [org, repo, handler, 'labels', 'enabled'])) {
+				(Labels(payload, get(config, [org, repo, handler, 'require_reviews', 'count'])))
+			}
+		}
 		if (get(config, [org, repo, handler, 'pull_request', 'enabled'])) {
 			if (get(config, [org, repo, handler, 'pull_request', 'check_tickets'])) {
 				CheckTickets(payload, githubEvent, get(config, [org, repo, handler, 'pull_request', 'done_status']))
 			}
 			return callback(null, helper.respond(PullRequest(payload, get(config, [org, repo, handler, 'pull_request']))))
 		}
-	}
 
-	if (githubEvent === 'label') {
-		if (get(config, [org, repo, handler, 'labels', 'enabled'])) {
-			return callback(null, helper.respond(Labels(payload)))
-		}
 	}
 
 	if (githubEvent === 'pull_request_review') {

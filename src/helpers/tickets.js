@@ -84,13 +84,23 @@ class Tickets {
 				table = `|| Deployed On || PR API || PR Human || Deployed || QA Approved || \n || ${moment().format('l')} || [(internal use)|${payload.pull_request.url}] || [${payload.pull_request.number}|${payload.pull_request.html_url}] || [Yes|http://features.pro.reelio.com/${parsedBranch}] || ||`
 
 			// Make sure the ticket is marked as `Ready for QA`
-			this.getJiraStatus(ticket)
-				.then((status) => {
-					if (status === '10400') {
-						this.transitionTicket(ticketUrl, 221)
-					}
+			// Don't move ticket if labeled WIP or BLOCKED
+			let blocked = false
+			rp(Github.get(`${payload.pull_request.issue_url}/labels`))
+				.then((response) => {
+					const labels = JSON.parse(response)
+					labels.forEach((label) => {
+						if (label.name === 'WIP' || label.name === 'BLOCKED') {
+							blocked = true
+						}
+					})
+					this.getJiraStatus(ticket)
+						.then((status) => {
+							if (status === '10400' && !blocked) {
+								this.transitionTicket(ticketUrl, 221)
+							}
+						})
 				})
-
 			this.getTicketFirebaseInfo(ticket, repo, (board, data) => {
 				Firebase.log('JIRA', board, 'transition', 'QA', { ticket: data })
 			})

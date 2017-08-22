@@ -3,6 +3,8 @@ import { FRONTEND_MEMBERS } from '../consts/slack'
 import { parseReviews } from './utils'
 import Github from '../helpers/github'
 import Slack from '../helpers/slack'
+import CheckReviews from '../handlers/github/CheckReviews'
+
 
 class LabelHelper {
 
@@ -32,7 +34,7 @@ class LabelHelper {
 		}
 	}
 
-	handleUnlabel(payload) {
+	handleUnlabel(payload, reviewCount) {
 		if (payload.label.name === 'changes requested') {
 			request(Github.post(`${payload.pull_request.issue_url}/labels`, ['$$review']))
 			return this.triggerReviewReminder(payload)
@@ -40,6 +42,10 @@ class LabelHelper {
 
 		if (payload.label.name === 'WIP') {
 			request(Github.post(`${payload.pull_request.issue_url}/labels`, ['$$review']))
+			CheckReviews(payload, 'synchronize', reviewCount)
+		}
+		if (payload.label.name === 'BLOCKED') {
+			CheckReviews(payload, 'synchronize', reviewCount)
 		}
 
 		return 'Label -- Unlabeled'

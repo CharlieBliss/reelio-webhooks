@@ -91,9 +91,10 @@ export function PullRequestReview() {
 
 			const successCI = nocks.status.successCI(sha)
 			const reviews = nocks.reviews.doubleApproved()
+			const labels = nocks.labels.genericLabelsGet()
 			const transition = nocks.jira.autoTransition()
 			const ticketTable = nocks.jira.createTable()
-			const getJiraStatus = nocks.jira.genericTicketData()
+			const getJiraStatus = nocks.jira.genericTicketData(3)
 			const addQAandApproved = nocks.labels.addQAandApproved()
 			const removeReview = nocks.labels.removeReview()
 			const removeChangesRequested = nocks.labels.removeChangesRequested()
@@ -102,6 +103,7 @@ export function PullRequestReview() {
 				setTimeout(() => {
 					expect(successCI.isDone()).to.be.true
 					expect(reviews.isDone()).to.be.true
+					expect(labels.isDone()).to.be.true
 					expect(transition.isDone()).to.not.be.true
 					expect(ticketTable.isDone()).to.be.true
 					expect(getJiraStatus.isDone()).to.be.true
@@ -111,7 +113,7 @@ export function PullRequestReview() {
 					// 1 pending mock since transition NOT made
 					expect(nock.pendingMocks().length).to.equal(1)
 					done()
-				}, 30)
+				}, 1500)
 			})
 
 		it('Returns CI success if 2+ reviews, all approved', (done) => {
@@ -120,17 +122,19 @@ export function PullRequestReview() {
 
 			const successCI = nocks.status.successCI(sha)
 			const reviews = nocks.reviews.tripleApproved()
+			const labels = nocks.labels.genericLabelsGet()
 			const transition = nocks.jira.autoTransition()
 			const ticketTable = nocks.jira.createTable()
 			const addQAandApproved = nocks.labels.addQAandApproved()
 			const removeChanges = nocks.labels.removeChangesRequested()
 			const removeReview = nocks.labels.removeReview()
-			const getJiraStatus = nocks.jira.genericTicketData()
+			const getJiraStatus = nocks.jira.genericTicketData(3)
 
 			CheckReviews(payload, 'pull_request')
 				setTimeout(() => {
 					expect(successCI.isDone()).to.be.true
 					expect(reviews.isDone()).to.be.true
+					expect(labels.isDone()).to.be.true
 					expect(transition.isDone()).to.not.be.true
 					expect(ticketTable.isDone()).to.be.true
 					expect(addQAandApproved.isDone()).to.be.true
@@ -140,7 +144,7 @@ export function PullRequestReview() {
 					// 1 pending mock since transition NOT made
 					expect(nock.pendingMocks().length).to.equal(1)
 					done()
-				}, 30)
+				}, 1500)
 			})
 
 		it('Handles 1 approved review', (done) => {

@@ -44,7 +44,6 @@ function CheckReviews(payload, event, count = 2) {
 			approved = reviews
 				.map(r => r.state)
 				.filter(r => r.toLowerCase() === 'approved')
-
 			if (
 				reviews.length >= count &&
 				approved.length >= count

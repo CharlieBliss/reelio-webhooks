@@ -1,5 +1,13 @@
 import nock from 'nock'
 
+// check labels
+
+export const genericLabelsGet = (times = 1) => (
+	nock('https://api.github.com')
+		.get('/repos/test/test/issues/1/labels').times(times)
+		.reply(200, '[]')
+)
+
 // add labels
 
 export const addChangesRequested = () => (
