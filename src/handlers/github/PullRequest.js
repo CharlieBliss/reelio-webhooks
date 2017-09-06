@@ -184,7 +184,19 @@ function handleMerge(payload, config) {
 		}
 	})
 
-		// If the closed PRs target was the master branch, alert QA of impending release
+	// If the closed PRs target was the master branch, alert QA of impending release
+	if (base === 'master' && !config.merged.alert) {
+		const tickets = payload.pull_request.body.match(jiraRegexWithDescription) || []
+		const uniqueTickets = tickets.filter(uniqueTicketFilter)
+
+		Firebase.log('github', payload.repository.full_name, 'reelio_deploy', null, {
+			tickets: uniqueTickets,
+			fixed_count: uniqueTickets.length,
+			environment: 'production',
+		})
+	}
+
+	// If the closed PRs target was the master branch, alert QA of impending release
 	if (
 			base === 'master' &&
 			config.merged.alert &&
