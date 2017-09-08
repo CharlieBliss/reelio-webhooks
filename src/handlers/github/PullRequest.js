@@ -9,61 +9,8 @@ import Jira from '../../helpers/jira'
 import Firebase from '../../helpers/firebase'
 import Labels from './Labels'
 import Slack from '../../helpers/slack'
+import PullRequestHelper from '../../helpers/pullRequests'
 import Tickets from '../../helpers/tickets'
-
-function createPullRequest(head, base, payload, newBody = '', labels = []) {
-	// Check if there is a PR between the head and branch already.  If there is, we don't need to make a new PR
-	request(Github.get(`${payload.repository.url}/pulls?head=${head}&base=${base}&state=open`), (response, errors, openPRs) => {
-		const open = JSON.parse(openPRs)
-		if (open.length) {
-			// sometimes it returns non-results.
-			const realOpen = open.filter(o => o.head.ref === head && o.base.ref === base)
-			if (realOpen.length) {
-				console.log('SKIPPING PR', head, base, open.map(o => ({ head: o.head.ref, base: o.base.ref })))
-
-				// append the new resolved tickets to the existing PR
-				// Assumes that there will only ever be ONE PR returned here...
-				const editedBody = realOpen[0].body + newBody.substr(newBody.indexOf('\n'), newBody.length) // append the resolved tickets to the ticket list
-
-				request(Github.patch(realOpen[0].url, { body: editedBody })) // update the body of the old PR
-				return
-			}
-		}
-
-		// create Issue.  To add labels to the PR on creation, it needs to start as an issue
-		const issue = {
-			title: `${head} --> ${base}`,
-			body: `# Merging from branch ${head} into ${base}.\n\n### Previous PR: ${payload.pull_request.html_url}\n\n${newBody}`,
-			labels: ['$$webhook', ...labels],
-		}
-
-		request(Github.post(`${payload.repository.url}/issues`, issue), (err, res, body) => {
-			let resBody = JSON.parse(body)
-
-			// If making the issue fails, slack Kyle
-			if (body.errors) {
-				Slack.slackErrorWarning(payload, body)
-			} else {
-				const pr = {
-					issue: JSON.parse(body).number,
-					head,
-					base,
-				}
-
-				console.log('PR', pr)
-
-				request(Github.post(`${payload.repository.url}/pulls`, pr), (e, r, b) => {
-					console.log('CREATE PR', JSON.parse(b))
-					resBody = JSON.parse(b)
-
-					if (e || !resBody.number) {
-						Slack.slackErrorWarning(payload, body)
-					}
-				})
-			}
-		})
-	})
-}
 
 function handleNew(payload, config) {
 	// Get the issue, not the PR
@@ -179,7 +126,7 @@ function handleMerge(payload, config) {
 				))
 
 				const newBody = `### Resolves:\n${namedTickets.join('\n\t')}`
-				createPullRequest('staging', 'master', payload, newBody, ['$$production'])
+				PullRequestHelper.createNextPullRequest('staging', 'master', payload, newBody, ['$$production'])
 			})
 		}
 	})

@@ -4,6 +4,7 @@ import CheckReviews from './CheckReviews'
 import CheckTickets from './CheckTickets'
 import Labels from './Labels'
 import PullRequest from './PullRequest'
+import Push from './Push'
 import Review from './Review'
 import Status from './Status'
 
@@ -36,7 +37,11 @@ export function handle(event, context, callback) {
 		return callback(null, helper.respond('No event provided.', 400))
 	}
 
-	if (!action && githubEvent !== 'status') {
+	if (
+		!action &&
+		githubEvent !== 'status' &&
+		githubEvent !== 'push'
+	) {
 		return callback(null, helper.respond('No action given.', 200))
 	}
 
@@ -61,7 +66,12 @@ export function handle(event, context, callback) {
 			}
 			return callback(null, helper.respond(PullRequest(payload, get(config, [org, repo, handler, 'pull_request']))))
 		}
+	}
 
+	if (githubEvent === 'push') {
+		if (get(config, [org, repo, handler, 'push', 'enabled'])) {
+			return callback(null, helper.respond(Push(payload)))
+		}
 	}
 
 	if (githubEvent === 'pull_request_review') {

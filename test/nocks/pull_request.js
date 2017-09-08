@@ -67,3 +67,9 @@ export const ticketlessPR = () => (
 		.get('/repos/test/test/pulls/1')
 		.reply(200, payloads.pullRequest.pullRequestTicketless.pull_request)
 )
+
+export const createPullRequest = () => (
+	nock('https://api.github.com')
+		.post('/repos/test/test/pulls')
+		.reply(200, {"number": "1"})
+)

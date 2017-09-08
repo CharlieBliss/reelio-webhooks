@@ -876,6 +876,12 @@ export const singlePull = [{
 		"repository": {
 			"url": "https://api.github.com/users/test/test",
 		},
+		"head": {
+			"ref": "schema-test-1"
+		},
+		"base": {
+			"ref": "feature-test-2"
+		},
 		"url": "https://api.github.com/repos/test/test/pulls/1",
 }]
 

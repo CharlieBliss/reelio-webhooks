@@ -206,6 +206,14 @@ class Tickets {
 				}
 			})
 	}
+
+	updateField(ticket, field, content) {
+		request(Jira.put(`${TICKET_BASE}/${ticket}`, {
+			fields: {
+				[field]: content,
+			},
+		}))
+	}
 }
 
 export default new Tickets()

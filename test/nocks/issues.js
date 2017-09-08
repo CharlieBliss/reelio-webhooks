@@ -15,3 +15,9 @@ export const masterIssue = () => (
 			payloads.issue.masterPR
 		)
 )
+
+export const genericIssuePost = () => (
+	nock('https://api.github.com')
+		.post('/repos/test/test/issues')
+		.reply(200, {})
+)

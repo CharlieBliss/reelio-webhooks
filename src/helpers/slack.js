@@ -1,3 +1,5 @@
+import { find } from 'lodash'
+
 import request from 'request'
 import { SLACK_URL, FRONTEND_MEMBERS } from '../consts'
 
@@ -68,6 +70,15 @@ class Slack {
 		})
 	}
 
+	prWarning(head, base, url) {
+		sendMessage({
+			channel: 'U28LB0AAH',
+			username: 'PR Bot',
+			icon_url: 'https://octodex.github.com/images/yaktocat.png',
+			text: `Something went wrong when trying to make a pr between ${head} and ${base}.  ${url}`,
+		})
+	}
+
 	slackCircleFailure(user, commit) {
 		sendMessage({
 			channel: user.slack_id,
@@ -105,6 +116,32 @@ class Slack {
 			icon_url: 'https://octodex.github.com/images/welcometocat.png',
 			text: `:tada::party_parrot::tada:Nice work, ${user.name}!  Your <${payload.pull_request.html_url}|pull request> was merged without needing changes! Keep up the good work! :tada::party_parrot::tada:`,
 		})
+	}
+
+	alertBranch(ticket, jiraKey) {
+		const user = jiraKey ? find(FRONTEND_MEMBERS, { jira_key: jiraKey }) : null
+
+		if (user) {
+			sendMessage({
+				channel: user.slack_id,
+				username: 'Branch Bot',
+				icon_url: 'https://octodex.github.com/images/maxtocat.gif',
+				text: `Hey there!  A schema branch was created for your ticket, ${ticket}.  You should get started on updating the schema!\n\nTo get started, \`git fetch -a && git checkout schema-${ticket}\`\n\nWhen you push to that branch, a feature-branch and PR will automatically be created.`,
+			})
+		}
+	}
+
+	alertPR(id, head, base, PR) {
+		const user = FRONTEND_MEMBERS[id]
+
+		if (user) {
+			sendMessage({
+				channel: user.slack_id,
+				username: 'Branch Bot',
+				icon_url: 'https://octodex.github.com/images/maxtocat.gif',
+				text: `Hey there!  A PR was created between \`${head}\` and \`${base}\` for you.  You can view it <${PR}|here>!`,
+			})
+		}
 	}
 
 }

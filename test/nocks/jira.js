@@ -61,3 +61,9 @@ export const createTable = () => (
 		.put('/rest/api/2/issue/XYZ-2')
 		.reply(200)
 )
+
+export const updateTable = () => (
+	nock('https://reelio.atlassian.net')
+		.put('/rest/api/2/issue/test-1')
+		.reply(200)
+)

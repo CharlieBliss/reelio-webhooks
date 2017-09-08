@@ -5,26 +5,31 @@ export const FRONTEND_MEMBERS = {
 		name: 'Bill',
 		slack_id: 'U02B7N72P',
 		github_id: '1688630',
+		jira_key: 'bill',
 	},
 	15472986: {
 		name: 'Charlie',
 		slack_id: 'U1QHPGCP2',
 		github_id: '15472986',
+		jira_key: 'charles',
 	},
 	17772073: {
 		name: 'David',
 		slack_id: 'U31HMS12M',
 		github_id: '17772073',
+		jira_key: 'David',
 	},
 	7416637: {
 		name: 'Dillon',
 		slack_id: 'U33BK6EQJ',
 		github_id: '7416637',
+		jira_key: 'dillon',
 	},
 	6400039: {
 		name: 'Kyle',
 		slack_id: 'U28LB0AAH',
 		github_id: '6400039',
+		jira_key: 'kyle',
 	},
 	19698267: {
 		name: 'Schyler',
@@ -35,16 +40,19 @@ export const FRONTEND_MEMBERS = {
 		name: 'Tony',
 		slack_id: 'U3CUZF28Z',
 		github_id: '17260122',
+		jira_key: 'Tony',
 	},
 	19507611: {
 		name: 'Troy',
 		slack_id: 'U3LNG8C9Y',
 		github_id: '19507611',
+		jira_key: 'troy',
 	},
 	188812: {
 		name: 'Damon',
 		slack_id: 'U02BWBRP1',
 		github_id: '188812',
+		jira_key: 'damon',
 	},
 	6333919: {
 		name: 'Steve',
@@ -60,11 +68,13 @@ export const FRONTEND_MEMBERS = {
 		name: 'dave.p',
 		slack_id: 'U2TEN9SUB',
 		github_id: '243799',
+		jira_key: 'Dave',
 	},
 	17497667: {
 		name: 'khaledanyc',
 		slack_id: 'U32AUKGKU',
 		github_id: '17497667',
+		jira_key: 'khaleda',
 	},
 	3579209: {
 		name: 'joaquin',
@@ -75,16 +85,19 @@ export const FRONTEND_MEMBERS = {
 		name: 'dash',
 		slack_id: 'U40RFFWQ1',
 		github_id: '1347347',
+		jira_key: 'Dash',
 	},
 	3439646: {
 		name: 'anthonyalmarza',
 		slack_id: 'U02B7MKKT',
 		github_id: '3439646',
+		jira_key: 'anthony',
 	},
 	10504688: {
 		name: 'chris',
 		slack_id: 'U02H14HQG',
 		github_id: '10504688',
+		jira_key: 'Chris',
 	},
 	16420835: {
 		name: 'daniellap',
@@ -95,11 +108,13 @@ export const FRONTEND_MEMBERS = {
 		name: 'gabriel',
 		slack_id: 'U0U5BKF0T',
 		github_id: '1058579',
+		jira_key: 'Gabriel',
 	},
 	13035177: {
 		name: 'sabina',
 		slack_id: 'U02H4GFGX',
 		github_id: '13035177',
+		jira_key: 'Sabina',
 	},
 	8799208: {
 		name: 'jaxball',
@@ -115,6 +130,7 @@ export const FRONTEND_MEMBERS = {
 		name: 'danp',
 		slack_id: 'U54D421RV',
 		github_id: '491128',
+		jira_key: 'Dan',
 	},
 }
 
@@ -323,6 +339,7 @@ export const slack_members = [
 	{
 		"name": "joe.bechtold",
 		"id": "U0A008HMZ",
+		"jira_key": 'admin',
 	},
 	{
 		"name": "joel",

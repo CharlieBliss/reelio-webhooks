@@ -82,6 +82,9 @@
 
     "reelio": {
       "github": {
+        "push": {
+          "enabled": true
+        },
         "labels": {
           "enabled": true
         },
@@ -340,6 +343,9 @@
       "test": {
 
         "github": {
+          "push" : {
+            "enabled": true
+          },
           "labels": {
             "enabled": true
           },
