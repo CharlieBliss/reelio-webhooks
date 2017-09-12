@@ -28,8 +28,8 @@ class PullRequests {
 	createNextPullRequest(head, base, payload, newBody = '', labels = []) {
 		this.checkIfPullRequest(payload.repository.url, head, base).then((exists) => {
 
-			if (exists && exists.length) {
-				console.log('SKIPPING PR', head, base, open.map(o => ({ head: o.head.ref, base: o.base.ref })))
+			if (exists && exists.id) {
+				console.log('SKIPPING PR', head, base, exists.id)
 
 				// append the new resolved tickets to the existing PR
 				// Assumes that there will only ever be ONE PR returned here...
@@ -59,7 +59,7 @@ class PullRequests {
 						base,
 					}
 
-					console.log('PR', pr)
+					console.log('ISSUE', pr)
 
 					request(Github.post(`${payload.repository.url}/pulls`, pr), (e, r, b) => {
 						console.log('CREATE PR', JSON.parse(b))
