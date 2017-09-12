@@ -48,6 +48,7 @@ function handleNew(payload, config) {
 			if (
 				!head.includes('feature-') &&
 				!labels.map(l => l.name).includes('$$webhook') &&
+				!labels.map(l => l.name).includes('$$featureless') &&
 				config.opened &&
 				(config.opened.enabled || config.opened.feature)
 			) {
