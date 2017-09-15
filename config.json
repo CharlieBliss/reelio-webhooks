@@ -90,7 +90,7 @@
         },
         "require_reviews": {
           "enabled": true,
-          "count": 1
+          "count": 2
         },
         "status": {
           "enabled": true
