@@ -136,7 +136,7 @@
 
         "pull_request": {
           "done_status": "10001",
-          "check_tickets": true,
+          "check_tickets": false,
           "enabled": true,
           "high_priority_label": true,
           "labels": true,
