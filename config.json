@@ -217,7 +217,7 @@
 
         "require_reviews": {
           "enabled": true,
-          "count": 2
+          "count": 1
         },
 
         "status": {

@@ -80,8 +80,15 @@ class Tickets {
 		const repo = payload.repository.html_url
 
 		tickets.forEach((ticket) => {
-			const ticketUrl = `${TICKET_BASE}/${ticket}`,
-				table = `|| Deployed On || PR API || PR Human || Deployed || QA Approved || \n || ${moment().format('l')} || [(internal use)|${payload.pull_request.url}] || [${payload.pull_request.number}|${payload.pull_request.html_url}] || [Yes|http://features.pro.reelio.com/${parsedBranch}] || ||`
+			let table = ''
+			const ticketUrl = `${TICKET_BASE}/${ticket}`
+
+			if (parsedBranch.includes('RA-')) {
+				table = `|| Deployed On || PR API || PR Human || API Deployed || FRONT Deployed || QA Approved || \n || ${moment().format('l')} || [(internal use)|${payload.pull_request.url}] || [${payload.pull_request.number}|${payload.pull_request.html_url}] || [Yes|http://${parsedBranch}.api.reelio.com] || [Yes|http://features.pro.reelio.com/${parsedBranch}] || ||`
+
+			} else if (parsedBranch.includes('FRONT-')) {
+				table = `|| Deployed On || PR API || PR Human || FRONT Deployed || QA Approved || \n || ${moment().format('l')} || [(internal use)|${payload.pull_request.url}] || [${payload.pull_request.number}|${payload.pull_request.html_url}] || [Yes|http://features.pro.reelio.com/${parsedBranch}] || ||`
+			}
 
 			// Make sure the ticket is marked as `Ready for QA`
 			// Don't move ticket if labeled WIP or BLOCKED
