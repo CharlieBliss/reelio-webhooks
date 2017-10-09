@@ -26,7 +26,7 @@ describe('helpers -- slack', () => {
 			expect(slack.isDone()).to.be.true
 			expect(nock.pendingMocks()).to.be.empty
 			done()
-		}, 10)
+		}, 30)
 	})
 
 	it('Should be able to alert when a table failed', (done) => {
@@ -38,7 +38,7 @@ describe('helpers -- slack', () => {
 			expect(slack.isDone()).to.be.true
 			expect(nock.pendingMocks()).to.be.empty
 			done()
-		}, 10)
+		}, 30)
 	})
 
 	it('Should be able to alert when firebase failed trimming', (done) => {
@@ -50,7 +50,7 @@ describe('helpers -- slack', () => {
 			expect(slack.isDone()).to.be.true
 			expect(nock.pendingMocks()).to.be.empty
 			done()
-		}, 10)
+		}, 30)
 	})
 
 })
