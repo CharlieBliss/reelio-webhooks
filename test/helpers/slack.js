@@ -13,7 +13,7 @@ describe('helpers -- slack', () => {
 	})
 
 	it('Should be able to alert when changes are requested', (done) => {
-		const slack = nocks.slack.changesRequestedSlack()
+		const slack = nocks.slack.genericSlack()
 
 		const user = consts.FRONTEND_MEMBERS[7416637]
 		const payload = {
@@ -26,11 +26,11 @@ describe('helpers -- slack', () => {
 			expect(slack.isDone()).to.be.true
 			expect(nock.pendingMocks()).to.be.empty
 			done()
-		}, 30)
+		}, 10)
 	})
 
 	it('Should be able to alert when a table failed', (done) => {
-		const slack = nocks.slack.slackTableFailed()
+		const slack = nocks.slack.genericSlack()
 
 		Slack.tableFailed('FRONT-1234', { errorMessages: ['That', 'wasn\'t',
 		'right.'] })
@@ -38,11 +38,11 @@ describe('helpers -- slack', () => {
 			expect(slack.isDone()).to.be.true
 			expect(nock.pendingMocks()).to.be.empty
 			done()
-		}, 30)
+		}, 10)
 	})
 
 	it('Should be able to alert when firebase failed trimming', (done) => {
-		const slack = nocks.slack.slackFirebaseFailed()
+		const slack = nocks.slack.genericSlack()
 
 		Slack.firebaseFailed('Something went wrong!')
 
@@ -50,7 +50,7 @@ describe('helpers -- slack', () => {
 			expect(slack.isDone()).to.be.true
 			expect(nock.pendingMocks()).to.be.empty
 			done()
-		}, 30)
+		}, 10)
 	})
 
 })
