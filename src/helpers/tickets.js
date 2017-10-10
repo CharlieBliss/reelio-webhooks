@@ -83,10 +83,10 @@ class Tickets {
 			let table = ''
 			const ticketUrl = `${TICKET_BASE}/${ticket}`
 
-			if (parsedBranch.includes('RA-')) {
+			if (payload.repository.name === 'reelio') {
 				table = `|| Deployed On || PR API || PR Human || API Deployed || FRONT Deployed || QA Approved || \n || ${moment().format('l')} || [(internal use)|${payload.pull_request.url}] || [${payload.pull_request.number}|${payload.pull_request.html_url}] || [Yes|http://${parsedBranch}.api.reelio.com] || [Yes|http://features.pro.reelio.com/${parsedBranch}] || ||`
 
-			} else if (parsedBranch.includes('FRONT-')) {
+			} else if (payload.repository.name === 'reelio-front') {
 				table = `|| Deployed On || PR API || PR Human || FRONT Deployed || QA Approved || \n || ${moment().format('l')} || [(internal use)|${payload.pull_request.url}] || [${payload.pull_request.number}|${payload.pull_request.html_url}] || [Yes|http://features.pro.reelio.com/${parsedBranch}] || ||`
 			}
 
