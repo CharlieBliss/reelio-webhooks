@@ -97,7 +97,7 @@
         },
         "pull_request": {
           "enabled": true,
-          "check_tickets": false,
+          "check_tickets": true,
           "high_priority_label": true,
           "done_status": "10001",
           "merged": {
