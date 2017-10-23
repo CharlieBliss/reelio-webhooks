@@ -1,7 +1,7 @@
 # Table of contents:
 1. [Getting Started](#getting-started)
-   a. [Github](#github)
-   b. [Jira](#jira)
+    - [Github](#github)
+    - [Jira](#jira)
 1. [Deployment](#deployment)
 
 ## Getting Started:
