@@ -1,7 +1,8 @@
 # Table of contents:
 1. [Getting Started](#getting-started)
-1. [Github](#github)
-1. [Jira](#jira)
+   a. [Github](#github)
+   b. [Jira](#jira)
+1. [Deployment](#deployment)
 
 ## Getting Started:
 1. Install [ngrok](https://ngrok.com/) via `brew`
@@ -46,3 +47,15 @@
    - Select "add a post function"
    - Select "trigger a webhook"
    - Select your dev webhook.
+   
+## Deployment
+Deployment is done automatically in the `circle.yml` file.  
+
+All a deployment needs is a valid AWS config, with credentials that have the access to the following:
+
+1. Lambda
+1. API Gateway
+1. S3
+1. Cloudwatch
+
+Then, deployments are triggerd using the `sls deploy` command with additional optional environmental targets.
