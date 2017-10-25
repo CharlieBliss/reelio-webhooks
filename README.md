@@ -29,8 +29,6 @@
    - Select "Send me *everything*."
    - Select "Active"
    - Click "Add Webhook"
-1. Go to `Settings -> Collaborators` and add `reelio-devops`
-1. Ask a Reelio Admin to accept the request. The email is sent to `devops@reeliolabs.com`
 1. Setup config
    - In `./config.json` add an object with:
      - Your github username
