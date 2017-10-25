@@ -225,7 +225,6 @@ function PullRequest(payload, config) {
 		(payload.action === 'labeled' || payload.action === 'unlabeled') &&
 		config.labels
 	) {
-		Labels(payload)
 		return 'Pull Request -- Labels Handled'
 	}
 
