@@ -57,7 +57,7 @@ export function handle(event, context, callback) {
 	if (githubEvent === 'pull_request') {
 		if (action === 'labeled' || action === 'unlabeled') {
 			if (get(config, [org, repo, handler, 'labels', 'enabled'])) {
-				(Labels(payload, get(config, [org, repo, handler, 'require_reviews', 'count'])))
+				Labels(payload, get(config, [org, repo, handler, 'require_reviews', 'count']))
 			}
 		}
 		if (get(config, [org, repo, handler, 'pull_request', 'enabled'])) {
