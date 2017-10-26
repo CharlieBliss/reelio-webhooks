@@ -1,6 +1,6 @@
 import * as admin from 'firebase-admin'
 import request from 'request'
-import { cloneDeep } from 'lodash'
+import { cloneDeep, get } from 'lodash'
 
 import Slack from './slack'
 
@@ -81,7 +81,7 @@ class Firebase {
 			if (payload.review) {
 				payload.reviewer = {
 					name: payload.review.user.login,
-					id: payload.review.user.id,
+					id: get(payload, ['review', 'user', 'id'])
 					status: payload.review.state,
 					body: payload.review.body,
 				}
@@ -97,7 +97,7 @@ class Firebase {
 
 			if (payload.sender) {
 				payload.sender_info = {
-					id: payload.sender.id,
+					id: get(payload, ['sender', 'id']),
 					author: payload.sender.login,
 				}
 
@@ -109,7 +109,7 @@ class Firebase {
 				payload.commit_info = {
 					url: payload.commit.url,
 					author: {
-						id: payload.commit.author.id,
+						id: get(payload, ['commit', 'author', 'id']),
 						login: payload.commit.author.login,
 					},
 				}
