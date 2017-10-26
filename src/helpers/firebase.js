@@ -53,7 +53,7 @@ class Firebase {
 			// comments
 			if (payload.comment) {
 				payload.comment_info = {
-					author: payload.comment.user.login,
+					author: get(payload, 'comment.user.login'),
 					issue: {
 						url: payload.issue ? payload.issue.url : '',
 						title: payload.issue ? payload.issue.title : '',
@@ -80,10 +80,10 @@ class Firebase {
 			// pr review
 			if (payload.review) {
 				payload.reviewer = {
-					name: payload.review.user.login,
+					name: get(payload, 'review.user.login'),
 					id: get(payload, ['review', 'user', 'id']),
-					status: payload.review.state,
-					body: payload.review.body,
+					status: get(payload, 'review.state'),
+					body: get(payload, 'review.body'),
 				}
 
 				delete payload.review
@@ -98,7 +98,7 @@ class Firebase {
 			if (payload.sender) {
 				payload.sender_info = {
 					id: get(payload, ['sender', 'id']),
-					author: payload.sender.login,
+					author: get(payload, 'sender.login'),
 				}
 
 				delete payload.sender
@@ -110,7 +110,7 @@ class Firebase {
 					url: payload.commit.url,
 					author: {
 						id: get(payload, ['commit', 'author', 'id']),
-						login: payload.commit.author.login,
+						login: get(payload, 'commit.author.login'),
 					},
 				}
 				delete payload.commit
