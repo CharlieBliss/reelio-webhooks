@@ -116,6 +116,7 @@ class Firebase {
 				delete payload.commit
 			}
 		} catch (err) {
+			console.error(err)
 			Slack.firebaseFailed(err)
 		}
 		if (action) {
