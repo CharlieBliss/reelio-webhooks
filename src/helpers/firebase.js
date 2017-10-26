@@ -81,7 +81,7 @@ class Firebase {
 			if (payload.review) {
 				payload.reviewer = {
 					name: payload.review.user.login,
-					id: get(payload, ['review', 'user', 'id'])
+					id: get(payload, ['review', 'user', 'id']),
 					status: payload.review.state,
 					body: payload.review.body,
 				}
