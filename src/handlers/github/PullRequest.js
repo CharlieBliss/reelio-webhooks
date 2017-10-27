@@ -11,6 +11,14 @@ import Slack from '../../helpers/slack'
 import PullRequestHelper from '../../helpers/pullRequests'
 import Tickets from '../../helpers/tickets'
 
+/**
+ * Handles a new PR being created.
+ *
+ * Checks if there are:
+ *	Tickets in the body
+ *	The Branch has "feature-" in the name
+ *
+ */
 function handleNew(payload, config) {
 	// Get the issue, not the PR
 	request(Github.get(payload.pull_request.issue_url), (err, res, body) => {
@@ -59,11 +67,13 @@ function handleNew(payload, config) {
 			} else {
 				const parsedBranch = head.substr(head.indexOf('-') + 1, head.length)
 
+				// Let the Dev know that there is a feature environment for their PR
 				if (config.opened.feature && head.includes('feature-')) {
 					const url = config.opened.feature.ticket_url.replace('{{branch}}', parsedBranch).toLowerCase()
 					request(Github.post(`${payload.pull_request.issue_url}/comments`, { body: `@${payload.pull_request.user.login} - Thanks for the PR! Your feature branch is now being built, and will be live at [live](${url})` }))
 				}
 
+				// Save ticket information
 				if (config.opened.enabled || config.opened.tickets) {
 					// If tickets are enabled, grab their information and save it to firebase
 					Promise.all(uniqueTickets.map(t => rp(Jira.get(`${TICKET_BASE}/${t}`))
@@ -80,10 +90,14 @@ function handleNew(payload, config) {
 									target: 'url',
 								})
 							})
+
+					// If any tickets are "highest" priority, label this PR as "High Priority"
 					if (config.high_priority_label) {
 						Tickets.setPriority(uniqueTickets, payload.pull_request.issue_url)
 					}
 				}
+
+				// Move "in progress" tickets to "PR Submitted"
 				if (config.opened.transition) {
 					uniqueTickets.forEach((ticket) => {
 						Tickets.transitionTicket(`${TICKET_BASE}/${ticket}`, 21)
@@ -98,6 +112,18 @@ function handleNew(payload, config) {
 	})
 }
 
+/**
+ *
+ * Handles a PR being merged.
+ *
+ * If the PR was into staging, either:
+ *	1. Creates a new PR from staging --> master to track all tickets for the release
+ *	2. Updates an existing PR with the new changes being added.
+ *
+ *
+ * If the PR was into master, hanldes alerting about an upcoming release and logs the release to Firebase
+ *
+ */
 function handleMerge(payload, config) {
 	const repo = payload.repository.html_url,
 		base = payload.pull_request.base.ref, // target of the original PR
@@ -192,7 +218,7 @@ function handleMerge(payload, config) {
 
 	}
 
-
+	// If there were no requested changes, congratulate the author!
 	if (config.merged.congrats) {
 		// Get the reviews
 		request(Github.get(`${payload.pull_request.url}/reviews`), (err, res, body) => {

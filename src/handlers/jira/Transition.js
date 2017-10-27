@@ -1,5 +1,6 @@
 import Tickets from '../../helpers/tickets'
 
+// If a ticket is moved to "done" check the associated PR to update the PR status check.
 export function Transition(payload) {
 
 	// GOOD Transition ID = 51

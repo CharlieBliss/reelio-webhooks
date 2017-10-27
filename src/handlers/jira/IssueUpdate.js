@@ -4,6 +4,7 @@ import Branches from '../../helpers/branches'
 import Slack from '../../helpers/slack'
 import { JiraGithubMap } from '../../consts/api'
 
+// When a RA ticket is moved to `in progress` makes a schema branch.
 function IssueUpdate(payload) {
 	const changelog = get(payload, ['changelog', 'items', '0'], {}) // the issue changelog
 	const change = changelog.field // get the issue field that changed.

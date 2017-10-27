@@ -5,6 +5,9 @@ import Tickets from '../../helpers/tickets'
 
 import { schemaCustomField } from '../../consts/api'
 
+/**
+ * When a schema branch is updated, creates a feature- branch (if none exits) and creates a schema --> feature PR
+ */
 function handleSchemaChange(payload, branch) {
 	// Create feature-<ticket> and make PR
 	const ticket = branch.split('schema-')[1],
@@ -29,6 +32,7 @@ function handleSchemaChange(payload, branch) {
 
 			return 'Branch already exists...'
 		}, () => {
+			// Create a PR between the two branches, if one doesn't exist
 			Branches.createBranch(project, nextBranch, stagingSha).then(() => {
 				PullRequests.createPullRequest(project, branch, nextBranch, `schema for [${ticket}](https://reelio.atlassian.net/browse/${ticket})`, ['WIP']).then((PR) => {
 					console.log("DOESN'T EXIST", PR)

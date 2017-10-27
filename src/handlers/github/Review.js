@@ -4,6 +4,9 @@ import Github from '../../helpers/github'
 import Slack from '../../helpers/slack'
 
 
+/**
+ * If a PR gets changes requested, put a label on the PR and slack the author to take a look.
+ */
 function handleRequestedChanges(payload) {
 	const user = FRONTEND_MEMBERS[payload.pull_request.user.id]
 

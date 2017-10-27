@@ -17,6 +17,7 @@ function CheckTickets(payload, event, status) {
 		return 'Devops Branch'
 	}
 
+	// Check to see what status all the tickets in this PR are in.
 	if (status) {
 		Tickets.checkTicketStatus(prUrl, false, status)
 	}

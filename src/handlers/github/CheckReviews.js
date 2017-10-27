@@ -5,6 +5,17 @@ import { parseReviews } from '../../helpers/utils'
 import Github from '../../helpers/github'
 import Tickets from '../../helpers/tickets'
 
+/**
+ * Checks the number of reviewers for a Pull Request.
+ * Count can be defined in the configuration for each repository.
+ *
+ * Checks that:
+ *	There are AT LEAST `count` reviews
+ *	All the most up to date reviews are passing
+ *
+ * Filters out review comments, only cares about "approved" or "changes requested"
+ *
+ */
 function CheckReviews(payload, event, count = 2) {
 	const action = payload.action,
 		author = payload.pull_request.user
@@ -34,13 +45,16 @@ function CheckReviews(payload, event, count = 2) {
 		return 'Webhook PR'
 	}
 
+	// Get all reviews for a PR
 	rp(Github.get(`${prUrl}/reviews`))
 		.then((body) => {
 			let reviews = body ? JSON.parse(body) : [],
 				approved = []
 
-			// group by author keep latest
+			// group by author keep latest review
 			reviews = parseReviews(reviews)
+
+			// grab only the appoved reviews
 			approved = reviews
 				.map(r => r.state)
 				.filter(r => r.toLowerCase() === 'approved')
