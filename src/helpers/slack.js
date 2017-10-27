@@ -45,7 +45,7 @@ class Slack {
 
 	tableFailed(ticket, resp) {
 		sendMessage({
-			channel: 'U28LB0AAH',
+			channel: 'U1QHPGCP2',
 			username: 'PR Bot',
 			icon_url: 'https://octodex.github.com/images/yaktocat.png',
 			text: `Something went wrong when trying to update the table for: <https://reelio.atlassian.net/browse/${ticket}|${ticket}>.\n\n\`\`\`${resp.errorMessages.join('\n')}\`\`\``,
@@ -54,7 +54,7 @@ class Slack {
 
 	noTable(payload) {
 		sendMessage({
-			channel: 'U28LB0AAH',
+			channel: 'U1QHPGCP2',
 			username: 'PR Bot',
 			icon_url: 'https://octodex.github.com/images/yaktocat.png',
 			text: `There was no table for ticket <https://reelio.atlassian.net/browse/${payload.issue.key}|${payload.issue.key}>`,
@@ -63,7 +63,7 @@ class Slack {
 
 	firebaseFailed() {
 		sendMessage({
-			channel: 'U28LB0AAH',
+			channel: 'U1QHPGCP2',
 			username: 'Firebase Bot',
 			icon_url: 'https://octodex.github.com/images/yaktocat.png',
 			text: 'Something went wrong when trying to trim firebase payload size. Check server logs, scrub',
@@ -72,7 +72,7 @@ class Slack {
 
 	prWarning(head, base, url) {
 		sendMessage({
-			channel: 'U28LB0AAH',
+			channel: 'U1QHPGCP2',
 			username: 'PR Bot',
 			icon_url: 'https://octodex.github.com/images/yaktocat.png',
 			text: `Something went wrong when trying to make a pr between ${head} and ${base}.  ${url}`,
