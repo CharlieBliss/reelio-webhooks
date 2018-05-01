@@ -4,7 +4,7 @@ class GithubHelper {
 	get headers() {
 		return {
 			Authorization: `token ${GITHUB_TOKEN}`,
-			'User-Agent': 'Kyle-Mendes',
+			'User-Agent': 'CharlieBliss',
 			Accept: 'application/vnd.github.black-cat-preview+json',
 		}
 	}
