@@ -43,7 +43,7 @@ export function Status() {
 			request.headers['X-Github-Event'] = 'status'
 
 			// this test is making sure that post to slack does NOT get made
-			const pendingMock = `POST https://hooks.slack.com/services/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`
+			const pendingMock = `POST https://hooks.slack.com:443/services/T02B43L0D/B3SJ6HDK3/2nfNwLugRTxII9hCFXJWwEKp`
 			const slack = nocks.slack.genericSlack()
 
 			wrapped.run(request).then((response) => {
