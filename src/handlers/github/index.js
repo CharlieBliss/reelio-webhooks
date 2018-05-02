@@ -29,7 +29,7 @@ export function handle(event, context, callback) {
 	console.log('---------------------------------');
 	console.log(`Github-Event: "${githubEvent}" with action: "${action}"`);
 	console.log('---------------------------------');
-	console.log('config: ', org, repo, handler, config)
+	console.log('config: ', org, repo, handler)
 	/* eslint-enable */
 
 	firebase.log('github', fullRepo, githubEvent, action, payload)
