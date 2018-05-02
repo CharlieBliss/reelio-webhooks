@@ -1,4 +1,4 @@
-export const SLACK_URL = 'https://hooks.slack.com/services/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'
+export const SLACK_URL = 'https://hooks.slack.com/services/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'
 
 export const FRONTEND_MEMBERS = {
 	1688630: {
