@@ -1,4 +1,5 @@
 export const GITHUB_TOKEN = '8ff6e9f8678334fa6e1398e2d1dada40bcaae492'
+export const GITHUB_BOT_ID = '23079536'
 export const JIRA_TOKEN = 'ZGV2b3BzQHJlZWxpb2xhYnMuY29tOkdhYWVDX0RCZWJwNkV0NGEtd3dkNmZKLTZkbktRWjhw'
 export const TICKET_BASE = 'https://reelio.atlassian.net/rest/api/2/issue'
 export const jiraRegex = /((XYZ|FRONT|BACK|RA|FAT|DEVOPS)-\d+)/gi

@@ -1,4 +1,6 @@
 import Tickets from '../../helpers/tickets'
+import { GITHUB_BOT_ID } from '../../consts'
+
 
 function CheckTickets(payload, event, status) {
 	const action = payload.action
@@ -13,7 +15,7 @@ function CheckTickets(payload, event, status) {
 	const prUrl = payload.pull_request.url
 
 	// Skip PRs that don't need reviews.
-	if (payload.pull_request.user.id.toString() === '25992031') {
+	if (payload.pull_request.user.id.toString() === GITHUB_BOT_ID) {
 		return 'Devops Branch'
 	}
 

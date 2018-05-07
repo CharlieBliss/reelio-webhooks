@@ -1,6 +1,6 @@
 import request from 'request'
 import rp from 'request-promise'
-import { jiraRegex } from '../../consts'
+import { jiraRegex, GITHUB_BOT_ID } from '../../consts'
 import { parseReviews } from '../../helpers/utils'
 import Github from '../../helpers/github'
 import Tickets from '../../helpers/tickets'
@@ -32,7 +32,7 @@ function CheckReviews(payload, event, count = 2) {
 
 	// Skip PRs that don't need reviews.
 	if (
-		author.id.toString() === '25992031' // If the PR was opened by the webhook bot, don't require reviews
+		author.id.toString() === GITHUB_BOT_ID // If the PR was opened by the webhook bot, don't require reviews
 	) {
 		rp(Github.post(`${payload.pull_request.head.repo.url}/statuses/${sha}`, {
 			state: 'success',

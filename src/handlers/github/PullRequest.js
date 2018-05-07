@@ -1,7 +1,7 @@
 import request from 'request'
 import rp from 'request-promise'
 
-import { jiraRegex, jiraRegexWithDescription, deployRegex, FRONTEND_MEMBERS, TICKET_BASE } from '../../consts'
+import { jiraRegex, jiraRegexWithDescription, deployRegex, FRONTEND_MEMBERS, TICKET_BASE, GITHUB_BOT_ID } from '../../consts'
 import { uniqueTicketFilter, wrapJiraTicketsFromArray, checkMergeStatus } from '../../helpers/utils'
 
 import Github from '../../helpers/github'
@@ -33,7 +33,7 @@ function handleNew(payload, config) {
 			const responses = []
 			const uniqueTickets = tickets.filter(uniqueTicketFilter)
 
-			if (author.id.toString() === '25992031') {
+			if (author.id.toString() === GITHUB_BOT_ID) {
 				return 'Devops PR -- Don\'t need to handle'
 			}
 
@@ -230,7 +230,7 @@ function handleMerge(payload, config) {
 			if (
 				!reviews.includes('CHANGES_REQUESTED') &&
 				user.slack_id !== 'U28LB0AAH' &&
-				payload.pull_request.user.id.toString() !== '25992031'
+				payload.pull_request.user.id.toString() !== GITHUB_BOT_ID
 			) {
 				Slack.slackCongrats(payload, user)
 				Firebase.log('github', payload.repository.full_name, 'pull_request', 'party_parrot', payload)

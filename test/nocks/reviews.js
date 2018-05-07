@@ -1,5 +1,5 @@
 import nock from 'nock'
-
+import { GITHUB_BOT_ID } from '../../src/consts'
 
 export const singleApproved = () => (
 	nock('https://api.github.com')
@@ -17,7 +17,7 @@ export const doubleApproved = () => (
 		.reply(200,
 			[
 				{ state: 'approved', user: { id: 7416637 }, submitted_at: 1489426108742 },
-				{ state: 'approved', user: { id: 25992031 }, submitted_at: 1489426108738 },
+				{ state: 'approved', user: { id: GITHUB_BOT_ID }, submitted_at: 1489426108738 },
 			],
 		)
 )
@@ -28,7 +28,7 @@ export const tripleApproved = () => (
 		.reply(200,
 			[
 				{ state: 'approved', user: { id: 7416637 }, submitted_at: 1489426108742 },
-				{ state: 'approved', user: { id: 25992031 }, submitted_at: 1489426108738 },
+				{ state: 'approved', user: { id: GITHUB_BOT_ID }, submitted_at: 1489426108738 },
 				{ state: 'approved', user: { id: 6400039 }, submitted_at: 1489426108755 },
 			],
 		)
@@ -50,7 +50,7 @@ export const outstandingChanges = () => (
 			[
 				{ state: 'CHANGES_REQUESTED', user: { id: 15472986 }, submitted_at: 1489426108756 },
 				{ state: 'approved', user: { id: 7416637 }, submitted_at: 1489426108742 },
-				{ state: 'approved', user: { id: 25992031 }, submitted_at: 1489426108738 },
+				{ state: 'approved', user: { id: GITHUB_BOT_ID }, submitted_at: 1489426108738 },
 			],
 		)
 )
