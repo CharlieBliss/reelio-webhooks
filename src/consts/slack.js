@@ -1,4 +1,5 @@
 export const SLACK_URL = 'https://hooks.slack.com/services/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'
+import { GITHUB_BOT_ID } from './'
 
 export const FRONTEND_MEMBERS = {
 	1688630: {
@@ -62,7 +63,7 @@ export const FRONTEND_MEMBERS = {
 	25992031: {
 		name: 'reelio-devops',
 		slack_id: 'USLACKBOT',
-		github_id: '25992031',
+		github_id: GITHUB_BOT_ID,
 	},
 	243799: {
 		name: 'dave.p',

@@ -1,3 +1,5 @@
+import { GITHUB_BOT_ID } from '../../../src/consts'
+
 export const pullRequestOpenedStaging = {
   "action": "opened",
   "pull_request": {
@@ -92,7 +94,7 @@ export const pullRequestOpenedMaster = {
     "title": "Update the README with new information",
     "user": {
       "login": "Kyle-Mendes",
-      "id": 25992031,
+      "id": GITHUB_BOT_ID,
       "url": "https://api.github.com/users/Kyle-Mendes",
       "html_url": "https://github.com/Kyle-Mendes",
     },
@@ -103,7 +105,7 @@ export const pullRequestOpenedMaster = {
       "sha": "0d1a26e67d8f5eaf1f6ba5c57fc3c7d91ac0fd1c",
       "user": {
         "login": "Kyle-Mendes",
-        "id": 25992031,
+        "id": GITHUB_BOT_ID,
         "url": "https://api.github.com/users/Kyle-Mendes",
         "html_url": "https://github.com/Kyle-Mendes",
       },
@@ -113,7 +115,7 @@ export const pullRequestOpenedMaster = {
         "full_name": "test/test",
         "owner": {
           "login": "Kyle-Mendes",
-          "id": 25992031,
+          "id": GITHUB_BOT_ID,
           "url": "https://api.github.com/users/Kyle-Mendes",
           "html_url": "https://github.com/Kyle-Mendes",
         },
@@ -127,7 +129,7 @@ export const pullRequestOpenedMaster = {
       "sha": "9049f1265b7d61be4a8904a9a27120d2064dab3b",
       "user": {
         "login": "Kyle-Mendes",
-        "id": 25992031,
+        "id": GITHUB_BOT_ID,
         "url": "https://api.github.com/users/Kyle-Mendes",
         "html_url": "https://github.com/Kyle-Mendes",
       },
@@ -137,7 +139,7 @@ export const pullRequestOpenedMaster = {
         "full_name": "test/test",
         "owner": {
           "login": "Kyle-Mendes",
-          "id": 25992031,
+          "id": GITHUB_BOT_ID,
           "url": "https://api.github.com/users/Kyle-Mendes",
           "html_url": "https://github.com/Kyle-Mendes",
         },
@@ -171,7 +173,7 @@ export const pullRequestOpenedMasterDevops = {
     "title": "Update the README with new information",
     "user": {
       "login": "reelio-devops",
-      "id": 25992031,
+      "id": GITHUB_BOT_ID,
       "url": "https://api.github.com/users/Kyle-Mendes",
       "html_url": "https://github.com/Kyle-Mendes",
     },
@@ -182,7 +184,7 @@ export const pullRequestOpenedMasterDevops = {
       "sha": "0d1a26e67d8f5eaf1f6ba5c57fc3c7d91ac0fd1c",
       "user": {
         "login": "reelio-devops",
-        "id": 25992031,
+        "id": GITHUB_BOT_ID,
         "url": "https://api.github.com/users/Kyle-Mendes",
         "html_url": "https://github.com/Kyle-Mendes",
       },
@@ -192,7 +194,7 @@ export const pullRequestOpenedMasterDevops = {
         "full_name": "test/test",
         "owner": {
           "login": "reelio-devops",
-          "id": 25992031,
+          "id": GITHUB_BOT_ID,
           "url": "https://api.github.com/users/Kyle-Mendes",
           "html_url": "https://github.com/Kyle-Mendes",
         },
@@ -206,7 +208,7 @@ export const pullRequestOpenedMasterDevops = {
       "sha": "9049f1265b7d61be4a8904a9a27120d2064dab3b",
       "user": {
         "login": "reelio-devops",
-        "id": 25992031,
+        "id": GITHUB_BOT_ID,
         "url": "https://api.github.com/users/Kyle-Mendes",
         "html_url": "https://github.com/Kyle-Mendes",
       },
@@ -216,7 +218,7 @@ export const pullRequestOpenedMasterDevops = {
         "full_name": "test/test",
         "owner": {
           "login": "reelio-devops",
-          "id": 25992031,
+          "id": GITHUB_BOT_ID,
           "url": "https://api.github.com/users/Kyle-Mendes",
           "html_url": "https://github.com/Kyle-Mendes",
         },
