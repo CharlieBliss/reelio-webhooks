@@ -1,4 +1,5 @@
 import request from 'request'
+import request from 'request'
 import rp from 'request-promise'
 
 import { jiraRegex, jiraRegexWithDescription, deployRegex, FRONTEND_MEMBERS, TICKET_BASE, GITHUB_BOT_ID } from '../../consts'
